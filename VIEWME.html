@@ -1,0 +1,2828 @@
+<!DOCTYPE html>
+<html lang="en" style="scroll-behavior: smooth;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planning from Observation and Interaction</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            color: #333;
+            background: #ffffff;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            width: 72px;
+            height: 36px;
+            padding: 0 8px;
+            border-radius: 18px;
+            border: none;
+            background: transparent;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            box-shadow: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            line-height: 0;
+            vertical-align: middle;
+        }
+
+        .theme-toggle:hover {
+            transform: translateY(-1px);
+        }
+        .theme-toggle svg {
+            width: 17px;
+            height: 17px;
+            transition: color 0.2s ease, opacity 0.2s ease;
+            display: block;
+            flex-shrink: 0;
+            vertical-align: middle;
+            margin: 0;
+            padding: 0;
+        }
+        .theme-toggle .sun-icon {
+            opacity: 0.75;
+        }
+        .theme-toggle .moon-icon {
+            opacity: 1;
+        }
+        .theme-toggle .theme-slash {
+            margin: 0 6px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-size: 0.95rem;
+            font-weight: 600;
+            line-height: 0;
+            display: inline-flex;
+            align-items: center;
+            flex-shrink: 0;
+            vertical-align: middle;
+            padding: 0;
+        }
+        .theme-toggle.hidden-on-hero {
+            opacity: 0;
+            transform: translateY(-8px);
+            pointer-events: none;
+        }
+        body:not(.dark-mode) .theme-toggle .sun-icon {
+            opacity: 1;
+        }
+        body:not(.dark-mode) .theme-toggle .moon-icon {
+            opacity: 0.75;
+        }
+        body.dark-mode {
+            background: #0d0d1a;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .theme-toggle {
+            border: none;
+            background: transparent;
+            box-shadow: none;
+        }
+        body.dark-mode .theme-toggle .moon-icon {
+            opacity: 1;
+        }
+        body.dark-mode .theme-toggle .sun-icon {
+            opacity: 0.75;
+        }
+        body.dark-mode .theme-toggle .moon-icon path {
+            fill: url(#moonGrad);
+        }
+        body.dark-mode .theme-toggle .sun-icon .sun-circle {
+            fill: none;
+        }
+
+        body.dark-mode .container {
+            background: #0d0d1a;
+        }
+
+        body.dark-mode .project-info,
+        body.dark-mode .tasks-section {
+            background: #0d0d1a;
+        }
+
+        body.dark-mode .section-header {
+            color: #e0e0e0;
+        }
+        body.dark-mode .summary-main-image::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.15);
+            mix-blend-mode: darken;
+            pointer-events: none;
+        }
+
+        body.dark-mode .project-description {
+            color: #b0b0b0;
+        }
+
+        body.dark-mode .subsection-header {
+            color: #c0c0c0;
+        }
+
+        body.dark-mode .task-btn {
+            background: transparent;
+            border-color: rgba(102, 126, 234, 0.5);
+            color: #a0a0a0;
+        }
+
+        body.dark-mode .task-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        body.dark-mode .task-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        body.dark-mode .iteration-info-item label {
+            color: #888;
+        }
+
+        body.dark-mode .video-label,
+        body.dark-mode .image-label {
+            color: #b0b0b0;
+        }
+
+        body.dark-mode .video-label.highlighted,
+        body.dark-mode .image-label.highlighted {
+            color: #8a9ff0;
+            font-weight: 600;
+        }
+
+        body.dark-mode .demonstrations-caption,
+        body.dark-mode .gen-video-label {
+            color: #a0a0a0;
+        }
+
+        body.dark-mode .full-video-link {
+            color: #888;
+        }
+
+        body.dark-mode .full-video-link:hover {
+            color: #667eea;
+        }
+
+        body.dark-mode .timeline-nav {
+            background: transparent;
+        }
+
+        body.dark-mode .timeline-line {
+            background: rgba(102, 126, 234, 0.15);
+        }
+
+        body.dark-mode .timeline-dot {
+            background: #1a1a30;
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+
+        body.dark-mode .timeline-item:hover .timeline-dot {
+            border-color: #667eea;
+        }
+
+        body.dark-mode .timeline-label {
+            color: #777;
+        }
+
+        body.dark-mode .timeline-item.active .timeline-label {
+            color: #667eea;
+        }
+
+        body.dark-mode .video-display {
+            background: #1a1a30;
+        }
+
+
+        body.dark-mode .icon-block,
+        body.dark-mode .icon-block-dest {
+            border-color: #888;
+        }
+
+        body.dark-mode .task-btn-wrapper.active .icon-block {
+            border-color: transparent;
+        }
+
+        body.dark-mode .icon-arrow {
+            color: #888;
+        }
+
+        body.dark-mode .iteration-slider {
+            background: linear-gradient(90deg, #2a2a40 0%, #2a2a40 100%);
+        }
+
+        body.dark-mode .iteration-slider::-webkit-slider-thumb {
+            border-color: #1a1a30;
+        }
+
+        body.dark-mode .iteration-slider::-moz-range-thumb {
+            border-color: #1a1a30;
+        }
+
+        body.dark-mode .slider-dot {
+            background: #2a2a4a;
+        }
+
+        body.dark-mode .slider-dot.active {
+            background: #667eea;
+        }
+
+        
+        .video-section {
+            width: 100%;
+            height: 100vh;
+            background: #000;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .video-container {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .video-container video {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            object-fit: cover;
+            display: block;
+        }
+
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .video-overlay h1 {
+            font-size: clamp(2em, 5vw, 4.2em);
+            font-weight: 700;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            padding: 0 40px;
+            user-select: none;
+            line-height: 1.2;
+            margin-bottom: 15px;
+        }
+
+        .video-overlay .subtitle {
+            font-size: clamp(1em, 2vw, 1.5em);
+            font-weight: 400;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            opacity: 0.9;
+        }
+
+        .hero-links {
+            display: flex;
+            gap: 14px;
+            margin-top: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .hero-link-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 24px;
+            border-radius: 50px;
+            border: 1.5px solid rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            color: white;
+            font-size: 1.05rem;
+            font-weight: 500;
+            text-decoration: none;
+            letter-spacing: 0.3px;
+            transition: all 0.25s ease;
+            cursor: pointer;
+        }
+        .hero-link-btn svg {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+        .hero-link-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.9);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            color: white;
+        }
+
+        @media (max-width: 1200px) {
+            .video-overlay h1 {
+                font-size: clamp(1.5em, 4vw, 3.5em);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .video-overlay h1 {
+                font-size: clamp(1.2em, 3.5vw, 2.5em);
+                padding: 0 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .video-overlay h1 {
+                font-size: clamp(1em, 3vw, 2em);
+                padding: 0 15px;
+            }
+        }
+
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 80px 40px;
+        }
+
+        
+        .summary-main-image {
+            position: relative;
+            margin-bottom: 28px;
+            border-radius: 12px;
+            overflow: hidden;
+            max-width: 100%;
+        }
+        .summary-main-image img {
+            display: block;
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            height: auto;
+        }
+        .project-info {
+            text-align: center;
+            margin-bottom: 100px;
+        }
+
+        .project-description {
+            font-size: 1.2em;
+            color: #555;
+            line-height: 1.9;
+            margin-bottom: 40px;
+            text-align: justify;
+        }
+
+        
+        .section-header {
+            font-size: clamp(2em, 4vw, 3em);
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        
+        .section-header.sticky {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            padding: 20px 0;
+            margin: 0 -40px 30px -40px;
+            padding-left: 40px;
+            padding-right: 40px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .section-header.sticky::after {
+            content: '';
+            position: absolute;
+            bottom: -30px;
+            left: 0;
+            right: 0;
+            height: 30px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0));
+            pointer-events: none;
+        }
+
+        .subsection-header {
+            font-size: 1.5em;
+            color: #666;
+            margin: 80px 0 0px 0;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        
+        .scroll-section {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+                        transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                        filter 0.8s ease;
+            filter: blur(0);
+        }
+
+        .scroll-section.fade-out {
+            opacity: 0;
+            transform: translateY(-50px) scale(0.95);
+            filter: blur(5px);
+            pointer-events: none;
+        }
+
+        .scroll-section.hidden-below {
+            opacity: 0;
+            transform: translateY(60px) scale(0.95);
+            filter: blur(5px);
+        }
+
+        .scroll-section.fade-in {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            filter: blur(0);
+        }
+
+        
+        .scroll-section.instant-show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            filter: blur(0);
+            transition: opacity 0.2s ease, transform 0.2s ease, filter 0.2s ease;
+        }
+
+        
+        .content-block {
+            margin-top: 60px;
+            padding-top: 20px;
+        }
+
+        .content-block:first-of-type {
+            margin-top: 10px;
+            padding-top: 0;
+        }
+
+        .content-block.fade-out {
+            opacity: 0.15;
+            transform: translateY(-30px) scale(0.98);
+            filter: blur(3px);
+            pointer-events: none;
+        }
+
+        .content-block.fade-in {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            filter: blur(0);
+        }
+
+        .content-block.hidden-below {
+            opacity: 0;
+            transform: translateY(60px) scale(0.95);
+            filter: blur(5px);
+        }
+
+        .section-text {
+            font-size: 1.2em;
+            color: #555;
+            line-height: 1.9;
+            margin-bottom: 40px;
+            text-align: justify;
+        }
+
+        
+        .tasks-section {
+            margin-bottom: 150px;
+            padding-top: 50px;
+        }
+
+        .video-controls {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .control-group label {
+            font-size: 1.1em;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .control-group select {
+            padding: 10px 20px;
+            font-size: 1em;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            background: white;
+            color: #2c3e50;
+            cursor: pointer;
+            min-width: 200px;
+            transition: border-color 0.3s;
+        }
+
+        .control-group select:hover {
+            border-color: #667eea;
+        }
+
+        .control-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .time-display {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .time-display label {
+            font-size: 1.1em;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .time-display .time-value {
+            padding: 10px 15px;
+            font-size: 1em;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #667eea;
+            font-weight: 500;
+            background: #f0f0f5;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            min-width: 150px;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .control-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 15px 0;
+        }
+
+        .control-header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .control-header label {
+            font-size: 1.1em;
+            color: #888;
+            font-weight: 500;
+        }
+
+        
+        .task-buttons-fixed {
+            position: fixed;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%) translateZ(0);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+            will-change: opacity;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+        }
+
+        .task-buttons-fixed.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        
+        .timeline-nav {
+            position: fixed;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%) translateZ(0);
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+            will-change: opacity;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+        }
+
+        .timeline-nav.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .timeline-line {
+            position: absolute;
+            right: 8px;
+            top: 18px;
+            bottom: 18px;
+            width: 3px;
+            background: rgba(102, 126, 234, 0.2);
+            border-radius: 2px;
+        }
+
+        .timeline-item {
+            display: flex;
+            flex-direction: row-reverse;
+            align-items: center;
+            gap: 15px;
+            padding: 16px 0;
+            text-decoration: none;
+            position: relative;
+        }
+
+        .timeline-dot {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 3px solid rgba(102, 126, 234, 0.4);
+            background: white;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            z-index: 1;
+        }
+
+        .timeline-label {
+            font-size: 1em;
+            color: #999;
+            font-weight: 500;
+            white-space: nowrap;
+            transition: color 0.3s ease;
+            text-align: right;
+        }
+
+        .timeline-item:hover .timeline-dot {
+            border-color: #667eea;
+            transform: scale(1.1);
+        }
+
+        .timeline-item:hover .timeline-label {
+            color: #667eea;
+        }
+
+        .timeline-item.active .timeline-dot {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: transparent;
+            box-shadow: 0 3px 12px rgba(102, 126, 234, 0.5);
+        }
+
+        .timeline-item.active .timeline-label {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        
+        @media (max-width: 1400px) {
+            .timeline-nav {
+                right: 10px;
+            }
+            .timeline-label {
+                font-size: 0.8em;
+            }
+        }
+
+        
+        .video-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .video-modal.active {
+            display: flex;
+        }
+
+        .modal-backdrop {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .modal-content {
+            position: relative;
+            width: 90%;
+            max-width: 1200px;
+            z-index: 1001;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 2em;
+            cursor: pointer;
+            padding: 5px 15px;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-close:hover {
+            opacity: 0.7;
+        }
+
+        .modal-video {
+            width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .full-video-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+            padding: 5px 24px;
+            background: transparent;
+            border: 2px solid #c5ccd6;
+            border-radius: 20px;
+            color: #888;
+            font-size: 1em;
+            font-weight: 500;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .full-video-link:hover {
+            color: #667eea;
+            border-color: #667eea;
+        }
+
+        .full-video-link svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        .task-btn-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 25px;
+        }
+
+        .task-btn-wrapper:last-child {
+            margin-bottom: 0;
+        }
+
+        .task-icon {
+            width: 50px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        
+        .icon-block {
+            width: 18px;
+            height: 18px;
+            background: transparent;
+            border: 2px solid #667eea;
+            border-radius: 3px;
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+
+        .icon-arrow, .icon-hand {
+            color: #aab;
+            transition: color 0.3s ease;
+        }
+
+        
+        .push-icon {
+            width: 80px;
+            height: 45px;
+            position: relative;
+        }
+
+        .push-icon .icon-block {
+            position: absolute;
+            left: 5px;
+            bottom: 3px;
+        }
+
+        .push-icon .icon-block-dest {
+            width: 18px;
+            height: 18px;
+            position: absolute;
+            left: 55px;
+            bottom: 3px;
+            border: 2px dashed #667eea;
+            border-radius: 3px;
+            opacity: 0.5;
+        }
+
+        .push-icon .icon-arrow {
+            font-size: 16px;
+            position: absolute;
+            left: 33px;
+            bottom: 0px;
+        }
+
+        
+        .pick-icon {
+            gap: 4px;
+            position: relative;
+            width: 80px;
+            height: 45px;
+        }
+
+        .pick-icon .icon-block {
+            position: absolute;
+            left: 5px;
+            bottom: 3px;
+        }
+
+        .pick-icon .icon-block-dest {
+            width: 18px;
+            height: 18px;
+            position: absolute;
+            left: 55px;
+            bottom: 3px;
+            border: 2px dashed #667eea;
+            border-radius: 3px;
+            opacity: 0.5;
+        }
+
+        .pick-arrow {
+            font-size: 14px;
+            color: #aab;
+            position: absolute;
+            opacity: 0.4;
+            transition: color 0.3s ease, opacity 0.3s ease;
+        }
+
+        .arrow-up {
+            left: 8px;
+            top: 0;
+        }
+
+        .arrow-right {
+            left: 33px;
+            top: 0;
+        }
+
+        .arrow-down {
+            left: 58px;
+            top: 0;
+        }
+
+        
+        .task-btn-wrapper.active .icon-block {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: transparent;
+        }
+
+        .task-btn-wrapper.active .icon-block-dest {
+            border-style: solid;
+            opacity: 0.6;
+        }
+
+        .task-btn-wrapper.active .icon-arrow {
+            color: #667eea;
+        }
+
+        .task-btn-wrapper.active .pick-arrow {
+            color: #667eea;
+            opacity: 0.7;
+        }
+
+        
+        .task-btn-wrapper:hover .icon-arrow {
+            opacity: 0;
+        }
+
+        .task-btn-wrapper:hover .pick-arrow {
+            opacity: 0;
+        }
+
+        .task-btn-wrapper:hover .icon-block-dest {
+            opacity: 0;
+        }
+
+        .task-btn-wrapper:hover .push-icon .icon-block {
+            animation: pushMove 1.2s ease-in-out infinite;
+        }
+
+        .task-btn-wrapper:hover .pick-icon .icon-block {
+            animation: pickMove 2.4s ease-in-out infinite;
+        }
+
+        @keyframes pushMove {
+            0% { transform: translateX(0); opacity: 1; }
+            45% { transform: translateX(50px); opacity: 1; }
+            50% { transform: translateX(50px); opacity: 0; }
+            55% { transform: translateX(0); opacity: 0; }
+            60%, 100% { transform: translateX(0); opacity: 1; }
+        }
+
+        
+        @keyframes pickMove {
+            0% { transform: translate(0, 0); opacity: 1; }
+            20% { transform: translate(0, -25px); opacity: 1; }
+            50% { transform: translate(50px, -25px); opacity: 1; }
+            70% { transform: translate(50px, 0); opacity: 1; }
+            75% { transform: translate(50px, 0); opacity: 0; }
+            80% { transform: translate(0, 0); opacity: 0; }
+            85%, 100% { transform: translate(0, 0); opacity: 1; }
+        }
+
+        .task-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .task-btn {
+            padding: 12px 20px;
+            font-size: 0.95em;
+            font-weight: 600;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            border: 2px solid #c5ccd6;
+            border-radius: 25px;
+            background: white;
+            color: #8892a0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            white-space: nowrap;
+            min-width: 130px;
+            text-align: center;
+        }
+
+        .task-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .task-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: transparent;
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        
+        .method-buttons-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px auto;
+            flex-wrap: wrap;
+        }
+
+        
+        @media (max-width: 1200px) {
+            .task-buttons-fixed {
+                left: 5px;
+                gap: 10px;
+            }
+            .task-btn {
+                font-size: 0.8em;
+                padding: 8px 14px;
+                min-width: 100px;
+            }
+        }
+
+        
+        .time-value-display {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #999;
+            padding: 5px 15px;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        
+        
+        .iteration-control-area {
+            width: 100%;
+            max-width: 800px;
+            margin: 15px auto;
+            padding: 15px 30px;
+        }
+
+        .iteration-info-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 80px;
+            margin-bottom: 20px;
+        }
+
+        .iteration-info-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .iteration-info-item label {
+            font-size: 1em;
+            color: #888;
+            font-weight: 500;
+        }
+
+        .iteration-info-item .value {
+            font-size: 1.8em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .iteration-value-display {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #999;
+            padding: 5px 15px;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .slider-track-container {
+            position: relative;
+            padding: 15px 0 10px 0;
+        }
+
+        .iteration-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: calc(100% - 8px);
+            margin: 0 4px;
+            height: 8px;
+            background: linear-gradient(90deg, #e0e5ec 0%, #e0e5ec 100%);
+            border-radius: 4px;
+            outline: none;
+            cursor: pointer;
+            position: relative;
+            z-index: 2;
+        }
+
+        .iteration-slider::-webkit-slider-runnable-track {
+            -webkit-appearance: none;
+            height: 8px;
+            border-radius: 4px;
+        }
+
+        .iteration-slider::-webkit-slider-thumb {
+            -webkit-appearance: none !important;
+            appearance: none !important;
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            border-radius: 50% !important;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: none !important;
+            outline: none !important;
+            box-sizing: border-box;
+            margin-top: -10px;
+            position: relative;
+        }
+
+        .iteration-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .iteration-slider:focus {
+            outline: none;
+        }
+
+        .iteration-slider::-moz-range-thumb {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            border-radius: 50% !important;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: none !important;
+            outline: none !important;
+            box-sizing: border-box;
+            -moz-appearance: none !important;
+            background-clip: padding-box;
+        }
+
+        .iteration-slider::-moz-range-thumb:hover {
+            transform: scale(1.15);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .iteration-slider::-moz-range-thumb:-moz-focusring,
+        .iteration-slider::-webkit-slider-thumb:focus {
+            outline: none;
+        }
+
+        /* Remove any default inner track rendering that might show square */
+        .iteration-slider::-webkit-slider-runnable-track {
+            background: linear-gradient(90deg, #e0e5ec 0%, #e0e5ec 100%);
+        }
+        
+        .iteration-slider::-moz-range-track {
+            height: 8px;
+            border-radius: 4px;
+            background: linear-gradient(90deg, #e0e5ec 0%, #e0e5ec 100%);
+        }
+        
+        /* Completely override thumb to remove any inner square */
+        .iteration-slider::-webkit-slider-thumb {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            -webkit-mask: none !important;
+            mask: none !important;
+        }
+        
+        .iteration-slider::-moz-range-thumb {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        }
+
+        .slider-dots {
+            display: flex;
+            justify-content: space-between;
+            position: absolute;
+            width: calc(100% - 28px);
+            top: 19px;
+            left: 14px;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .slider-dot {
+            width: 12px;
+            height: 12px;
+            background: #c5ccd6;
+            border-radius: 50%;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .slider-dot.active {
+            background: #667eea;
+            transform: scale(1.2);
+        }
+
+        .task-note {
+            text-align: center;
+            font-size: 0.95em;
+            color: #777;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        .video-display {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            position: relative;
+            aspect-ratio: 16 / 9;
+        }
+
+        .video-display video {
+            position: absolute;
+            top: -10%;
+            left: 0;
+            width: 100%;
+            height: 110%;
+            transform: none;
+            object-fit: cover;
+            display: block;
+            transition: opacity 0.15s ease;
+        }
+        
+        .video-display video.loading {
+            opacity: 0;
+        }
+
+        
+        .sample-method-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            width: 100%;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .sample-method-btn {
+            padding: 8px 18px;
+            width: 150px;
+            flex: 0 0 150px;
+            height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9em;
+            font-weight: 500;
+            font-family: inherit;
+            border: 2px solid #c5ccd6;
+            border-radius: 20px;
+            background: transparent;
+            color: #8a8f98;
+            cursor: pointer;
+            box-sizing: border-box;
+            text-align: center;
+            white-space: nowrap;
+            transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+        }
+        .sample-method-btn:hover {
+            border: 2px solid transparent;
+            color: #667eea;
+            background:
+                linear-gradient(#ffffff, #ffffff) padding-box,
+                linear-gradient(135deg, #667eea 0%, #764ba2 100%) border-box;
+        }
+        .sample-method-btn.active {
+            border: 2px solid transparent;
+            color: #667eea;
+            font-weight: 700;
+            background:
+                linear-gradient(#ffffff, #ffffff) padding-box,
+                linear-gradient(135deg, #667eea 0%, #764ba2 100%) border-box;
+        }
+        .transfer-demo-toggle {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 6px 0 16px 0;
+        }
+        /* Transfer buttons reuse .sample-method-btn styles for identical behavior */
+        .transfer-demo-btn {
+            font-family: inherit;
+        }
+        .transfer-demo-panel {
+            min-height: 0;
+        }
+        .transfer-demo-panel.hidden {
+            display: none;
+        }
+        .transfer-demo-subtitle {
+            margin-top: 20px;
+            margin-bottom: 5px;
+            font-style: normal;
+            font-weight: 600;
+            color: #999;
+        }
+        body.dark-mode .sample-method-btn {
+            border-color: #4a4a6a;
+            color: #a0a0a0;
+        }
+        body.dark-mode .sample-method-btn:hover {
+            border: 2px solid transparent;
+            color: #8a9ff0;
+            background:
+                linear-gradient(#0d0d1a, #0d0d1a) padding-box,
+                linear-gradient(135deg, #667eea 0%, #764ba2 100%) border-box;
+        }
+        body.dark-mode .sample-method-btn.active {
+            border: 2px solid transparent;
+            color: #8a9ff0;
+            font-weight: 700;
+            background:
+                linear-gradient(#0d0d1a, #0d0d1a) padding-box,
+                linear-gradient(135deg, #667eea 0%, #764ba2 100%) border-box;
+        }
+        body.dark-mode .transfer-demo-btn {
+            font-family: inherit;
+        }
+        .transfer-videos-container {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            align-items: flex-start;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .transfer-video-wrapper {
+            flex: 1;
+            max-width: 580px;
+            text-align: center;
+        }
+
+        /* Keep left/right button baselines aligned in Sample Efficiency */
+        #time-lapses-block .transfer-videos-container {
+            align-items: stretch;
+        }
+        #time-lapses-block .transfer-video-wrapper {
+            display: flex;
+            flex-direction: column;
+        }
+        #time-lapses-block .video-label {
+            margin-top: 6px;
+            margin-bottom: 14px;
+        }
+        #time-lapses-block .full-video-link {
+            margin-top: auto;
+            align-self: center;
+        }
+        #transfer-time-lapses-block .transfer-videos-container {
+            align-items: stretch;
+        }
+        #transfer-time-lapses-block .transfer-video-wrapper {
+            display: flex;
+            flex-direction: column;
+        }
+        #transfer-time-lapses-block .video-label {
+            margin-top: 6px;
+            margin-bottom: 14px;
+        }
+        #transfer-time-lapses-block .full-video-link {
+            margin-top: auto;
+            align-self: center;
+        }
+
+        .transfer-video-wrapper .video-display {
+            aspect-ratio: 16 / 9;
+            width: 100%;
+        }
+
+        .transfer-video-wrapper .video-display video {
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            transform: none;
+        }
+
+        .task-pick-place .transfer-video-wrapper .video-display video {
+            width: 110%;
+            height: 110%;
+            top: -10%;
+            left: -5%;
+        }
+
+        .task-pick-place .demo-video-wrapper .video-display video {
+            height: 110%;
+            top: -10%;
+        }
+
+        .video-label {
+            margin-top: 12px;
+            font-size: 0.95rem;
+            color: #888;
+            font-weight: 500;
+        }
+
+        .video-label.highlighted {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 1.05rem;
+        }
+        .sample-mpail2-title {
+            font-size: 1.58rem;
+            font-weight: 800;
+            letter-spacing: 0.2px;
+        }
+
+        
+
+        
+        .generalization-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .generalization-video-wrapper {
+            width: 100%;
+        }
+
+        .generalization-video-wrapper .video-display {
+            aspect-ratio: 16 / 9;
+            width: 100%;
+        }
+
+        .generalization-video-wrapper .video-display video {
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            transform: none;
+        }
+
+        .gen-video-label {
+            text-align: center;
+            margin-top: 12px;
+            font-size: 0.95em;
+            color: #888;
+            font-weight: 500;
+        }
+
+        
+        .demonstrations-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0;
+            width: 100%;
+            max-width: 1000px;
+            margin: 20px auto 0 auto;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .demo-video-wrapper {
+            width: 100%;
+        }
+
+        .demo-video-wrapper .video-display {
+            aspect-ratio: 1 / 1;
+            width: 100%;
+            border-radius: 0;
+            overflow: hidden;
+            box-shadow: none;
+        }
+
+        .demo-video-wrapper .video-display video {
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            transform: none;
+            object-fit: cover;
+            box-shadow: none;
+        }
+
+        .demonstrations-caption {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.95em;
+            color: #888;
+            font-style: italic;
+        }
+        .demonstrations-caption.transfer-demo-subtitle {
+            font-style: normal;
+            font-weight: 600;
+            color: #999;
+        }
+
+        
+        a {
+            color: #667eea;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        a:hover {
+            color: #667eea;
+        }
+
+    </style>
+    <script>
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            var video = document.querySelector('video');
+            if (video) {
+                
+                video.addEventListener('loadedmetadata', function() {
+                });
+
+                video.addEventListener('timeupdate', function() {
+                    
+                    if (this.duration && !isNaN(this.duration)) {
+                        var remaining = this.duration - this.currentTime;
+                        if (remaining <= 8 && remaining > 0) {
+                            this.currentTime = 0;
+                        }
+                    }
+                });
+
+                
+                video.addEventListener('ended', function() {
+                    this.currentTime = 0;
+                    this.play();
+                });
+            }
+        });
+    </script>
+</head>
+<body>
+    
+    <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode" aria-label="Toggle dark and light mode">
+        <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke-width="2">
+            <defs>
+                <linearGradient id="moonGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#667eea"/>
+                    <stop offset="100%" stop-color="#764ba2"/>
+                </linearGradient>
+            </defs>
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="url(#moonGrad)"/>
+        </svg>
+        <span class="theme-slash">/</span>
+        <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke-width="2">
+            <defs>
+                <linearGradient id="sunGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#667eea"/>
+                    <stop offset="100%" stop-color="#764ba2"/>
+                </linearGradient>
+            </defs>
+            <circle class="sun-circle" cx="12" cy="12" r="5" stroke="url(#sunGrad)" fill="url(#sunGrad)"/>
+            <line x1="12" y1="1" x2="12" y2="3" stroke="url(#sunGrad)"/>
+            <line x1="12" y1="21" x2="12" y2="23" stroke="url(#sunGrad)"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="url(#sunGrad)"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="url(#sunGrad)"/>
+            <line x1="1" y1="12" x2="3" y2="12" stroke="url(#sunGrad)"/>
+            <line x1="21" y1="12" x2="23" y2="12" stroke="url(#sunGrad)"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="url(#sunGrad)"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="url(#sunGrad)"/>
+        </svg>
+    </button>
+
+    
+    <section class="video-section">
+        <div class="video-container">
+            <video autoplay muted loop playsinline>
+                <source src="Media/Video/Background/background.mp4" type="video/mp4">
+                Your browser does not support video playback.
+            </video>
+        </div>
+        <div class="video-overlay">
+            <h1>Planning from Observation and Interaction</h1>
+            <div class="hero-links">
+                <a href="Media/paper.pdf" target="_blank" class="hero-link-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                    Paper
+                </a>
+                <a href="https://github.com/WheeledLab" target="_blank" class="hero-link-btn">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+                    GitHub
+                </a>
+            </div>
+        </div>
+    </section>
+
+    
+    <nav class="timeline-nav" id="timeline-nav">
+        <div class="timeline-line"></div>
+        <a href="#summary-section" class="timeline-item active" data-section="summary">
+            <span class="timeline-dot"></span>
+            <span class="timeline-label">Summary</span>
+        </a>
+        <a href="#efficiency-section" class="timeline-item" data-section="efficiency">
+            <span class="timeline-dot"></span>
+            <span class="timeline-label">Sample Efficiency</span>
+        </a>
+        <a href="#transfer-section" class="timeline-item" data-section="transfer">
+            <span class="timeline-dot"></span>
+            <span class="timeline-label">Transfer Learning</span>
+        </a>
+        <a href="#generalization-section" class="timeline-item" data-section="generalization">
+            <span class="timeline-dot"></span>
+            <span class="timeline-label">Generalization</span>
+        </a>
+        <a href="#tablecam-section" class="timeline-item" data-section="tablecam">
+            <span class="timeline-dot"></span>
+            <span class="timeline-label">Minimal Observations</span>
+        </a>
+    </nav>
+
+    
+    <div class="task-buttons-fixed" id="task-buttons-left">
+        <div class="task-btn-wrapper active" data-task="push">
+            <div class="task-icon push-icon">
+                <div class="icon-block"></div>
+                <div class="icon-block-dest"></div>
+                <div class="icon-arrow">→</div>
+            </div>
+            <button class="task-btn active" data-task="push" onclick="selectTask('push')">Push</button>
+        </div>
+        <div class="task-btn-wrapper" data-task="pick-place">
+            <div class="task-icon pick-icon">
+                <div class="pick-arrow arrow-up">↑</div>
+                <div class="pick-arrow arrow-right">→</div>
+                <div class="pick-arrow arrow-down">↓</div>
+                <div class="icon-block"></div>
+                <div class="icon-block-dest"></div>
+            </div>
+            <button class="task-btn" data-task="pick-place" onclick="selectTask('pick-place')">Pick and Place</button>
+        </div>
+    </div>
+
+    
+    <div class="container">
+        
+        <section class="project-info scroll-section" id="summary-section">
+            <div class="summary-main-image"><img src="Media/Image/main.jpg" alt="Main"></div>
+            <h2 class="section-header">Summary</h2>
+            <p class="project-description">
+                Experiments conducted entirely in the real-world demonstrate that this paradigm is effective for learning <strong>image-based manipulation tasks from scratch in under an hour</strong>, without assuming prior knowledge, pre-training, or data of any kind beyond task observations. Moreover, this work demonstrates that the learned world model representation is capable of <strong>online transfer learning</strong> in the real-world from scratch. In comparison to existing approaches, including IRL, RL, and Behavior Cloning (BC), which have more restrictive assumptions, our approach demonstrates <strong>significantly greater sample efficiency and success rates</strong>. This enables a practical path forward for world modeling and planning from online observation and interaction.
+            </p>
+        </section>
+
+        
+        <section class="tasks-section scroll-section" id="efficiency-section">
+            <h2 class="section-header">Sample Efficiency</h2>
+            <p class="demonstrations-caption" style="margin-bottom:-40px;">&#8592; Use the left sidebar to switch between tasks</p>
+
+            <div class="content-block" id="demonstrations-block">
+                <h3 class="subsection-header">Demonstrations</h3>
+                <div class="demonstrations-grid" id="demonstrations-grid">
+                    <div class="demo-video-wrapper">
+                        <div class="video-display">
+                            <video class="demo-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Demonstrations/Push/demo_1.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                    <div class="demo-video-wrapper">
+                        <div class="video-display">
+                            <video class="demo-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Demonstrations/Push/demo_2.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                    <div class="demo-video-wrapper">
+                        <div class="video-display">
+                            <video class="demo-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Demonstrations/Push/demo_3.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                    <div class="demo-video-wrapper">
+                        <div class="video-display">
+                            <video class="demo-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Demonstrations/Push/demo_4.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                    <div class="demo-video-wrapper">
+                        <div class="video-display">
+                            <video class="demo-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Demonstrations/Push/demo_5.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                    <div class="demo-video-wrapper">
+                        <div class="video-display">
+                            <video class="demo-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Demonstrations/Push/demo_6.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                    <div class="demo-video-wrapper">
+                        <div class="video-display">
+                            <video class="demo-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Demonstrations/Push/demo_7.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                    <div class="demo-video-wrapper">
+                        <div class="video-display">
+                            <video class="demo-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Demonstrations/Push/demo_8.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                    <div class="demo-video-wrapper">
+                        <div class="video-display">
+                            <video class="demo-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Demonstrations/Push/demo_9.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                    <div class="demo-video-wrapper">
+                        <div class="video-display">
+                            <video class="demo-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Demonstrations/Push/demo_10.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                </div>
+                <div class="demonstrations-caption"><span style="font-weight:700; font-size:1.15em; color:#667eea;">All</span> demonstrations used in training</div>
+            </div>
+
+            
+            <div class="content-block" id="time-lapses-block">
+                <h3 class="subsection-header">Training Time-lapse</h3>
+
+                
+                <div class="iteration-control-area">
+                    <div class="iteration-info-row">
+                        <div class="iteration-info-item">
+                            <label>Iteration:</label>
+                            <span class="value" id="iteration-display">0</span>
+                        </div>
+                        <div class="iteration-info-item">
+                            <label>Time Spent:</label>
+                            <span class="value" id="time-spent">0</span>
+                        </div>
+                    </div>
+                    <div class="slider-track-container">
+                        <input type="range" class="iteration-slider" id="iteration-slider" 
+                               min="0" max="100" value="0" step="10" oninput="updateIteration(this.value)">
+                        <div class="slider-dots" id="slider-dots"></div>
+                    </div>
+                </div>
+
+                <p class="demonstrations-caption" style="margin-top: 6px; margin-bottom: 10px; font-size: 1.08rem; font-weight: 600; font-style: normal; letter-spacing: 0.2px; text-align: center;">Comparison with SOTA</p>
+                <div class="sample-method-row">
+                    <button type="button" class="sample-method-btn active" data-method="mpail2-p" onclick="selectSampleMethod('mpail2-p')">MPAIL2[-P]</button>
+                    <button type="button" class="sample-method-btn" data-method="mpail2-pm" onclick="selectSampleMethod('mpail2-pm')">MPAIL2[-PM]</button>
+                    <button type="button" class="sample-method-btn" data-method="rlpd" onclick="selectSampleMethod('rlpd')">RLPD</button>
+                </div>
+
+                <div class="transfer-videos-container">
+                    <div class="transfer-video-wrapper">
+                        <div class="video-display">
+                            <video id="task-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Push/iter_0.mp4" type="video/mp4">
+                                Your browser does not support video playback.
+                            </video>
+                        </div>
+                        <p class="video-label highlighted sample-mpail2-title">MPAIL2</p>
+                        <a class="full-video-link" onclick="openVideoModal('sample')">
+                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                            Full Training Video
+                        </a>
+                    </div>
+                    <div class="transfer-video-wrapper">
+                        <div class="video-display">
+                            <video id="sample-method-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Comparison/mpail2_p/Push/iter_0.mp4" type="video/mp4">
+                                Your browser does not support video playback.
+                            </video>
+                        </div>
+                        <p class="video-label" id="sample-method-label">MPAIL2[-P]</p>
+                        <a class="full-video-link" onclick="openVideoModal('comparison')">
+                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                            Full Training Video
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comparisons with SOTA section temporarily hidden -->
+        </section>
+
+        
+        <section class="tasks-section scroll-section" id="transfer-section">
+            <h2 class="section-header">Transfer Learning</h2>
+            <p class="demonstrations-caption" style="margin-bottom:-40px;">&#8592; Use the left sidebar to switch between tasks</p>
+
+            <div class="content-block" id="transfer-initial-demonstrations-block">
+                <h3 class="subsection-header">Demonstrations</h3>
+                <div class="transfer-demo-toggle">
+                    <button type="button" class="sample-method-btn transfer-demo-btn active" data-transfer-demo="initial" onclick="switchTransferDemo('initial')">Initial Task</button>
+                    <button type="button" class="sample-method-btn transfer-demo-btn" data-transfer-demo="new" onclick="switchTransferDemo('new')">New Task</button>
+                </div>
+                <div class="transfer-demo-panel" id="transfer-demo-panel-initial">
+                <div class="demonstrations-grid" id="initial-demonstrations-grid">
+                    <div class="demo-video-wrapper">
+                        <div class="video-display">
+                            <video class="initial-demo-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Demonstrations/Push/demo_1.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                    <div class="demo-video-wrapper">
+                        <div class="video-display">
+                            <video class="initial-demo-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Demonstrations/Push/demo_2.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                    <div class="demo-video-wrapper">
+                        <div class="video-display">
+                            <video class="initial-demo-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Demonstrations/Push/demo_3.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                    <div class="demo-video-wrapper">
+                        <div class="video-display">
+                            <video class="initial-demo-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Demonstrations/Push/demo_4.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                    <div class="demo-video-wrapper">
+                        <div class="video-display">
+                            <video class="initial-demo-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Demonstrations/Push/demo_5.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                    <div class="demo-video-wrapper">
+                        <div class="video-display">
+                            <video class="initial-demo-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Demonstrations/Push/demo_6.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                    <div class="demo-video-wrapper">
+                        <div class="video-display">
+                            <video class="initial-demo-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Demonstrations/Push/demo_7.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                    <div class="demo-video-wrapper">
+                        <div class="video-display">
+                            <video class="initial-demo-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Demonstrations/Push/demo_8.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                    <div class="demo-video-wrapper">
+                        <div class="video-display">
+                            <video class="initial-demo-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Demonstrations/Push/demo_9.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                    <div class="demo-video-wrapper">
+                        <div class="video-display">
+                            <video class="initial-demo-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Demonstrations/Push/demo_10.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                </div>
+                <div class="demonstrations-caption"><span style="font-weight:700; font-size:1.15em; color:#667eea;">All</span> demonstrations used in initial training</div>
+                </div>
+                <div class="transfer-demo-panel hidden" id="transfer-demo-panel-new">
+                <div class="demonstrations-grid" id="transfer-demonstrations-grid">
+                    <div class="demo-video-wrapper">
+                        <div class="video-display">
+                            <video class="transfer-demo-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Demonstrations/Transfer/Push/demo_1.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                    <div class="demo-video-wrapper">
+                        <div class="video-display">
+                            <video class="transfer-demo-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Demonstrations/Transfer/Push/demo_2.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                    <div class="demo-video-wrapper">
+                        <div class="video-display">
+                            <video class="transfer-demo-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Demonstrations/Transfer/Push/demo_3.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                    <div class="demo-video-wrapper">
+                        <div class="video-display">
+                            <video class="transfer-demo-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Demonstrations/Transfer/Push/demo_4.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                    <div class="demo-video-wrapper">
+                        <div class="video-display">
+                            <video class="transfer-demo-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Demonstrations/Transfer/Push/demo_5.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                    <div class="demo-video-wrapper">
+                        <div class="video-display">
+                            <video class="transfer-demo-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Demonstrations/Transfer/Push/demo_6.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                    <div class="demo-video-wrapper">
+                        <div class="video-display">
+                            <video class="transfer-demo-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Demonstrations/Transfer/Push/demo_7.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                    <div class="demo-video-wrapper">
+                        <div class="video-display">
+                            <video class="transfer-demo-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Demonstrations/Transfer/Push/demo_8.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                    <div class="demo-video-wrapper">
+                        <div class="video-display">
+                            <video class="transfer-demo-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Demonstrations/Transfer/Push/demo_9.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                    <div class="demo-video-wrapper">
+                        <div class="video-display">
+                            <video class="transfer-demo-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Demonstrations/Transfer/Push/demo_10.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                </div>
+                <div class="demonstrations-caption"><span style="font-weight:700; font-size:1.15em; color:#667eea;">All</span> demonstrations used in new task training</div>
+                </div>
+            </div>
+
+            
+            <div class="content-block" id="transfer-time-lapses-block">
+                <h3 class="subsection-header">Training Time-lapse</h3>
+
+                
+                <div class="iteration-control-area">
+                    <div class="iteration-info-row">
+                        <div class="iteration-info-item">
+                            <label>Iteration:</label>
+                            <span class="value" id="transfer-iteration-display">0</span>
+                        </div>
+                        <div class="iteration-info-item">
+                            <label>Time Spent:</label>
+                            <span class="value" id="transfer-time-spent">0</span>
+                        </div>
+                    </div>
+                    <div class="slider-track-container">
+                        <input type="range" class="iteration-slider" id="transfer-iteration-slider" 
+                               min="0" max="100" value="0" step="10" oninput="updateTransferIteration(this.value)">
+                        <div class="slider-dots" id="transfer-slider-dots"></div>
+                    </div>
+                </div>
+
+                
+                <div class="transfer-videos-container">
+                    <div class="transfer-video-wrapper transferred">
+                        <div class="video-display">
+                            <video id="transfer-video-left" autoplay muted loop playsinline>
+                                <source src="Media/Video/Transfer/Push/iter_0.mp4" type="video/mp4">
+                                Your browser does not support video playback.
+                            </video>
+                        </div>
+                        <p class="video-label highlighted sample-mpail2-title">Transferred</p>
+                        
+                        <a class="full-video-link" onclick="openVideoModal('transfer')">
+                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                            Full Training Video
+                        </a>
+                    </div>
+                    <div class="transfer-video-wrapper">
+                        <div class="video-display">
+                            <video id="transfer-video-right" autoplay muted loop playsinline>
+                                <source src="Media/Video/From%20Scratch/Push/iter_0.mp4" type="video/mp4">
+                                Your browser does not support video playback.
+                            </video>
+                        </div>
+                        <p class="video-label">From Scratch</p>
+                        <a href="#" class="full-video-link" onclick="openVideoModal('scratch'); return false;">
+                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                            Full Training Video
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        
+        <section class="tasks-section scroll-section" id="generalization-section">
+            <h2 class="section-header">Generalization</h2>
+            <p class="demonstrations-caption">(Trained with <span style="font-weight:700; font-size:1.15em; color:#e6a817;">only Yellow Cube</span> in scene)</p>
+
+            <div class="content-block">
+                
+                <div class="generalization-grid">
+                    <div class="generalization-video-wrapper">
+                        <div class="video-display">
+                            <video id="gen-video-1" autoplay muted loop playsinline>
+                                <source src="Media/Video/Generalization/video_1.mp4" type="video/mp4">
+                                Your browser does not support video playback.
+                            </video>
+                        </div>
+                        <div class="gen-video-label">Novel Cube 1</div>
+                    </div>
+                    <div class="generalization-video-wrapper">
+                        <div class="video-display">
+                            <video id="gen-video-2" autoplay muted loop playsinline>
+                                <source src="Media/Video/Generalization/video_2.mp4" type="video/mp4">
+                                Your browser does not support video playback.
+                            </video>
+                        </div>
+                        <div class="gen-video-label">Novel Cube 2</div>
+                    </div>
+                    <div class="generalization-video-wrapper">
+                        <div class="video-display">
+                            <video id="gen-video-3" autoplay muted loop playsinline>
+                                <source src="Media/Video/Generalization/video_3.mp4" type="video/mp4">
+                                Your browser does not support video playback.
+                            </video>
+                        </div>
+                        <div class="gen-video-label">Multi-Cube Scene 1</div>
+                    </div>
+                    <div class="generalization-video-wrapper">
+                        <div class="video-display">
+                            <video id="gen-video-4" autoplay muted loop playsinline>
+                                <source src="Media/Video/Generalization/video_4.mp4" type="video/mp4">
+                                Your browser does not support video playback.
+                            </video>
+                        </div>
+                        <div class="gen-video-label">Multi-Cube Scene 2</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        
+        <section class="tasks-section scroll-section" id="tablecam-section">
+            <h2 class="section-header">Minimal Observations</h2>
+            <p class="demonstrations-caption">(Demonstrations contain <span style="font-weight:700; font-size:1.15em; color:#667eea;">only the table camera</span>, with no proprioceptive/Wrist-mounted camera from the robot in demonstrations)</p>
+
+            <div class="content-block">
+                
+                <div class="generalization-grid">
+                    <div class="generalization-video-wrapper">
+                        <div class="video-display">
+                            <video id="tablecam-video-1" autoplay muted loop playsinline>
+                                <source src="Media/Video/TableCam/video_1.mp4" type="video/mp4">
+                                Your browser does not support video playback.
+                            </video>
+                        </div>
+                    </div>
+                    <div class="generalization-video-wrapper">
+                        <div class="video-display">
+                            <video id="tablecam-video-2" autoplay muted loop playsinline>
+                                <source src="Media/Video/TableCam/video_2.mp4" type="video/mp4">
+                                Your browser does not support video playback.
+                            </video>
+                        </div>
+                    </div>
+                    <div class="generalization-video-wrapper">
+                        <div class="video-display">
+                            <video id="tablecam-video-3" autoplay muted loop playsinline>
+                                <source src="Media/Video/TableCam/video_3.mp4" type="video/mp4">
+                                Your browser does not support video playback.
+                            </video>
+                        </div>
+                    </div>
+                    <div class="generalization-video-wrapper">
+                        <div class="video-display">
+                            <video id="tablecam-video-4" autoplay muted loop playsinline>
+                                <source src="Media/Video/TableCam/video_4.mp4" type="video/mp4">
+                                Your browser does not support video playback.
+                            </video>
+                        </div>
+                    </div>
+                </div>
+                <div class="demonstrations-caption" style="margin-top:20px;">Achieved in ~500 iterations. The ArUco marker on the cube is used solely for trajectory recording, not as part of the observation.</div>
+            </div>
+        </section>
+
+    <script>
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const dotsContainer = document.getElementById('slider-dots');
+            const iterationSlider = document.getElementById('iteration-slider');
+            
+            
+            iterationSlider.value = 0;
+            iterationSlider.max = 100;
+            document.getElementById('iteration-display').textContent = '0';
+            document.getElementById('time-spent').textContent = '0';
+            
+            
+            for (let i = 0; i <= 100; i += 10) {
+                const dot = document.createElement('div');
+                dot.className = 'slider-dot' + (i === 0 ? ' active' : '');
+                dot.dataset.value = i;
+                dotsContainer.appendChild(dot);
+            }
+
+            
+            const transferDotsContainer = document.getElementById('transfer-slider-dots');
+            const transferSlider = document.getElementById('transfer-iteration-slider');
+            
+            
+            transferSlider.value = 0;
+            transferSlider.max = 100;
+            document.getElementById('transfer-iteration-display').textContent = '0';
+            document.getElementById('transfer-time-spent').textContent = '0';
+            
+            
+            for (let i = 0; i <= 100; i += 10) {
+                const dot = document.createElement('div');
+                dot.className = 'slider-dot' + (i === 0 ? ' active' : '');
+                dot.dataset.value = i;
+                transferDotsContainer.appendChild(dot);
+            }
+
+            updateSampleMethodVideo();
+
+            // Ensure Initial Task is selected by default
+            switchTransferDemo('initial');
+
+            
+            const taskButtonsLeft = document.getElementById('task-buttons-left');
+            const tasksSection = document.querySelector('.tasks-section');
+            
+            
+            const timelineNav = document.getElementById('timeline-nav');
+            const timelineItems = document.querySelectorAll('.timeline-item');
+            const themeToggle = document.getElementById('theme-toggle');
+
+            
+            const summarySection = document.getElementById('summary-section');
+            const efficiencySection = document.getElementById('efficiency-section');
+            const transferSection = document.getElementById('transfer-section');
+            const generalizationSection = document.getElementById('generalization-section');
+            const tablecamSection = document.getElementById('tablecam-section');
+
+            
+            window.isTimelineNavigating = false;
+
+            
+            efficiencySection.classList.add('hidden-below');
+            transferSection.classList.add('hidden-below');
+            generalizationSection.classList.add('hidden-below');
+            tablecamSection.classList.add('hidden-below');
+
+            if (themeToggle) {
+                themeToggle.classList.add('hidden-on-hero');
+            }
+            
+            window.addEventListener('scroll', function() {
+                const scrollY = window.scrollY;
+                const windowHeight = window.innerHeight;
+                
+                
+                const summaryRect = summarySection.getBoundingClientRect();
+                const efficiencyRect = efficiencySection.getBoundingClientRect();
+                const transferRect = transferSection.getBoundingClientRect();
+                const generalizationRect = generalizationSection.getBoundingClientRect();
+                const tablecamRect = tablecamSection.getBoundingClientRect();
+                
+                
+                const showLeftButtons = efficiencyRect.top < windowHeight * 0.75 && generalizationRect.top > windowHeight * 0.5;
+                
+                if (showLeftButtons) {
+                    taskButtonsLeft.classList.add('visible');
+                } else {
+                    taskButtonsLeft.classList.remove('visible');
+                }
+
+                if (themeToggle) {
+                    if (scrollY > windowHeight * 0.9) {
+                        themeToggle.classList.remove('hidden-on-hero');
+                    } else {
+                        themeToggle.classList.add('hidden-on-hero');
+                    }
+                }
+                
+                
+                if (scrollY > windowHeight * 0.5) {
+                    timelineNav.classList.add('visible');
+                } else {
+                    timelineNav.classList.remove('visible');
+                }
+                
+                
+                if (window.isTimelineNavigating) {
+                    return;
+                }
+                
+                
+                let activeSection = 'summary';
+                if (tablecamRect.top < windowHeight * 0.5) {
+                    activeSection = 'tablecam';
+                } else if (generalizationRect.top < windowHeight * 0.5) {
+                    activeSection = 'generalization';
+                } else if (transferRect.top < windowHeight * 0.5) {
+                    activeSection = 'transfer';
+                } else if (efficiencyRect.top < windowHeight * 0.5) {
+                    activeSection = 'efficiency';
+                }
+                
+                timelineItems.forEach(item => {
+                    if (item.dataset.section === activeSection) {
+                        item.classList.add('active');
+                    } else {
+                        item.classList.remove('active');
+                    }
+                });
+
+                
+                const showTablecam = tablecamRect.top < windowHeight * 0.75;
+                const showGeneralization = generalizationRect.top < windowHeight * 0.75;
+                const showTransfer = transferRect.top < windowHeight * 0.75;
+                const showEfficiency = efficiencyRect.top < windowHeight * 0.75;
+
+                
+                summarySection.classList.remove('fade-out');
+                efficiencySection.classList.remove('fade-in', 'fade-out', 'hidden-below');
+                transferSection.classList.remove('fade-in', 'fade-out', 'hidden-below');
+                generalizationSection.classList.remove('fade-in', 'fade-out', 'hidden-below');
+                tablecamSection.classList.remove('fade-in', 'fade-out', 'hidden-below');
+
+                if (showTablecam) {
+                    summarySection.classList.add('fade-out');
+                    efficiencySection.classList.add('fade-out');
+                    transferSection.classList.add('fade-out');
+                    generalizationSection.classList.add('fade-out');
+                    tablecamSection.classList.add('fade-in');
+                } else if (showGeneralization) {
+                    summarySection.classList.add('fade-out');
+                    efficiencySection.classList.add('fade-out');
+                    transferSection.classList.add('fade-out');
+                    generalizationSection.classList.add('fade-in');
+                    tablecamSection.classList.add('hidden-below');
+                } else if (showTransfer) {
+                    summarySection.classList.add('fade-out');
+                    efficiencySection.classList.add('fade-out');
+                    transferSection.classList.add('fade-in');
+                    generalizationSection.classList.add('hidden-below');
+                    tablecamSection.classList.add('hidden-below');
+                } else if (showEfficiency) {
+                    summarySection.classList.add('fade-out');
+                    efficiencySection.classList.add('fade-in');
+                    transferSection.classList.add('hidden-below');
+                    generalizationSection.classList.add('hidden-below');
+                    tablecamSection.classList.add('hidden-below');
+                } else {
+                    efficiencySection.classList.add('hidden-below');
+                    transferSection.classList.add('hidden-below');
+                    generalizationSection.classList.add('hidden-below');
+                    tablecamSection.classList.add('hidden-below');
+                }
+
+            });
+        });
+
+        function updateIteration(value) {
+            const iteration = parseInt(value);
+            document.getElementById('iteration-display').textContent = iteration;
+            
+            
+            const dots = document.querySelectorAll('#slider-dots .slider-dot');
+            dots.forEach(dot => {
+                const dotValue = parseInt(dot.dataset.value);
+                if (dotValue <= iteration) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+            
+            
+            const timeSpent = document.getElementById('time-spent');
+            if (iteration === 0) {
+                timeSpent.textContent = '0';
+            } else {
+                const rate = currentTask === 'pick-place' ? (68 / 150) : (49 / 100);
+                const minutes = Math.round(iteration * rate);
+                timeSpent.textContent = `~${minutes} min`;
+            }
+            
+            updateVideo();
+            updateSampleMethodVideo();
+        }
+
+        
+        let currentTask = 'push';
+
+        function selectTask(task) {
+            currentTask = task;
+            
+            
+            document.querySelectorAll('.task-btn').forEach(btn => {
+                if (btn.dataset.task === task) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            
+            document.querySelectorAll('.task-btn-wrapper').forEach(wrapper => {
+                if (wrapper.dataset.task === task) {
+                    wrapper.classList.add('active');
+                } else {
+                    wrapper.classList.remove('active');
+                }
+            });
+            
+            if (task === 'pick-place') {
+                document.getElementById('efficiency-section').classList.add('task-pick-place');
+                document.getElementById('transfer-section').classList.add('task-pick-place');
+            } else {
+                document.getElementById('efficiency-section').classList.remove('task-pick-place');
+                document.getElementById('transfer-section').classList.remove('task-pick-place');
+            }
+
+            updateSliderRange();
+            updateVideo();
+            updateSampleMethodVideo();
+            updateTransferVideo();
+            updateDemonstrationVideos();
+            updateTransferDemonstrationVideos();
+            updateInitialDemonstrationVideos();
+        }
+
+        function updateSliderRange() {
+            const maxIter = currentTask === 'push' ? 100 : 150;
+
+            const slider = document.getElementById('iteration-slider');
+            slider.max = maxIter;
+            if (parseInt(slider.value) > maxIter) slider.value = maxIter;
+            rebuildDots('slider-dots', maxIter, parseInt(slider.value));
+            updateIteration(slider.value);
+
+            const transferSlider = document.getElementById('transfer-iteration-slider');
+            transferSlider.max = maxIter;
+            if (parseInt(transferSlider.value) > maxIter) transferSlider.value = maxIter;
+            rebuildDots('transfer-slider-dots', maxIter, parseInt(transferSlider.value));
+            updateTransferIteration(transferSlider.value);
+
+        }
+
+        function rebuildDots(containerId, maxIter, currentValue) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            for (let i = 0; i <= maxIter; i += 10) {
+                const dot = document.createElement('div');
+                dot.className = 'slider-dot' + (i <= currentValue ? ' active' : '');
+                dot.dataset.value = i;
+                container.appendChild(dot);
+            }
+        }
+
+        function updateDemonstrationVideos() {
+            const taskFolder = currentTask === 'push' ? 'Push' : 'Pick';
+            const demoVideos = document.querySelectorAll('.demo-video');
+            
+            demoVideos.forEach((video, index) => {
+                const demoNum = index + 1;
+                const videoPath = `Media/Video/Demonstrations/${taskFolder}/demo_${demoNum}.mp4`;
+                video.src = videoPath;
+                video.load();
+            });
+        }
+
+        function updateTransferDemonstrationVideos() {
+            const taskFolder = currentTask === 'push' ? 'Push' : 'Pick';
+            const demoVideos = document.querySelectorAll('.transfer-demo-video');
+            
+            demoVideos.forEach((video, index) => {
+                const demoNum = index + 1;
+                const videoPath = `Media/Video/Demonstrations/Transfer/${taskFolder}/demo_${demoNum}.mp4`;
+                video.src = videoPath;
+                video.load();
+            });
+        }
+
+        function updateInitialDemonstrationVideos() {
+            const taskFolder = currentTask === 'push' ? 'Push' : 'Pick';
+            const demoVideos = document.querySelectorAll('.initial-demo-video');
+            
+            demoVideos.forEach((video, index) => {
+                const demoNum = index + 1;
+                const videoPath = `Media/Video/Demonstrations/${taskFolder}/demo_${demoNum}.mp4`;
+                video.src = videoPath;
+                video.load();
+            });
+        }
+
+        function switchTransferDemo(mode) {
+            const initialPanel = document.getElementById('transfer-demo-panel-initial');
+            const newPanel = document.getElementById('transfer-demo-panel-new');
+            const buttons = document.querySelectorAll('.transfer-demo-btn');
+            if (!initialPanel || !newPanel) return;
+
+            if (mode === 'initial') {
+                initialPanel.classList.remove('hidden');
+                newPanel.classList.add('hidden');
+            } else {
+                initialPanel.classList.add('hidden');
+                newPanel.classList.remove('hidden');
+            }
+
+            buttons.forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.transferDemo === mode);
+            });
+        }
+
+        let currentSampleMethod = 'mpail2-p';
+        const sampleMethodFolderMap = {
+            'mpail2-p': 'mpail2_p',
+            'mpail2-pm': 'mpail2_pm',
+            'rlpd': 'rlpd'
+        };
+        const sampleMethodLabelMap = {
+            'mpail2-p': 'MPAIL2[-P]',
+            'mpail2-pm': 'MPAIL2[-PM]',
+            'rlpd': 'RLPD'
+        };
+        function selectSampleMethod(method) {
+            currentSampleMethod = method;
+            document.querySelectorAll('.sample-method-btn').forEach(btn => {
+                if (btn.dataset.method === method) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            const label = document.getElementById('sample-method-label');
+            if (label) label.textContent = sampleMethodLabelMap[method] || method;
+            updateSampleMethodVideo();
+        }
+        function updateSampleMethodVideo() {
+            const iteration = parseInt(document.getElementById('iteration-slider').value);
+            const folder = sampleMethodFolderMap[currentSampleMethod] || 'mpail2_p';
+            const taskFolder = currentTask === 'push' ? 'Push' : 'Pick';
+            const videoPath = `Media/Video/Comparison/${folder}/${taskFolder}/iter_${iteration}.mp4`;
+            const video = document.getElementById('sample-method-video');
+            if (!video) return;
+            video.classList.add('loading');
+            video.src = videoPath;
+            video.load();
+            video.oncanplay = function() {
+                video.classList.remove('loading');
+                video.play();
+                video.oncanplay = null;
+            };
+        }
+
+        function updateVideo() {
+            const iteration = parseInt(document.getElementById('iteration-slider').value);
+            const videoLeft = document.getElementById('task-video');
+
+            const taskFolder = currentTask === 'push' ? 'Push' : 'Pick';
+            const videoPath = `Media/Video/${taskFolder}/iter_${iteration}.mp4`;
+
+            videoLeft.classList.add('loading');
+
+            setTimeout(() => {
+                videoLeft.src = videoPath;
+                videoLeft.load();
+
+                videoLeft.oncanplay = function() {
+                    videoLeft.classList.remove('loading');
+                    videoLeft.play();
+                    videoLeft.oncanplay = null;
+                };
+            }, 150);
+        }
+
+        
+        function updateTransferIteration(value) {
+            const iteration = parseInt(value);
+            document.getElementById('transfer-iteration-display').textContent = iteration;
+            
+            
+            const dots = document.querySelectorAll('#transfer-slider-dots .slider-dot');
+            dots.forEach(dot => {
+                const dotValue = parseInt(dot.dataset.value);
+                if (dotValue <= iteration) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+            
+            
+            const timeSpent = document.getElementById('transfer-time-spent');
+            if (iteration === 0) {
+                timeSpent.textContent = '0';
+            } else {
+                const rate = currentTask === 'pick-place' ? (72 / 150) : (47 / 100);
+                const minutes = Math.round(iteration * rate);
+                timeSpent.textContent = `~${minutes} min`;
+            }
+            
+            updateTransferVideo();
+        }
+
+        function updateTransferVideo() {
+            const iteration = parseInt(document.getElementById('transfer-iteration-slider').value);
+            const videoLeft = document.getElementById('transfer-video-left');
+            const videoRight = document.getElementById('transfer-video-right');
+            
+            
+            const taskFolder = currentTask === 'push' ? 'Push' : 'Pick';
+            
+            
+            const videoPathLeft = `Media/Video/Transfer/${taskFolder}/iter_${iteration}.mp4`;
+            const videoPathRight = `Media/Video/From%20Scratch/${taskFolder}/iter_${iteration}.mp4`;
+
+            
+            videoLeft.classList.add('loading');
+            videoRight.classList.add('loading');
+            
+            setTimeout(() => {
+                videoLeft.src = videoPathLeft;
+                videoRight.src = videoPathRight;
+                videoLeft.load();
+                videoRight.load();
+                
+                videoLeft.oncanplay = function() {
+                    videoLeft.classList.remove('loading');
+                    videoLeft.play();
+                    videoLeft.oncanplay = null;
+                };
+                videoRight.oncanplay = function() {
+                    videoRight.classList.remove('loading');
+                    videoRight.play();
+                    videoRight.oncanplay = null;
+                };
+            }, 150);
+        }
+
+        
+        document.querySelectorAll('.timeline-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const sectionName = this.dataset.section;
+                
+                
+                window.isTimelineNavigating = true;
+                
+                
+                const summarySection = document.getElementById('summary-section');
+                const efficiencySection = document.getElementById('efficiency-section');
+                const transferSection = document.getElementById('transfer-section');
+                const generalizationSection = document.getElementById('generalization-section');
+                const tablecamSection = document.getElementById('tablecam-section');
+                
+                
+                summarySection.classList.remove('fade-out', 'instant-show');
+                efficiencySection.classList.remove('fade-in', 'fade-out', 'hidden-below');
+                transferSection.classList.remove('fade-in', 'fade-out', 'hidden-below');
+                generalizationSection.classList.remove('fade-in', 'fade-out', 'hidden-below');
+                tablecamSection.classList.remove('fade-in', 'fade-out', 'hidden-below');
+                
+                
+                document.querySelectorAll('.timeline-item').forEach(ti => {
+                    if (ti.dataset.section === sectionName) {
+                        ti.classList.add('active');
+                    } else {
+                        ti.classList.remove('active');
+                    }
+                });
+                
+                
+                let scrollTarget = 0;
+                
+                
+                if (sectionName === 'summary') {
+                    scrollTarget = window.innerHeight;
+                    summarySection.classList.add('instant-show');
+                    efficiencySection.classList.add('hidden-below');
+                    transferSection.classList.add('hidden-below');
+                    generalizationSection.classList.add('hidden-below');
+                    tablecamSection.classList.add('hidden-below');
+                } else if (sectionName === 'efficiency') {
+                    scrollTarget = efficiencySection.offsetTop;
+                    summarySection.classList.add('fade-out');
+                    efficiencySection.classList.add('fade-in');
+                    transferSection.classList.add('hidden-below');
+                    generalizationSection.classList.add('hidden-below');
+                    tablecamSection.classList.add('hidden-below');
+                } else if (sectionName === 'transfer') {
+                    scrollTarget = transferSection.offsetTop;
+                    summarySection.classList.add('fade-out');
+                    efficiencySection.classList.add('fade-out');
+                    transferSection.classList.add('fade-in');
+                    generalizationSection.classList.add('hidden-below');
+                    tablecamSection.classList.add('hidden-below');
+                } else if (sectionName === 'generalization') {
+                    scrollTarget = generalizationSection.offsetTop;
+                    summarySection.classList.add('fade-out');
+                    efficiencySection.classList.add('fade-out');
+                    transferSection.classList.add('fade-out');
+                    generalizationSection.classList.add('fade-in');
+                    tablecamSection.classList.add('hidden-below');
+                } else if (sectionName === 'tablecam') {
+                    scrollTarget = tablecamSection.offsetTop;
+                    summarySection.classList.add('fade-out');
+                    efficiencySection.classList.add('fade-out');
+                    transferSection.classList.add('fade-out');
+                    generalizationSection.classList.add('fade-out');
+                    tablecamSection.classList.add('fade-in');
+                }
+                
+                
+                window.scrollTo({
+                    top: scrollTarget,
+                    behavior: 'smooth'
+                });
+                
+                
+                setTimeout(() => {
+                    window.isTimelineNavigating = false;
+                    
+                    summarySection.classList.remove('instant-show');
+                }, 800);
+            });
+        });
+        
+        function openVideoModal(section) {
+            const modal = document.getElementById('video-modal');
+            const video = document.getElementById('modal-video');
+            
+            
+            let videoPath;
+            if (section === 'sample') {
+                
+                if (currentTask === 'push') {
+                    videoPath = 'Media/Video/Full/MPAIL.mp4';
+                } else {
+                    videoPath = 'Media/Video/Full/PickandPlace.mp4';
+                }
+            } else if (section === 'scratch') {
+                
+                if (currentTask === 'push') {
+                    videoPath = 'Media/Video/Full/From_Scratch_Push.mp4';
+                } else {
+                    videoPath = 'Media/Video/Full/From_Scratch_Pick.mp4';
+                }
+            } else if (section === 'transfer') {
+                
+                if (currentTask === 'push') {
+                    videoPath = 'Media/Video/Full/Transfer_Push.mp4';
+                } else {
+                    videoPath = 'Media/Video/Full/Transfer_PickandPlace.mp4';
+                }
+            } else if (section === 'comparison') {
+                const methodFolder = sampleMethodFolderMap[currentSampleMethod] || 'mpail2_p';
+                const taskFolder = currentTask === 'push' ? 'Push' : 'Pick';
+                videoPath = `Media/Video/Comparison/Full/${methodFolder}_${taskFolder}.mp4`;
+            }
+            
+            
+            video.src = videoPath;
+            video.load();
+            
+            modal.classList.add('active');
+            video.currentTime = 0;
+            video.play();
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeVideoModal() {
+            const modal = document.getElementById('video-modal');
+            const video = document.getElementById('modal-video');
+            modal.classList.remove('active');
+            video.pause();
+            document.body.style.overflow = '';
+        }
+
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('video-modal');
+            const backdrop = modal.querySelector('.modal-backdrop');
+            backdrop.addEventListener('click', closeVideoModal);
+            
+            
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && modal.classList.contains('active')) {
+                    closeVideoModal();
+                }
+            });
+        });
+
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('video').forEach(function(video) {
+                video.muted = true;
+                video.addEventListener('volumechange', function() {
+                    if (!this.muted) {
+                        this.muted = true;
+                    }
+                });
+            });
+
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    mutation.addedNodes.forEach(function(node) {
+                        if (node.nodeName === 'VIDEO') {
+                            node.muted = true;
+                            node.addEventListener('volumechange', function() {
+                                if (!this.muted) this.muted = true;
+                            });
+                        }
+                        if (node.querySelectorAll) {
+                            node.querySelectorAll('video').forEach(function(v) {
+                                v.muted = true;
+                                v.addEventListener('volumechange', function() {
+                                    if (!this.muted) this.muted = true;
+                                });
+                            });
+                        }
+                    });
+                });
+            });
+            observer.observe(document.body, { childList: true, subtree: true });
+        });
+
+        
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            
+            
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDarkMode);
+        }
+
+        
+        (function() {
+            const savedDarkMode = localStorage.getItem('darkMode');
+            if (savedDarkMode === 'true') {
+                document.body.classList.add('dark-mode');
+            }
+        })();
+    </script>
+    </div>
+
+    
+    <div class="video-modal" id="video-modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeVideoModal()">×</button>
+            <video class="modal-video" id="modal-video" controls muted>
+                <source src="Media/Video/Full/MPAIL.mp4" type="video/mp4">
+                Your browser does not support video playback.
+            </video>
+        </div>
+    </div>
+
+</body>
+</html>
