@@ -64,10 +64,7 @@
         }
         .theme-toggle .theme-slash {
             margin: 0 6px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            color: #667eea;
             font-size: 0.95rem;
             font-weight: 600;
             line-height: 0;
@@ -76,6 +73,9 @@
             flex-shrink: 0;
             vertical-align: middle;
             padding: 0;
+        }
+        body.dark-mode .theme-toggle .theme-slash {
+            color: #a5b4fc;
         }
         .theme-toggle.hidden-on-hero {
             opacity: 0;
@@ -1204,7 +1204,6 @@
             outline: none;
         }
 
-        /* Remove any default inner track rendering that might show square */
         .iteration-slider::-webkit-slider-runnable-track {
             background: linear-gradient(90deg, #e0e5ec 0%, #e0e5ec 100%);
         }
@@ -1215,7 +1214,6 @@
             background: linear-gradient(90deg, #e0e5ec 0%, #e0e5ec 100%);
         }
         
-        /* Completely override thumb to remove any inner square */
         .iteration-slider::-webkit-slider-thumb {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
             -webkit-mask: none !important;
@@ -1248,6 +1246,27 @@
         .slider-dot.active {
             background: #667eea;
             transform: scale(1.2);
+        }
+
+        .slider-checkmarks {
+            display: flex;
+            justify-content: space-between;
+            position: absolute;
+            width: calc(100% - 28px);
+            top: 40px;
+            left: 14px;
+            z-index: 1;
+            pointer-events: none;
+            font-size: 14px;
+            color: #667eea;
+            font-weight: 700;
+        }
+        .slider-checkmarks span {
+            width: 12px;
+            text-align: center;
+        }
+        body.dark-mode .slider-checkmarks {
+            color: #a5b4fc;
         }
 
         .task-note {
@@ -1285,6 +1304,32 @@
         
         .video-display video.loading {
             opacity: 0;
+        }
+
+        .video-speed-badge {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 700;
+            z-index: 2;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+            pointer-events: none;
+        }
+        .transfer-video-wrapper .video-speed-badge,
+        .generalization-video-wrapper .video-speed-badge {
+            font-size: 24px;
+            bottom: 12px;
+            right: 12px;
+        }
+        .demonstrations-grid {
+            position: relative;
+        }
+        .demonstrations-grid .video-speed-badge {
+            font-size: 24px;
+            bottom: 12px;
+            right: 12px;
         }
 
         
@@ -1341,7 +1386,6 @@
             gap: 12px;
             margin: 6px 0 16px 0;
         }
-        /* Transfer buttons reuse .sample-method-btn styles for identical behavior */
         .transfer-demo-btn {
             font-family: inherit;
         }
@@ -1396,7 +1440,6 @@
             text-align: center;
         }
 
-        /* Keep left/right button baselines aligned in Sample Efficiency */
         #time-lapses-block .transfer-videos-container {
             align-items: stretch;
         }
@@ -1625,8 +1668,6 @@
         </svg>
     </button>
 
-    
-    <!-- 海报图：用视频第一帧生成。在项目根目录执行: ffmpeg -y -i Media/Video/Background/background.mp4 -vframes 1 -q:v 2 Media/Video/Background/poster.jpg -->
     <section class="video-section">
         <div class="video-container" id="hero-video-container">
             <img class="hero-poster" src="Media/Video/Background/poster.jpg" alt="" aria-hidden="true">
@@ -1637,16 +1678,16 @@
         </div>
         <div class="video-overlay">
             <h1>Planning from Observation and Interaction</h1>
-            <!-- <div class="hero-links">
-                <a href="Media/paper.pdf" target="_blank" class="hero-link-btn">
+            <div class="hero-links">
+                <a href="#" class="hero-link-btn" title="Paper (coming soon)">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
                     Paper
                 </a>
-                <a href="https://github.com/WheeledLab" target="_blank" class="hero-link-btn">
+                <a href="https://github.com/UWRobotLearning/mpail2/" target="_blank" rel="noopener noreferrer" class="hero-link-btn">
                     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
                     GitHub
                 </a>
-            </div> -->
+            </div>
         </div>
     </section>
 
@@ -1810,6 +1851,7 @@
                         <input type="range" class="iteration-slider" id="iteration-slider" 
                                min="0" max="100" value="0" step="10" oninput="updateIteration(this.value)">
                         <div class="slider-dots" id="slider-dots"></div>
+                        <div class="slider-checkmarks" id="slider-checkmarks"></div>
                     </div>
                 </div>
 
@@ -1849,8 +1891,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Comparisons with SOTA section temporarily hidden -->
         </section>
 
         
@@ -2036,6 +2076,7 @@
                         <input type="range" class="iteration-slider" id="transfer-iteration-slider" 
                                min="0" max="100" value="0" step="10" oninput="updateTransferIteration(this.value)">
                         <div class="slider-dots" id="transfer-slider-dots"></div>
+                        <div class="slider-checkmarks" id="transfer-slider-checkmarks"></div>
                     </div>
                 </div>
 
@@ -2184,6 +2225,13 @@
                 dot.dataset.value = i;
                 dotsContainer.appendChild(dot);
             }
+            const checkmarksContainer = document.getElementById('slider-checkmarks');
+            const pushCheckValues = [60, 70, 80, 90, 100];
+            for (let i = 0; i <= 100; i += 10) {
+                const span = document.createElement('span');
+                span.textContent = pushCheckValues.includes(i) ? '✓' : '';
+                checkmarksContainer.appendChild(span);
+            }
 
             
             const transferDotsContainer = document.getElementById('transfer-slider-dots');
@@ -2202,11 +2250,41 @@
                 dot.dataset.value = i;
                 transferDotsContainer.appendChild(dot);
             }
+            const transferCheckmarksContainer = document.getElementById('transfer-slider-checkmarks');
+            const transferPushCheckValues = [30, 40, 50, 60, 80, 100];
+            for (let i = 0; i <= 100; i += 10) {
+                const span = document.createElement('span');
+                span.textContent = transferPushCheckValues.includes(i) ? '✓' : '';
+                transferCheckmarksContainer.appendChild(span);
+            }
 
             updateSampleMethodVideo();
 
-            // Ensure Initial Task is selected by default
             switchTransferDemo('initial');
+
+            document.querySelectorAll('.video-display').forEach(display => {
+                var isDemo = display.closest('.demo-video-wrapper');
+                var isIter = display.closest('.transfer-video-wrapper');
+                if (!isDemo && !display.querySelector('.video-speed-badge')) {
+                    const badge = document.createElement('span');
+                    badge.className = 'video-speed-badge';
+                    badge.textContent = '3X';
+                    display.appendChild(badge);
+                }
+                display.querySelectorAll('video').forEach(v => {
+                    v.playbackRate = 3;
+                    v.addEventListener('loadeddata', function() { this.playbackRate = 3; });
+                });
+            });
+            ['demonstrations-grid', 'initial-demonstrations-grid', 'transfer-demonstrations-grid'].forEach(gridId => {
+                const grid = document.getElementById(gridId);
+                if (grid && !grid.querySelector('.video-speed-badge')) {
+                    const badge = document.createElement('span');
+                    badge.className = 'video-speed-badge';
+                    badge.textContent = '3X';
+                    grid.appendChild(badge);
+                }
+            });
 
             
             const taskButtonsLeft = document.getElementById('task-buttons-left');
@@ -2440,6 +2518,34 @@
                 dot.dataset.value = i;
                 container.appendChild(dot);
             }
+            if (containerId === 'slider-dots') {
+                const checkmarksContainer = document.getElementById('slider-checkmarks');
+                if (checkmarksContainer) {
+                    const pushCheckValues = [60, 70, 80, 90, 100];
+                    const pickPlaceCheckValues = [60, 70, 100, 110, 120, 130, 140];
+                    const checkValues = currentTask === 'push' ? pushCheckValues : pickPlaceCheckValues;
+                    checkmarksContainer.innerHTML = '';
+                    for (let i = 0; i <= maxIter; i += 10) {
+                        const span = document.createElement('span');
+                        span.textContent = checkValues.includes(i) ? '✓' : '';
+                        checkmarksContainer.appendChild(span);
+                    }
+                }
+            }
+            if (containerId === 'transfer-slider-dots') {
+                const transferCheckmarksContainer = document.getElementById('transfer-slider-checkmarks');
+                if (transferCheckmarksContainer) {
+                    const transferPushCheckValues = [30, 40, 50, 60, 80, 100];
+                    const transferPickPlaceCheckValues = [30, 40, 70, 80, 90, 100, 110, 130, 140, 150];
+                    const transferCheckValues = currentTask === 'push' ? transferPushCheckValues : transferPickPlaceCheckValues;
+                    transferCheckmarksContainer.innerHTML = '';
+                    for (let i = 0; i <= maxIter; i += 10) {
+                        const span = document.createElement('span');
+                        span.textContent = transferCheckValues.includes(i) ? '✓' : '';
+                        transferCheckmarksContainer.appendChild(span);
+                    }
+                }
+            }
         }
 
         function updateDemonstrationVideos() {
@@ -2532,9 +2638,10 @@
             video.src = videoPath;
             video.load();
             video.oncanplay = function() {
-                video.classList.remove('loading');
-                video.play();
-                video.oncanplay = null;
+                this.playbackRate = 3;
+                this.classList.remove('loading');
+                this.play();
+                this.oncanplay = null;
             };
         }
 
@@ -2552,6 +2659,7 @@
                 videoLeft.load();
 
                 videoLeft.oncanplay = function() {
+                    this.playbackRate = 3;
                     videoLeft.classList.remove('loading');
                     videoLeft.play();
                     videoLeft.oncanplay = null;
@@ -2607,15 +2715,19 @@
             setTimeout(() => {
                 videoLeft.src = videoPathLeft;
                 videoRight.src = videoPathRight;
+                videoLeft.playbackRate = 3;
+                videoRight.playbackRate = 3;
                 videoLeft.load();
                 videoRight.load();
                 
                 videoLeft.oncanplay = function() {
+                    this.playbackRate = 3;
                     videoLeft.classList.remove('loading');
                     videoLeft.play();
                     videoLeft.oncanplay = null;
                 };
                 videoRight.oncanplay = function() {
+                    this.playbackRate = 3;
                     videoRight.classList.remove('loading');
                     videoRight.play();
                     videoRight.oncanplay = null;
@@ -2747,6 +2859,7 @@
             
             video.src = videoPath;
             video.load();
+            video.playbackRate = 3;
             
             modal.classList.add('active');
             video.currentTime = 0;
@@ -2838,6 +2951,7 @@
                 <source src="Media/Video/Full/MPAIL.mp4" type="video/mp4">
                 Your browser does not support video playback.
             </video>
+            <span class="video-speed-badge">3X</span>
         </div>
     </div>
 
