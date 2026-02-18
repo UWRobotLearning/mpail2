@@ -265,14 +265,31 @@
             left: 0;
         }
 
+        .hero-poster {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            object-fit: cover;
+        }
+        .video-container.hero-ready .hero-poster {
+            display: none;
+        }
         .video-container video {
             width: 100%;
             height: 100%;
             position: absolute;
             top: 0;
             left: 0;
+            z-index: 0;
             object-fit: cover;
             display: block;
+            opacity: 0;
+        }
+        .video-container video.hero-ready {
+            opacity: 1;
         }
 
         .video-overlay {
@@ -1553,14 +1570,14 @@
     <script>
         
         document.addEventListener('DOMContentLoaded', function() {
-            var video = document.querySelector('video');
-            if (video) {
-                
-                video.addEventListener('loadedmetadata', function() {
+            var heroVideo = document.getElementById('hero-video');
+            var heroContainer = document.getElementById('hero-video-container');
+            if (heroVideo && heroContainer) {
+                heroVideo.addEventListener('canplay', function() {
+                    this.classList.add('hero-ready');
+                    heroContainer.classList.add('hero-ready');
                 });
-
-                video.addEventListener('timeupdate', function() {
-                    
+                heroVideo.addEventListener('timeupdate', function() {
                     if (this.duration && !isNaN(this.duration)) {
                         var remaining = this.duration - this.currentTime;
                         if (remaining <= 8 && remaining > 0) {
@@ -1568,9 +1585,7 @@
                         }
                     }
                 });
-
-                
-                video.addEventListener('ended', function() {
+                heroVideo.addEventListener('ended', function() {
                     this.currentTime = 0;
                     this.play();
                 });
@@ -1611,9 +1626,11 @@
     </button>
 
     
+    <!-- 海报图：用视频第一帧生成。在项目根目录执行: ffmpeg -y -i Media/Video/Background/background.mp4 -vframes 1 -q:v 2 Media/Video/Background/poster.jpg -->
     <section class="video-section">
-        <div class="video-container">
-            <video autoplay muted loop playsinline>
+        <div class="video-container" id="hero-video-container">
+            <img class="hero-poster" src="Media/Video/Background/poster.jpg" alt="" aria-hidden="true">
+            <video id="hero-video" autoplay muted loop playsinline preload="metadata">
                 <source src="Media/Video/Background/background.mp4" type="video/mp4">
                 Your browser does not support video playback.
             </video>
