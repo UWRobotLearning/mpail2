@@ -121,7 +121,7 @@
         }
 
         body.dark-mode .section-header {
-            color: #e0e0e0;
+            color: #a5b4fc;
         }
         body.dark-mode .summary-main-image::after {
             content: '';
@@ -229,7 +229,7 @@
         }
 
         body.dark-mode .iteration-slider {
-            background: linear-gradient(90deg, #2a2a40 0%, #2a2a40 100%);
+            background: linear-gradient(90deg, #2a2a3e 0%, #2a2a3e 100%);
         }
 
         body.dark-mode .iteration-slider::-webkit-slider-thumb {
@@ -240,8 +240,15 @@
             border-color: #1a1a30;
         }
 
+        body.dark-mode .iteration-slider::-webkit-slider-runnable-track {
+            background: linear-gradient(90deg, #2a2a3e 0%, #2a2a3e 100%);
+        }
+        body.dark-mode .iteration-slider::-moz-range-track {
+            background: linear-gradient(90deg, #2a2a3e 0%, #2a2a3e 100%);
+        }
+
         body.dark-mode .slider-dot {
-            background: #2a2a4a;
+            background: #3d3d58;
         }
 
         body.dark-mode .slider-dot.active {
@@ -422,9 +429,9 @@
 
         
         .section-header {
-            font-size: clamp(2em, 4vw, 3em);
-            color: #2c3e50;
-            margin-bottom: 30px;
+            font-size: clamp(1.5em, 3vw, 2.2em);
+            color: #667eea;
+            margin-bottom: 20px;
             font-weight: 600;
             text-align: center;
         }
@@ -454,10 +461,19 @@
             pointer-events: none;
         }
 
-        .subsection-header {
-            font-size: 1.5em;
+        .section-header.experiment-sub-header {
+            font-size: clamp(1.2em, 2.5vw, 1.6em);
             color: #666;
-            margin: 80px 0 0px 0;
+            margin-bottom: 5px;
+        }
+        body.dark-mode .section-header.experiment-sub-header {
+            color: #c0c0c0;
+        }
+
+        .subsection-header {
+            font-size: 1.1em;
+            color: #666;
+            margin: 10px 0 0px 0;
             font-weight: 600;
             text-align: center;
         }
@@ -501,8 +517,8 @@
 
         
         .content-block {
-            margin-top: 60px;
-            padding-top: 20px;
+            margin-top: 20px;
+            padding-top: 10px;
         }
 
         .content-block:first-of-type {
@@ -741,6 +757,17 @@
         .timeline-item.active .timeline-label {
             color: #667eea;
             font-weight: 600;
+        }
+
+        .timeline-sub-item {
+            padding-left: 12px;
+        }
+        .timeline-sub-item .timeline-dot {
+            width: 6px;
+            height: 6px;
+        }
+        .timeline-sub-item .timeline-label {
+            font-size: 0.85em;
         }
 
         
@@ -1086,8 +1113,8 @@
         .iteration-control-area {
             width: 100%;
             max-width: 800px;
-            margin: 15px auto;
-            padding: 15px 30px;
+            margin: 5px auto;
+            padding: 5px 30px;
         }
 
         .iteration-info-row {
@@ -1095,7 +1122,7 @@
             justify-content: center;
             align-items: center;
             gap: 80px;
-            margin-bottom: 20px;
+            margin-bottom: 8px;
         }
 
         .iteration-info-item {
@@ -1130,7 +1157,7 @@
 
         .slider-track-container {
             position: relative;
-            padding: 15px 0 10px 0;
+            padding: 5px 0 25px 0;
         }
 
         .iteration-slider {
@@ -1253,7 +1280,7 @@
             justify-content: space-between;
             position: absolute;
             width: calc(100% - 28px);
-            top: 40px;
+            top: 33px;
             left: 14px;
             z-index: 1;
             pointer-events: none;
@@ -1345,14 +1372,15 @@
             margin-right: auto;
         }
         .sample-method-btn {
-            padding: 8px 18px;
-            width: 150px;
-            flex: 0 0 150px;
-            height: 40px;
+            padding: 5px 14px;
+            width: 100px;
+            flex: 0 0 100px;
+            height: 32px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.9em;
+            text-align: center;
+            font-size: 0.82em;
             font-weight: 500;
             font-family: inherit;
             border: 2px solid #c5ccd6;
@@ -1554,12 +1582,12 @@
         
         .demonstrations-grid {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: repeat(10, 1fr);
             gap: 0;
             width: 100%;
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 20px auto 0 auto;
-            border-radius: 12px;
+            border-radius: 0;
             overflow: hidden;
         }
 
@@ -1696,15 +1724,19 @@
         <div class="timeline-line"></div>
         <a href="#summary-section" class="timeline-item active" data-section="summary">
             <span class="timeline-dot"></span>
-            <span class="timeline-label">Summary</span>
+            <span class="timeline-label">Abstract</span>
         </a>
-        <a href="#efficiency-section" class="timeline-item" data-section="efficiency">
+        <a href="#contributions-section" class="timeline-item" data-section="contributions">
             <span class="timeline-dot"></span>
-            <span class="timeline-label">Sample Efficiency</span>
+            <span class="timeline-label">Contributions</span>
         </a>
-        <a href="#transfer-section" class="timeline-item" data-section="transfer">
+        <a href="#methods-section" class="timeline-item" data-section="methods">
             <span class="timeline-dot"></span>
-            <span class="timeline-label">Transfer Learning</span>
+            <span class="timeline-label">Methods</span>
+        </a>
+        <a href="#experiments-section" class="timeline-item" data-section="experiments">
+            <span class="timeline-dot"></span>
+            <span class="timeline-label">Experiments</span>
         </a>
         <a href="#generalization-section" class="timeline-item" data-section="generalization">
             <span class="timeline-dot"></span>
@@ -1742,17 +1774,53 @@
     <div class="container">
         
         <section class="project-info scroll-section" id="summary-section">
-            <div class="summary-main-image"><img src="Media/Image/main.jpg" alt="Main"></div>
-            <h2 class="section-header">Summary</h2>
+            <h2 class="section-header">Abstract</h2>
             <p class="project-description">
-                Experiments conducted <strong>entirely in the real-world</strong> demonstrate that this paradigm is effective for learning <strong>image-based manipulation tasks from scratch in under an hour</strong>, without assuming prior knowledge, pre-training, or data of any kind beyond task observations. Moreover, this work demonstrates that the learned world model representation is capable of <strong>online transfer learning</strong> <strong>in the real-world</strong> from scratch. In comparison to existing approaches, including IRL, RL, and Behavior Cloning (BC), which have more restrictive assumptions, our approach demonstrates <strong>significantly greater sample efficiency and success rates</strong>. This enables a practical path forward for world modeling and planning from online observation and interaction.
+                Observational learning requires an agent to learn to perform a task by referencing only observations of the performed task. This work investigates the equivalent setting in real-world robot learning where access to hand-designed rewards and demonstrator actions are not assumed. To address this data-constrained setting, this work presents a <strong>planning-based Inverse Reinforcement Learning (IRL) algorithm</strong> for world modeling from observation and interaction alone. Experiments conducted <strong>entirely in the real-world</strong> demonstrate that this paradigm is effective for learning <strong>image-based manipulation tasks from scratch in under an hour</strong>, without assuming prior knowledge, pre-training, or data of any kind beyond task observations. Moreover, this work demonstrates that the learned world model representation is capable of <strong>online transfer learning in the real-world</strong> from scratch. In comparison to existing approaches, including IRL, RL, and Behavior Cloning (BC), which have more restrictive assumptions, our approach demonstrates <strong>significantly greater sample efficiency and success rates</strong>. This enables a practical path forward for world modeling and planning from online observation and interaction.
             </p>
         </section>
 
         
+        <section class="project-info scroll-section" id="contributions-section">
+            <h2 class="section-header">Contributions</h2>
+            <p class="project-description">
+                Coming soon.
+            </p>
+        </section>
+
+        
+        <section class="project-info scroll-section" id="methods-section">
+            <h2 class="section-header">Methods</h2>
+            <p class="project-description">
+                Coming soon.
+            </p>
+            <div class="summary-main-image"><img src="Media/Image/main.jpg" alt="Methods Overview"></div>
+        </section>
+
+        
+        <section class="project-info scroll-section" id="vis-section">
+            <div style="display: flex; gap: 0; justify-content: center; align-items: stretch; max-width: 1200px; margin: 0 auto; overflow: hidden;">
+                <div style="flex: 1;">
+                    <video autoplay muted loop playsinline style="width: 100%; height: 100%; display: block; object-fit: cover;">
+                        <source src="Media/Video/Vis/render.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div style="flex: 1;">
+                    <video autoplay muted loop playsinline style="width: 100%; height: 100%; display: block; object-fit: cover;">
+                        <source src="Media/Video/Vis/rollout-vis.mp4" type="video/mp4">
+                    </video>
+                </div>
+            </div>
+        </section>
+
+        
         <section class="tasks-section scroll-section" id="efficiency-section">
-            <h2 class="section-header">Sample Efficiency</h2>
-            <p class="demonstrations-caption" style="margin-bottom:-40px;">&#8592; Use the left sidebar to switch between tasks</p>
+            <h2 class="section-header" id="experiments-section">Experiments</h2>
+            <p class="project-description" style="margin-bottom: 40px;">
+                All experiments are trained <strong>entirely from scratch in the real world</strong> with <strong>no pre-training or prior data of any kind</strong> (beyond task observations). Demonstrations are all the expert data used in training; Training time-lapses show the training process.
+            </p>
+            <h2 class="section-header experiment-sub-header">Sample Efficiency</h2>
+            <p class="demonstrations-caption" style="margin-top: 0; margin-bottom: 0; font-size: 0.8em;">&#8592; Use the left sidebar to switch between tasks</p>
 
             <div class="content-block" id="demonstrations-block">
                 <h3 class="subsection-header">Demonstrations</h3>
@@ -1828,7 +1896,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="demonstrations-caption"><span style="font-weight:700; font-size:1.15em; color:#667eea;">All</span> demonstrations used in training</div>
+                <div class="demonstrations-caption">Only use these <span style="font-weight:700; font-size:1.15em; color:#667eea;">10</span> Demonstrations in training</div>
             </div>
 
             
@@ -1855,39 +1923,51 @@
                     </div>
                 </div>
 
-                <p class="demonstrations-caption" style="margin-top: 6px; margin-bottom: 10px; font-size: 1.08rem; font-weight: 600; font-style: normal; letter-spacing: 0.2px; text-align: center;">Comparison with SOTA</p>
-                <div class="sample-method-row">
-                    <button type="button" class="sample-method-btn active" data-method="mpail2-p" onclick="selectSampleMethod('mpail2-p')">MPAIL2[-P]</button>
-                    <button type="button" class="sample-method-btn" data-method="mpail2-pm" onclick="selectSampleMethod('mpail2-pm')">MPAIL2[-PM]</button>
-                    <button type="button" class="sample-method-btn" data-method="rlpd" onclick="selectSampleMethod('rlpd')">RLPD</button>
-                </div>
-
                 <div class="transfer-videos-container">
                     <div class="transfer-video-wrapper">
+                        <p class="video-label highlighted sample-mpail2-title" style="margin-bottom: 10px;">MPAIL2</p>
                         <div class="video-display">
                             <video id="task-video" autoplay muted loop playsinline>
                                 <source src="Media/Video/Push/iter_0.mp4" type="video/mp4">
                                 Your browser does not support video playback.
                             </video>
                         </div>
-                        <p class="video-label highlighted sample-mpail2-title">MPAIL2</p>
-                        <a class="full-video-link" onclick="openVideoModal('sample')">
+                        <a class="full-video-link" style="margin-top: 20px;" onclick="openVideoModal('sample')">
                             <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                             Full Training Video
                         </a>
                     </div>
                     <div class="transfer-video-wrapper">
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 10px; flex-wrap: nowrap;">
+                            <div class="sample-method-row" style="justify-content: center; margin-bottom: 0; flex-wrap: nowrap;">
+                                <button type="button" class="sample-method-btn active" data-method="mpail2-p" onclick="selectSampleMethod('mpail2-p')">No Planning</button>
+                                <button type="button" class="sample-method-btn" data-method="mpail2-pm" onclick="selectSampleMethod('mpail2-pm')">Model-Free</button>
+                                <button type="button" class="sample-method-btn" data-method="rlpd" onclick="selectSampleMethod('rlpd')">RLPD</button>
+                            </div>
+                        </div>
                         <div class="video-display">
                             <video id="sample-method-video" autoplay muted loop playsinline>
                                 <source src="Media/Video/Comparison/mpail2_p/Push/iter_0.mp4" type="video/mp4">
                                 Your browser does not support video playback.
                             </video>
                         </div>
-                        <p class="video-label" id="sample-method-label">MPAIL2[-P]</p>
-                        <a class="full-video-link" onclick="openVideoModal('comparison')">
+                        <p class="video-label" id="sample-method-label" style="display:none;">No Planning</p>
+                        <a class="full-video-link" style="margin-top: 20px;" onclick="openVideoModal('comparison')">
                             <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                             Full Training Video
                         </a>
+                    </div>
+                </div>
+
+                <div class="content-block" id="results-block">
+                    <h3 class="subsection-header">Results</h3>
+                    <div style="display: flex; gap: 20px; justify-content: center; align-items: center; max-width: 1200px; margin: 15px auto 0 auto; height: 280px;" id="results-images">
+                        <div style="flex: 1; max-width: 550px; height: 100%; display: flex; align-items: center; justify-content: center;">
+                            <img id="results-chart-img" src="Media/Image/Results/push_chart.png" alt="Results Chart" style="max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px;">
+                        </div>
+                        <div style="flex: 1; max-width: 550px; height: 100%; display: flex; align-items: center; justify-content: center;">
+                            <img id="results-table-img" src="Media/Image/Results/push_table.png" alt="Results Table" style="max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px;">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1895,8 +1975,8 @@
 
         
         <section class="tasks-section scroll-section" id="transfer-section">
-            <h2 class="section-header">Transfer Learning</h2>
-            <p class="demonstrations-caption" style="margin-bottom:-40px;">&#8592; Use the left sidebar to switch between tasks</p>
+            <h2 class="section-header experiment-sub-header">Transfer Learning</h2>
+            <p class="demonstrations-caption" style="margin-top: 0; margin-bottom: 0; font-size: 0.8em;">&#8592; Use the left sidebar to switch between tasks</p>
 
             <div class="content-block" id="transfer-initial-demonstrations-block">
                 <h3 class="subsection-header">Demonstrations</h3>
@@ -1977,7 +2057,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="demonstrations-caption"><span style="font-weight:700; font-size:1.15em; color:#667eea;">All</span> demonstrations used in initial training</div>
+                <div class="demonstrations-caption">Only use these <span style="font-weight:700; font-size:1.15em; color:#667eea;">10</span> Demonstrations in initial training</div>
                 </div>
                 <div class="transfer-demo-panel hidden" id="transfer-demo-panel-new">
                 <div class="demonstrations-grid" id="transfer-demonstrations-grid">
@@ -2052,7 +2132,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="demonstrations-caption"><span style="font-weight:700; font-size:1.15em; color:#667eea;">All</span> demonstrations used in new task training</div>
+                <div class="demonstrations-caption">Only use these <span style="font-weight:700; font-size:1.15em; color:#667eea;">10</span> Demonstrations in new task training</div>
                 </div>
             </div>
 
@@ -2083,28 +2163,28 @@
                 
                 <div class="transfer-videos-container">
                     <div class="transfer-video-wrapper transferred">
+                        <p class="video-label highlighted sample-mpail2-title" style="margin-bottom: 10px;">Transferred</p>
                         <div class="video-display">
                             <video id="transfer-video-left" autoplay muted loop playsinline>
                                 <source src="Media/Video/Transfer/Push/iter_0.mp4" type="video/mp4">
                                 Your browser does not support video playback.
                             </video>
                         </div>
-                        <p class="video-label highlighted sample-mpail2-title">Transferred</p>
                         
-                        <a class="full-video-link" onclick="openVideoModal('transfer')">
+                        <a class="full-video-link" style="margin-top: 20px;" onclick="openVideoModal('transfer')">
                             <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                             Full Training Video
                         </a>
                     </div>
                     <div class="transfer-video-wrapper">
+                        <p class="video-label" style="margin-bottom: 10px;">From Scratch</p>
                         <div class="video-display">
                             <video id="transfer-video-right" autoplay muted loop playsinline>
                                 <source src="Media/Video/From%20Scratch/Push/iter_0.mp4" type="video/mp4">
                                 Your browser does not support video playback.
                             </video>
                         </div>
-                        <p class="video-label">From Scratch</p>
-                        <a href="#" class="full-video-link" onclick="openVideoModal('scratch'); return false;">
+                        <a href="#" class="full-video-link" style="margin-top: 20px;" onclick="openVideoModal('scratch'); return false;">
                             <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                             Full Training Video
                         </a>
@@ -2116,7 +2196,7 @@
         
         <section class="tasks-section scroll-section" id="generalization-section">
             <h2 class="section-header">Generalization</h2>
-            <p class="demonstrations-caption">(Trained with <span style="font-weight:700; font-size:1.15em; color:#e6a817;">only Yellow Cube</span> in scene)</p>
+            <p class="demonstrations-caption">(Trained with <span style="font-weight:700; font-size:1em; color:#e6a817;">only Yellow Cube</span> in scene)</p>
 
             <div class="content-block">
                 
@@ -2164,7 +2244,7 @@
         
         <section class="tasks-section scroll-section" id="tablecam-section">
             <h2 class="section-header">Minimal Observations</h2>
-            <p class="demonstrations-caption">(Demonstrations contain <span style="font-weight:700; font-size:1.15em; color:#667eea;">only the table camera</span>, with no proprioceptive/Wrist-mounted camera from the robot in demonstrations)</p>
+            <p class="demonstrations-caption">(Demonstrations contain <span style="font-weight:700; font-size:1em; color:#667eea;">only the table camera</span>, with no proprioceptive/Wrist-mounted camera from the robot in demonstrations)</p>
 
             <div class="content-block">
                 
@@ -2297,6 +2377,9 @@
 
             
             const summarySection = document.getElementById('summary-section');
+            const contributionsSection = document.getElementById('contributions-section');
+            const methodsSection = document.getElementById('methods-section');
+            const visSection = document.getElementById('vis-section');
             const efficiencySection = document.getElementById('efficiency-section');
             const transferSection = document.getElementById('transfer-section');
             const generalizationSection = document.getElementById('generalization-section');
@@ -2321,6 +2404,8 @@
                 
                 
                 const summaryRect = summarySection.getBoundingClientRect();
+                const contributionsRect = contributionsSection.getBoundingClientRect();
+                const methodsRect = methodsSection.getBoundingClientRect();
                 const efficiencyRect = efficiencySection.getBoundingClientRect();
                 const transferRect = transferSection.getBoundingClientRect();
                 const generalizationRect = generalizationSection.getBoundingClientRect();
@@ -2362,9 +2447,13 @@
                 } else if (generalizationRect.top < windowHeight * 0.5) {
                     activeSection = 'generalization';
                 } else if (transferRect.top < windowHeight * 0.5) {
-                    activeSection = 'transfer';
+                    activeSection = 'experiments';
                 } else if (efficiencyRect.top < windowHeight * 0.5) {
-                    activeSection = 'efficiency';
+                    activeSection = 'experiments';
+                } else if (methodsRect.top < windowHeight * 0.5) {
+                    activeSection = 'methods';
+                } else if (contributionsRect.top < windowHeight * 0.5) {
+                    activeSection = 'contributions';
                 }
                 
                 timelineItems.forEach(item => {
@@ -2490,6 +2579,7 @@
             updateDemonstrationVideos();
             updateTransferDemonstrationVideos();
             updateInitialDemonstrationVideos();
+            updateResultsImages();
         }
 
         function updateSliderRange() {
@@ -2546,6 +2636,14 @@
                     }
                 }
             }
+        }
+
+        function updateResultsImages() {
+            const folder = currentTask === 'push' ? 'push' : 'Pick';
+            const chartImg = document.getElementById('results-chart-img');
+            const tableImg = document.getElementById('results-table-img');
+            if (chartImg) chartImg.src = `Media/Image/Results/${folder}_chart.png`;
+            if (tableImg) tableImg.src = `Media/Image/Results/${folder}_table.png`;
         }
 
         function updateDemonstrationVideos() {
@@ -2610,8 +2708,8 @@
             'rlpd': 'rlpd'
         };
         const sampleMethodLabelMap = {
-            'mpail2-p': 'MPAIL2[-P]',
-            'mpail2-pm': 'MPAIL2[-PM]',
+            'mpail2-p': 'No Planning',
+            'mpail2-pm': 'Model-Free',
             'rlpd': 'RLPD'
         };
         function selectSampleMethod(method) {
