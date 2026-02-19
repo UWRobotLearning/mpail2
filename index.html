@@ -1961,12 +1961,12 @@
 
                 <div class="content-block" id="results-block">
                     <h3 class="subsection-header">Results</h3>
-                    <div style="display: flex; gap: 20px; justify-content: center; align-items: center; max-width: 1200px; margin: 15px auto 0 auto; height: 280px;" id="results-images">
-                        <div style="flex: 1; max-width: 550px; height: 100%; display: flex; align-items: center; justify-content: center;">
-                            <img id="results-chart-img" src="Media/Image/Results/Push_chart.png" alt="Results Chart" style="max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px;">
+                    <div style="display: flex; gap: 10px; justify-content: center; align-items: center; max-width: 1200px; margin: 15px auto 0 auto;" id="results-images">
+                        <div style="flex: 1; max-width: 550px;">
+                            <img id="results-chart-img" src="Media/Image/Results/Push_chart.png" alt="Results Chart" style="width: 100%; border-radius: 8px;">
                         </div>
-                        <div style="flex: 1; max-width: 550px; height: 100%; display: flex; align-items: center; justify-content: center;">
-                            <img id="results-table-img" src="Media/Image/Results/Push_table.png" alt="Results Table" style="max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px;">
+                        <div style="flex: 1; max-width: 550px;">
+                            <img id="results-table-img" src="Media/Image/Results/Push_table.png" alt="Results Table" style="width: 100%; border-radius: 8px;">
                         </div>
                     </div>
                 </div>
@@ -2188,6 +2188,17 @@
                             <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                             Full Training Video
                         </a>
+                    </div>
+                </div>
+                <div class="content-block" id="transfer-results-block">
+                    <h3 class="subsection-header">Results</h3>
+                    <div style="display: flex; gap: 10px; justify-content: center; align-items: center; max-width: 1200px; margin: 15px auto 0 auto;" id="transfer-results-images">
+                        <div style="flex: 1; max-width: 550px;">
+                            <img id="transfer-results-chart-img" src="Media/Image/Results/Transfer_Push_chart.png" alt="Transfer Results Chart" style="width: 100%; border-radius: 8px;">
+                        </div>
+                        <div style="flex: 1; max-width: 550px;">
+                            <img id="transfer-results-table-img" src="Media/Image/Results/Transfer_Push_table.png" alt="Transfer Results Table" style="width: 100%; border-radius: 8px;">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2644,6 +2655,10 @@
             const tableImg = document.getElementById('results-table-img');
             if (chartImg) chartImg.src = `Media/Image/Results/${folder}_chart.png`;
             if (tableImg) tableImg.src = `Media/Image/Results/${folder}_table.png`;
+            const tChartImg = document.getElementById('transfer-results-chart-img');
+            const tTableImg = document.getElementById('transfer-results-table-img');
+            if (tChartImg) tChartImg.src = `Media/Image/Results/Transfer_${folder}_chart.png`;
+            if (tTableImg) tTableImg.src = `Media/Image/Results/Transfer_${folder}_table.png`;
         }
 
         function updateDemonstrationVideos() {
