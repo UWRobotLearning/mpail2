@@ -1794,21 +1794,19 @@
             <p class="project-description">
                 Coming soon.
             </p>
-            <div class="summary-main-image"><img src="Media/Image/main.jpg" alt="Methods Overview"></div>
-        </section>
-
-        
-        <section class="project-info scroll-section" id="vis-section">
-            <div style="display: flex; gap: 0; justify-content: center; align-items: stretch; max-width: 1200px; margin: 0 auto; overflow: hidden;">
-                <div style="flex: 1;">
-                    <video autoplay muted loop playsinline style="width: 100%; height: 100%; display: block; object-fit: cover;">
-                        <source src="Media/Video/Vis/render.mp4" type="video/mp4">
-                    </video>
-                </div>
-                <div style="flex: 1;">
-                    <video autoplay muted loop playsinline style="width: 100%; height: 100%; display: block; object-fit: cover;">
-                        <source src="Media/Video/Vis/rollout-vis.mp4" type="video/mp4">
-                    </video>
+            <div style="display: flex; gap: 20px; justify-content: center; align-items: center; max-width: 1200px; margin: 20px auto 0 auto;">
+                <div class="summary-main-image" style="flex: 3; margin-bottom: 0;"><img src="Media/Image/main.jpg" alt="Methods Overview"></div>
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 0; align-self: stretch;">
+                    <div style="flex: 1; overflow: hidden;">
+                        <video autoplay muted loop playsinline style="width: 100%; height: 100%; display: block; object-fit: cover;">
+                            <source src="Media/Video/Vis/render.mp4" type="video/mp4">
+                        </video>
+                    </div>
+                    <div style="flex: 1; overflow: hidden;">
+                        <video autoplay muted loop playsinline style="width: 100%; height: 100%; display: block; object-fit: cover;">
+                            <source src="Media/Video/Vis/rollout-vis.mp4" type="video/mp4">
+                        </video>
+                    </div>
                 </div>
             </div>
         </section>
@@ -2247,6 +2245,17 @@
                             </video>
                         </div>
                         <div class="gen-video-label">Multi-Cube Scene 2</div>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: center; margin-top: 20px;">
+                    <div class="generalization-video-wrapper" style="max-width: calc(50% - 12px);">
+                        <div class="video-display">
+                            <video id="gen-video-5" autoplay muted loop playsinline>
+                                <source src="Media/Video/Generalization/video_5.mp4" type="video/mp4">
+                                Your browser does not support video playback.
+                            </video>
+                        </div>
+                        <div class="gen-video-label">Camera Disturbance</div>
                     </div>
                 </div>
             </div>
