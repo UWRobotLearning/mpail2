@@ -1798,12 +1798,12 @@
                 <div class="summary-main-image" style="flex: 3; margin-bottom: 0;"><img src="Media/Image/main.jpg" alt="Methods Overview"></div>
                 <div style="flex: 1; display: flex; flex-direction: column; gap: 0; align-self: stretch;">
                     <div style="flex: 1; overflow: hidden;">
-                        <video autoplay muted loop playsinline style="width: 100%; height: 100%; display: block; object-fit: cover;">
+                        <video id="vis-render" autoplay muted playsinline style="width: 100%; height: 100%; display: block; object-fit: cover;">
                             <source src="Media/Video/Vis/render.mp4" type="video/mp4">
                         </video>
                     </div>
                     <div style="flex: 1; overflow: hidden;">
-                        <video autoplay muted loop playsinline style="width: 100%; height: 100%; display: block; object-fit: cover;">
+                        <video id="vis-rollout" autoplay muted playsinline style="width: 100%; height: 100%; display: block; object-fit: cover;">
                             <source src="Media/Video/Vis/rollout-vis.mp4" type="video/mp4">
                         </video>
                     </div>
@@ -3013,6 +3013,24 @@
 
         
         document.addEventListener('DOMContentLoaded', function() {
+            var visRender = document.getElementById('vis-render');
+            var visRollout = document.getElementById('vis-rollout');
+            if (visRender && visRollout) {
+                var visMaxDuration = 6;
+                function syncVisVideos() {
+                    visRender.currentTime = 0;
+                    visRollout.currentTime = 0;
+                    visRender.play();
+                    visRollout.play();
+                }
+                visRender.addEventListener('timeupdate', function() {
+                    if (this.currentTime >= visMaxDuration) syncVisVideos();
+                });
+                visRollout.addEventListener('timeupdate', function() {
+                    if (this.currentTime >= visMaxDuration) syncVisVideos();
+                });
+            }
+
             document.querySelectorAll('video').forEach(function(video) {
                 video.muted = true;
                 video.addEventListener('volumechange', function() {
