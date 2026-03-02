@@ -206,30 +206,6 @@ class EnsembleValueCfg:
 
     model_factory: Callable[[Any], torch.nn.Sequential] = mlp_factory
 
-
-@dataclass(kw_only=True)
-class TDReturnCfg:
-    '''DEPRECATED: Use PlannerCfg.reward_cfg and PlannerCfg.value_cfg directly.
-
-    This config class is deprecated. The Planner now directly manages
-    Reward and EnsembleValue instances.
-    '''
-
-    reward_cfg: RewardCfg = None
-    '''Config for the reward function'''
-
-    value_cfg: EnsembleValueCfg = None
-    '''Config for the value function'''
-
-    feature_inds: Optional[list] = None
-    '''Feature indices to apply reward to. If None, applies to all features'''
-
-    gamma: Optional[float] = None
-    '''Discount factor for reward computation'''
-
-    class_type: type = None  # Deprecated, not used
-
-
 ###############################################################################
 # LEARNER CONFIGURATIONS
 ###############################################################################

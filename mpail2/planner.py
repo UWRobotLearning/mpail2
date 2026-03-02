@@ -126,7 +126,6 @@ class Planner(torch.nn.Module):
 
         # Make temperature learnable
         self._temp_exp = torch.nn.Parameter(torch.log(torch.tensor(self.cfg.temperature, device=self.device, dtype=self.dtype)))
-        self.feature_inds = self.cfg.reward_cfg.feature_inds
 
         self._obs_normalizer = None
 

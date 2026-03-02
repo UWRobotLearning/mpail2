@@ -64,12 +64,6 @@ class EnsembleValueConfig(cfgs.EnsembleValueCfg):
         **MODEL_KWARGS,
     })
 
-@dataclass(kw_only=True)
-class TDReturnConfig(cfgs.TDReturnCfg):
-    reward_cfg: RewardConfig = RewardConfig()
-    value_cfg: EnsembleValueConfig = EnsembleValueConfig()
-    gamma: float = GAMMA
-
 #
 # Encoders
 #
@@ -181,7 +175,8 @@ class PlannerConfig(cfgs.PlannerCfg):
     temperature: float = 2.0
     opt_iters: int = OPT_ITERS
 
-    reward_cfg: TDReturnConfig = TDReturnConfig()
+    reward_cfg: RewardConfig = RewardConfig()
+    value_cfg: EnsembleValueConfig = EnsembleValueConfig()
     sampling_cfg: PolicySamplingConfig = PolicySamplingConfig()
     dynamics_cfg: DynamicsConfig = DynamicsConfig()
 
