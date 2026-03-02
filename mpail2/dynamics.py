@@ -28,10 +28,10 @@ class Dynamics(torch.nn.Module):
         self.num_envs = num_envs
 
         # Feedforward dynamics network
-        self.ff_dynamics = resolve_obj(self.cfg.ff_cfg.model_factory)(
+        self.model = resolve_obj(self.cfg.model_factory)(
             input_dim=self.cfg.latent_dim + self.cfg.action_dim,
             output_dim=self.cfg.latent_dim,
-            **self.cfg.ff_cfg.model_kwargs,
+            **self.cfg.model_kwargs,
         )
 
     def step(self, current_latent: torch.Tensor, control: torch.Tensor):
@@ -46,15 +46,13 @@ class Dynamics(torch.nn.Module):
             next_latent: Next latent state of shape (..., latent_dim)
         """
         model_input = torch.cat((current_latent, control), dim=-1)
-        return self.ff_dynamics(model_input)
+        return self.model(model_input)
 
     @torch.compile
     def forward(
         self,
         z0: torch.Tensor,
         controls: torch.Tensor,
-        tf_mask: torch.Tensor = None,
-        latent_gt: torch.Tensor = None,
     ):
         """
         Forward pass for dynamics model. Rolls out latent trajectory from initial latent state.
@@ -68,15 +66,11 @@ class Dynamics(torch.nn.Module):
         Returns:
             zs: latent trajectory of shape (B, ..., T+1, latent_dim)
         """
-        _use_tf = tf_mask is not None
         controls = controls.to(device=self.d, dtype=self.dtype)
         T = controls.shape[-2]
 
         # Match batch dimensions: if controls is (B, ..., T, a_dim), expand z0 to (B, ..., latent_dim)
         batch_shape = controls.shape[:-2]  # (B, ...)
-
-        if _use_tf:
-            latent_gt = latent_gt.detach()
 
         num_extra_dims = len(batch_shape) - (z0.ndim - 1)
         z0_expanded = z0.view(*z0.shape[:-1], *([1] * max(0, num_extra_dims)), z0.shape[-1])
@@ -85,15 +79,7 @@ class Dynamics(torch.nn.Module):
         zs_list = [z0_expanded]
 
         for i in range(T):
-            # Apply teacher forcing based on tf_mask if provided
-            if _use_tf:
-                current_latent = torch.where(
-                    tf_mask[..., i].unsqueeze(-1),
-                    latent_gt[..., i, :],
-                    zs_list[-1]
-                )
-            else:
-                current_latent = zs_list[-1]
+            current_latent = zs_list[-1]
 
             # Step dynamics in latent space
             next_latent = self.step(current_latent, controls[..., i, :])

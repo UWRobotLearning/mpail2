@@ -30,7 +30,6 @@ def mlp_factory(
     disable_output_bias: bool = False,
     override_last_layer_norm: bool = False,
     override_last_layer_activation: bool = False,
-    squash_output: bool = False,
     device: torch.device = torch.device('cuda'),
     dtype: torch.dtype = torch.float32,
     **kwargs,
@@ -66,10 +65,6 @@ def mlp_factory(
         )
         if not is_last:
             layers.append(activation)
-
-    # Optional sigmoid output
-    if squash_output:
-        layers.append(nn.Sigmoid())
 
     if override_last_layer_activation:
         layers.append(activation)

@@ -18,9 +18,12 @@ INSTALL_REQUIRES = [
     "pyyaml",
     "toml",
     "gymnasium",
+    "gymnasium[mujoco]",  # MuJoCo environments
     "tqdm",
     "wandb",
     "imageio",
+    "imageio-ffmpeg",  # For video encoding
+    "av",  # PyAV for video encoding
     "matplotlib",
     "scipy",
 ]
@@ -28,7 +31,7 @@ INSTALL_REQUIRES = [
 # Installation operation
 setup(
     name="mpail2",
-    packages=["mpail2"],
+    packages=["mpail2", "mpail2.configs", "mpail2.utils", "gymnasium_mpail"],
     author=EXTENSION_TOML_DATA["package"]["author"],
     maintainer=EXTENSION_TOML_DATA["package"]["maintainer"],
     url=EXTENSION_TOML_DATA["package"]["repository"],

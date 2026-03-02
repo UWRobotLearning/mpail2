@@ -7,12 +7,15 @@ from typing import Literal, Callable, Any, Optional, Type, List, Tuple, TYPE_CHE
 
 from mpail2.layers import mlp_factory, cnn_factory, identity_factory
 
+# Import actual classes for default class_type values
+from mpail2.encoder import Coder, Decoder, CNNCoder, MultiCoder
+from mpail2.dynamics import Dynamics
+from mpail2.sampling import PolicySampling
+from mpail2.reward import Reward
+from mpail2.value import EnsembleValue
+from mpail2.learner import MPAIL2Learner
+
 if TYPE_CHECKING:
-    from ..encoder import Coder, Decoder, CNNCoder, MultiCoder
-    from ..dynamics import Dynamics
-    from ..sampling import PolicySampling
-    from ..reward import TDReturn, Reward, EnsembleValue
-    from ..learner import MPAIL2Learner
     from ..utils.rollout_vis import RolloutsVisualization
 
 ###############################################################################
@@ -30,16 +33,13 @@ class CoderCfg:
 
     obs_key: str = None
 
-    class_type: Type['Coder'] = None
+    class_type: Type['Coder'] = Coder
     '''class type for the encoder/decoder model'''
 
 
 @dataclass(kw_only=True)
 class IdentityCoderCfg(CoderCfg):
     '''Configuration for Identity Encoder/Decoder that returns input as is'''
-
-    class_type: Type['Coder'] = None
-    '''class type for the encoder/decoder model'''
 
     model_factory: callable = identity_factory
     '''model factory that creates an identity model'''
@@ -61,7 +61,7 @@ class MLPDecoderCfg(MLPCoderCfg):
 
     model_kwargs: dict = field(default_factory=dict)
 
-    class_type: Type['Decoder'] = None
+    class_type: Type['Decoder'] = Decoder
 
 
 @dataclass(kw_only=True)
@@ -76,7 +76,7 @@ class CNNCoderCfg(CoderCfg):
 
     model_factory: callable = cnn_factory
 
-    class_type: Type['CNNCoder'] = None
+    class_type: Type = CNNCoder
 
 
 @dataclass(kw_only=True)
@@ -92,7 +92,7 @@ class MultiCoderCfg(MLPCoderCfg):
 
     model_factory: callable = mlp_factory
 
-    class_type: Type['MultiCoder'] = None
+    class_type: Type['MultiCoder'] = MultiCoder
 
     def __post_init__(self):
         # Propagate output_dim to individual coders if not set
@@ -110,7 +110,7 @@ class MultiCoderCfg(MLPCoderCfg):
 class DynamicsCfg:
     """Configuration for latent dynamics models (operates on encoded states)."""
 
-    class_type: Type['Dynamics'] = None
+    class_type: Type['Dynamics'] = Dynamics
     '''class type for the dynamics model'''
 
     latent_dim: int = None
@@ -155,7 +155,7 @@ class PolicySamplingCfg(SamplingCfg):
 
     state_dim: int = None
 
-    class_type: Type['PolicySampling'] = None
+    class_type: Type['PolicySampling'] = PolicySampling
 
     model_factory: callable = mlp_factory
 
@@ -181,7 +181,7 @@ class PolicySamplingCfg(SamplingCfg):
 @dataclass(kw_only=True)
 class RewardCfg:
 
-    class_type: Type['Reward'] = None
+    class_type: Type['Reward'] = Reward
 
     state_dim: int = None
 
@@ -194,7 +194,7 @@ class RewardCfg:
 class EnsembleValueCfg:
     """Configuration for ensemble value function with multiple Q-networks"""
 
-    class_type: Type['EnsembleValue'] = None
+    class_type: Type['EnsembleValue'] = EnsembleValue
 
     state_dim: int = None
 
@@ -209,6 +209,11 @@ class EnsembleValueCfg:
 
 @dataclass(kw_only=True)
 class TDReturnCfg:
+    '''DEPRECATED: Use PlannerCfg.reward_cfg and PlannerCfg.value_cfg directly.
+
+    This config class is deprecated. The Planner now directly manages
+    Reward and EnsembleValue instances.
+    '''
 
     reward_cfg: RewardCfg = None
     '''Config for the reward function'''
@@ -222,7 +227,7 @@ class TDReturnCfg:
     gamma: Optional[float] = None
     '''Discount factor for reward computation'''
 
-    class_type: Type['TDReturn'] = None
+    class_type: type = None  # Deprecated, not used
 
 
 ###############################################################################
@@ -262,6 +267,9 @@ class RewardLearnerCfg:
 
     gp_coeff: float = None
     '''Coefficient for gradient penalty term in WGAN loss'''
+
+    gp_target_gradient: float = None
+    '''Target gradient norm for gradient penalty'''
 
 @dataclass(kw_only=True)
 class DynamicsLearnerCfg:
@@ -411,8 +419,14 @@ class PlannerCfg:
     decoder_cfg: CoderCfg = None
     '''Configuration for the decoder (latent -> obs), optional'''
 
-    reward_cfg: TDReturnCfg = None
-    '''Configuration for reward module'''
+    reward_cfg: RewardCfg = None
+    '''Configuration for reward function'''
+
+    value_cfg: EnsembleValueCfg = None
+    '''Configuration for value function'''
+
+    gamma: Optional[float] = None
+    '''Discount factor for reward computation during planning'''
 
     sampling_cfg: PolicySamplingCfg = None
     '''Configuration for sampling module'''
@@ -431,13 +445,16 @@ class PlannerCfg:
             if self.decoder_cfg is not None:
                 self.decoder_cfg.output_dim = self.obs_dim  # Decoder output
         if self.action_dim is not None:
-            self.reward_cfg.value_cfg.action_dim = self.action_dim  # Value
+            if self.value_cfg is not None:
+                self.value_cfg.action_dim = self.action_dim  # Value
             self.dynamics_cfg.action_dim = self.action_dim  # Dynamics
             self.sampling_cfg.action_dim = self.action_dim  # Policy
         if self.latent_dim is not None:
             self.sampling_cfg.state_dim = self.latent_dim  # Policy
-            self.reward_cfg.reward_cfg.state_dim = self.latent_dim  # Reward
-            self.reward_cfg.value_cfg.state_dim = self.latent_dim  # Value
+            if self.reward_cfg is not None:
+                self.reward_cfg.state_dim = self.latent_dim  # Reward
+            if self.value_cfg is not None:
+                self.value_cfg.state_dim = self.latent_dim  # Value
             self.dynamics_cfg.latent_dim = self.latent_dim  # Dynamics
             self.encoder_cfg.output_dim = self.latent_dim  # Encoder output
             if hasattr(self.encoder_cfg, '__post_init__'):
@@ -453,7 +470,7 @@ class PlannerCfg:
 @dataclass(kw_only=True)
 class MPAIL2LearnerCfg:
 
-    class_type: Type['MPAIL2Learner'] = None
+    class_type: Type['MPAIL2Learner'] = MPAIL2Learner
     '''Type of the MPAIL learner class'''
 
     replay_ratio: float = None
@@ -468,8 +485,10 @@ class MPAIL2LearnerCfg:
     loss_horizon: int = None
     '''Number of steps to consider for loss computation'''
 
-    use_stack_buffer: bool = None
-    '''Whether to use a stacked buffer for storing transitions'''
+    use_terminations: bool = None
+    '''Whether to use terminal mask in value function updates.
+    When True, the next state value is set to 0 for terminal transitions,
+    implementing the standard RL (1 - done) * V(s') term.'''
 
     # Planner
     planner_cfg: PlannerCfg = None

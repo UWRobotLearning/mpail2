@@ -8,7 +8,8 @@ from typing import TYPE_CHECKING, Dict, Optional
 
 from mpail2.encoder import Coder
 from mpail2.dynamics import Dynamics
-from mpail2.reward import Reward, EnsembleValue
+from mpail2.reward import Reward
+from mpail2.value import EnsembleValue
 from mpail2.sampling import PolicyNetwork
 from mpail2.planner import Planner
 from .storage import RolloutStorage as Storage, DictDemoDataset
@@ -45,6 +46,9 @@ class MPAIL2Learner:
         self.value_learner_cfg = self.cfg.value_learner_cfg
         self.reward_learner_cfg = self.cfg.reward_learner_cfg
 
+        # Log important settings
+        print(f"[MPAIL2Learner] use_terminations: {self.cfg.use_terminations}")
+
         self.transition = Storage.Transition()
 
         # Learning params
@@ -59,8 +63,8 @@ class MPAIL2Learner:
 
         self._encoder:Coder = self.planner.encoder
         self._dynamics:Dynamics = self.planner.dynamics
-        self._reward:Reward = self.planner.td_return.get_reward()
-        self._value:EnsembleValue = self.planner.td_return.get_value_function()
+        self._reward:Reward = self.planner.reward
+        self._value:EnsembleValue = self.planner.value
         self._policy:PolicyNetwork = self.planner.sampling.policy
 
         self._decoder:Optional[Coder] = self.planner.decoder
@@ -155,7 +159,6 @@ class MPAIL2Learner:
             replay_size=self.cfg.replay_size,
             replay_batch_size=self.cfg.replay_batch_size,
             device=self.device,
-            use_stack_buffer=self.cfg.use_stack_buffer,
             obs_normalizer=self._obs_normalizer
         )
 
@@ -177,15 +180,15 @@ class MPAIL2Learner:
             critic_obs = obs
 
         with torch.no_grad():
-            self.transition.actions = self.planner.act(obs, vis_rollouts=vis_rollouts)
+            actions = self.planner.act(obs, vis_rollouts=vis_rollouts)
 
+        self.transition.actions = actions
         # need to record obs and critic_obs before env.step()
         # Store observations (both dict and tensor cases)
         self.transition.observations = obs
         self.transition.critic_observations = obs
 
-        actions_to_return = self.transition.actions
-        return actions_to_return
+        return actions
 
     def process_env_step(self, rewards, dones, infos, next_obs) -> Dict[str, float]:
 
@@ -274,7 +277,7 @@ class MPAIL2Learner:
         actual_updates = 0
 
         for (
-            (replay_obs_traj, replay_actions_traj, replay_next_obs_traj, _),
+            (replay_obs_traj, replay_actions_traj, replay_next_obs_traj, dones_traj),
             (demo_obs_traj, demo_next_obs_traj)
         ) in zip(traj_generator, demo_generator):
 
@@ -286,7 +289,7 @@ class MPAIL2Learner:
             _start = time.time()
             self._mean_stats['Dyn/mean_loss'] += self.update_dynamics( # TODO: dont duplicate encoding
                 obs_batch_traj=replay_obs_traj,
-                next_obs_batch_traj=replay_next_obs_traj, # For reconstruction loss
+                next_obs_batch_traj=replay_next_obs_traj,
                 actions_batch_traj=replay_actions_traj,
             )
             self._tot_stats['Dyn/learn_time'] += time.time() - _start
@@ -303,6 +306,19 @@ class MPAIL2Learner:
             latent_batch_flat = replay_latent_traj[:_num_flat_trajs].flatten(start_dim=0, end_dim=1)
             next_latent_batch_flat = replay_next_latent_traj[:_num_flat_trajs].flatten(start_dim=0, end_dim=1)
             actions_batch_flat = replay_actions_traj[:_num_flat_trajs].flatten(start_dim=0, end_dim=1)
+
+            # Create flattened terminal mask for value learning
+            # terminal_mask: [batch_size] - True if last timestep is terminal
+            # We need: [batch_size * horizon] where only last timestep of each traj can be terminal
+            terminal_mask_flat = None
+            if self.cfg.use_terminations and dones_traj is not None:
+                horizon = replay_latent_traj.shape[1]
+                batch_size = min(_num_flat_trajs, replay_latent_traj.shape[0])
+                terminal_mask_flat = torch.zeros(batch_size, horizon, device=self.device, dtype=torch.bool)
+                terminal_mask_flat[:, -1] = dones_traj[:batch_size]  # Only last timestep can be terminal
+                terminal_mask_flat = terminal_mask_flat.flatten()  # [batch_size * horizon]
+                # Log how many terminals we see
+                self._mean_stats['Value/num_terminals'] += terminal_mask_flat.sum().item()
 
             # (2) UPDATE REWARD
             _start = time.time()
@@ -323,6 +339,7 @@ class MPAIL2Learner:
                 action_batch=actions_batch_flat,
                 next_latent_batch=next_latent_batch_flat,
                 learner_cfg=self.value_learner_cfg,
+                terminal_mask=terminal_mask_flat,
             )
             self._tot_stats['Value/learn_time'] += time.time() - _start
 
@@ -354,6 +371,57 @@ class MPAIL2Learner:
 
         return self._mean_stats
 
+    def update_dynamics(
+        self,
+        obs_batch_traj: torch.Tensor,
+        next_obs_batch_traj: torch.Tensor, # For optional decoding loss
+        actions_batch_traj: torch.Tensor,
+    ):
+
+        # TODO: only encode first observation in traj
+        latent_batch_traj = self._encoder(obs_batch_traj)
+        with torch.no_grad():
+            next_latent_batch_traj = self._encoder(next_obs_batch_traj)
+
+        _H = actions_batch_traj.shape[1]
+        rho = self.dynamics_learner_cfg.rho
+        _rhos = rho ** torch.arange(_H, device=self.device)
+
+        # Get initial latent state z0
+        z0 = latent_batch_traj[:, 0, :]
+
+        pred_latents = self._dynamics( # [batch_size, H+1, latent_dim]
+            z0=z0, controls=actions_batch_traj,
+        )
+
+        # JEP loss: L = sum_t rho^t || z_{t+1} - f(z_t, a_t) ||_2^2
+        _jep_se = (pred_latents[:, 1:, :] - next_latent_batch_traj.detach()).pow(2)
+        loss = (_rhos[..., None] * _jep_se).mean()
+
+        # Decoder for visualization if specified
+        if self._decoder:
+            _recon_loss = torch.tensor(0.0, device=self.device, dtype=self.dtype)
+            for obs_key, obs in next_obs_batch_traj.items():
+                _recon_loss += F.mse_loss(
+                    self._decoder(next_latent_batch_traj.detach())[obs_key],
+                    next_obs_batch_traj[obs_key],
+                )
+        else:
+            _recon_loss = torch.tensor(0.0, device=self.device, dtype=self.dtype)
+
+        self._mean_stats['Dyn/recon_loss'] += _recon_loss.item()
+
+        self._dyn_opt.zero_grad()
+        loss.backward()
+        if self._decoder:
+            _recon_loss.backward() # Backprop through decoder
+        self._dyn_opt.step()
+
+        # Compute validation losses
+        # TODO
+
+        return loss.item()
+
     def update_reward(
         self,
         latent_batch: torch.Tensor,
@@ -371,15 +439,14 @@ class MPAIL2Learner:
 
         train_stats = {}
         # add gradient penalty if coefficient is specified
-        if self.reward_learner_cfg.gp_coeff is not None and self.reward_learner_cfg.gp_coeff > 0:
-            gp_loss = self.reward_learner_cfg.gp_coeff * self._compute_gradient_penalty(
-                expert_state=demo_latent_batch.detach(),
-                expert_next_state=demo_next_latent_batch.detach(),
-                gen_state=latent_batch.detach(),
-                gen_next_state=next_latent_batch.detach(),
-                stats_dict=train_stats,
-            )
-            loss += gp_loss
+        gp_loss = self.reward_learner_cfg.gp_coeff * self._compute_gradient_penalty(
+            expert_state=demo_latent_batch.detach(),
+            expert_next_state=demo_next_latent_batch.detach(),
+            gen_state=latent_batch.detach(),
+            gen_next_state=next_latent_batch.detach(),
+            stats_dict=train_stats,
+        )
+        loss += gp_loss
 
         with torch.no_grad():
             # FOR STATS LOGGING
@@ -471,7 +538,19 @@ class MPAIL2Learner:
         action_batch: torch.Tensor,
         next_latent_batch: torch.Tensor,
         learner_cfg : 'ValueLearnerCfg',
+        terminal_mask: Optional[torch.Tensor] = None,
     ):
+        """
+        Update value function using TD learning.
+
+        Args:
+            latent_batch: [batch, latent_dim] - current latent states
+            action_batch: [batch, action_dim] - actions taken
+            next_latent_batch: [batch, latent_dim] - next latent states
+            learner_cfg: Value learner configuration
+            terminal_mask: Optional [batch] boolean tensor indicating terminal transitions.
+                          If True, the next state value should be 0 (episode ended).
+        """
 
         with torch.no_grad():
             rewards_batch = self._reward(latent_batch, next_latent_batch, action=action_batch)
@@ -487,6 +566,12 @@ class MPAIL2Learner:
                 value=self._value_target,
                 reward_fn=self._reward,
             )
+
+            # Apply terminal mask: V(next_state) = 0 for terminal transitions
+            # This implements the standard RL (1 - done) * V(s') term
+            if terminal_mask is not None:
+                next_vals = next_vals * (~terminal_mask).float()
+
             td_target = rewards_batch + learner_cfg.gamma * next_vals
 
         # Use normalized states for value function
@@ -518,9 +603,7 @@ class MPAIL2Learner:
 
         plans = self._policy.plan(latent_batch)
         log_prob_plans = self._policy._log_prob_plans # [batch_size, H, 1]
-        pred_latents = self._dynamics(
-            z0=latent_batch, controls=plans,
-        )
+        pred_latents = self._dynamics(z0=latent_batch, controls=plans)
 
         alpha = self._log_alpha.exp().squeeze()
 
@@ -559,61 +642,6 @@ class MPAIL2Learner:
         self._value.track_q_grad(enable=True)
         return loss.item()
 
-    def update_dynamics(
-        self,
-        obs_batch_traj: torch.Tensor,
-        next_obs_batch_traj: torch.Tensor, # For optional decoding loss
-        actions_batch_traj: torch.Tensor,
-    ):
-
-        with torch.no_grad():
-            latent_batch_traj = self._encoder(obs_batch_traj)
-            next_latent_batch_traj = self._encoder(next_obs_batch_traj)
-
-        _H = actions_batch_traj.shape[1]
-        rho = self.dynamics_learner_cfg.rho
-        _rhos = rho ** torch.arange(_H, device=self.device)
-
-        # Get initial latent state z0
-        z0 = latent_batch_traj[:, 0]
-
-        pred_latents = self._dynamics( # [batch_size, H+1, latent_dim]
-            z0=z0, controls=actions_batch_traj,
-        )
-
-        # JEP loss: L = sum_t rho^t || z_{t+1} - f(z_t, a_t) ||_2^2
-        _jep_se = (pred_latents[:, 1:, :] - next_latent_batch_traj.detach()).pow(2)
-        jep_loss = (_rhos[..., None] * _jep_se).mean()
-
-        # Decoder for visualization if specified
-        if self._decoder:
-            _recon_loss = torch.tensor(0.0, device=self.device, dtype=self.dtype)
-            for obs_key, obs in next_obs_batch_traj.items():
-                _recon_loss += F.mse_loss(
-                    self._decoder(next_latent_batch_traj.detach())[obs_key],
-                    next_obs_batch_traj[obs_key],
-                )
-        else:
-            _recon_loss = torch.tensor(0.0, device=self.device, dtype=self.dtype)
-
-        dyn_loss = jep_loss
-
-        loss = dyn_loss
-
-        self._mean_stats['Dyn/jep_loss'] += jep_loss.item()
-        self._mean_stats['Dyn/recon_loss'] += _recon_loss.item()
-
-        self._dyn_opt.zero_grad()
-        loss.backward()
-        if self._decoder:
-            _recon_loss.backward() # Backprop through decoder
-        self._dyn_opt.step()
-
-        # Compute validation losses
-        # TODO
-
-        return loss.item()
-
     def _n_step_return_lambda(
             self, z_traj, actions_traj, next_z_traj, value, lam: float, reward_fn,
             alpha:float=None, log_probs:torch.Tensor=None,
@@ -638,7 +666,7 @@ class MPAIL2Learner:
         '''
 
         _gam, _H = self.value_learner_cfg.gamma, self.cfg.loss_horizon
-        _all_rewards = reward_fn.reward( # [batch, H]
+        _all_rewards = reward_fn( # [batch, H]
             z_traj, next_z_traj, action=actions_traj
         )
         _all_vals = value(z_traj, actions_traj, return_type=value_return_type)  # [batch, H] or [num_q, batch, H]

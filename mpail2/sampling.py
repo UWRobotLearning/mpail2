@@ -207,7 +207,6 @@ class PolicySampling(torch.nn.Module):
     def sample(
         self, state: torch.Tensor, iter: int,
         prev_controls: Optional[torch.Tensor] = None,
-        use_iterative_std: bool = True,
         **kwargs
     ):
         """

@@ -209,7 +209,7 @@ class ValueLearnerConfig(cfgs.ValueLearnerCfg):
     polyak_tau: float = 0.01
 
 @dataclass(kw_only=True)
-class DiscLearnerConfig(cfgs.DiscLearnerCfg):
+class RewardLearnerConfig(cfgs.RewardLearnerCfg):
 
     opt: str = OPT
 
@@ -259,7 +259,6 @@ class LearnerConfig(cfgs.MPAIL2LearnerCfg):
     # Replay buffer settings
     replay_size: int = 100_000
     replay_batch_size: int = 256
-    use_stack_buffer: bool = True
 
     # Loss horizon for trajectory-based updates
     loss_horizon: int = HORIZON  # Match num_timesteps in sampling_cfg
@@ -268,7 +267,7 @@ class LearnerConfig(cfgs.MPAIL2LearnerCfg):
     dynamics_learner_cfg: cfgs.DynamicsLearnerCfg = DynamicsLearnerConfig()
 
     # Reward (adversarial training)
-    reward_learner_cfg: cfgs.DiscLearnerCfg = DiscLearnerConfig()
+    reward_learner_cfg: cfgs.RewardLearnerCfg = RewardLearnerConfig()
 
     # Value
     value_learner_cfg: cfgs.ValueLearnerCfg = ValueLearnerConfig()

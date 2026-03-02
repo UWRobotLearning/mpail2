@@ -125,6 +125,7 @@ class MPAIL2Runner:
             self.env.unwrapped.current_iteration = it
 
             vis_ep = self.cfg.vis_rollouts and it % self.video_interval_its == 0
+            iter_completed_rewards = []  # Track rewards from episodes completed this iteration
             # Rollout
             self.learner.eval()
             for i in range(self._num_steps_per_env):
@@ -152,13 +153,16 @@ class MPAIL2Runner:
 
                         # Update step stats
                         ep_stats.update(stats)
-                        ep_stats.update(infos['log'])
+                        if infos is not None and 'log' in infos:
+                            ep_stats.update(infos['log'])
 
                         # Clear data for completed episodes
                         # Use 1D indices and guard empty to avoid CUDA device-side asserts
                         new_ids = (dones > 0).nonzero(as_tuple=True)[0]
                         if new_ids.numel() > 0:
                             # cur_reward_sum and cur_episode_length are 1D (num_envs,)
+                            completed_rewards = cur_reward_sum[new_ids].cpu().numpy().tolist()
+                            iter_completed_rewards.extend(completed_rewards)
                             rewbuffer.extend(cur_reward_sum[new_ids].cpu().numpy().tolist())
                             lenbuffer.extend(cur_episode_length[new_ids].cpu().numpy().tolist())
                             cur_reward_sum[new_ids] = 0
@@ -203,6 +207,7 @@ class MPAIL2Runner:
                 "Perf/fps": fps,
                 "Env/mean_reward": 0 if len(rewbuffer) == 0 else statistics.mean(rewbuffer),
                 "Env/mean_length": 0 if len(lenbuffer) == 0 else statistics.mean(lenbuffer),
+                "Env/ep_mean_return": 0 if len(iter_completed_rewards) == 0 else statistics.mean(iter_completed_rewards),
                 "Env/max_return": max_return,
                 "Env/mean_return": mean_return,
                 "Env/min_return": min_return,

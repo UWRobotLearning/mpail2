@@ -3,7 +3,8 @@ from typing import TYPE_CHECKING, Any, Dict, Optional
 
 from mpail2.sampling import PolicySampling
 from mpail2.dynamics import Dynamics
-from mpail2.reward import TDReturn
+from mpail2.reward import Reward
+from mpail2.value import EnsembleValue
 from mpail2.encoder import Coder, Decoder
 from mpail2.utils import resolve_obj
 
@@ -20,7 +21,8 @@ class Planner(torch.nn.Module):
     encoder: Coder
     decoder: Optional[Decoder]
     dynamics: Dynamics
-    td_return: TDReturn
+    reward: Reward
+    value: EnsembleValue
     sampling: PolicySampling
 
     def __init__(self,
@@ -48,11 +50,17 @@ class Planner(torch.nn.Module):
             num_envs=self.num_envs,
             device=self.device,
         )
-        self.td_return = resolve_obj(self.cfg.reward_cfg.class_type)(
+        self.reward = resolve_obj(self.cfg.reward_cfg.class_type)(
             self.cfg.reward_cfg,
             self.num_envs,
             device=self.device
         )
+        self.value = resolve_obj(self.cfg.value_cfg.class_type)(
+            self.cfg.value_cfg,
+            self.num_envs,
+            device=self.device
+        )
+        self.gamma = self.cfg.gamma
         self.sampling = resolve_obj(self.cfg.sampling_cfg.class_type)(
             self.cfg.sampling_cfg,
             self.num_envs,
@@ -77,8 +85,8 @@ class Planner(torch.nn.Module):
         # Updated upon calling optimize()
         self._current_obs = None
         self._opt_controls = torch.zeros(self._opt_controls_shape, device=self.device, dtype=self.dtype) # Optimal controls
-        self._reward_values = torch.zeros_like(self._z_rollouts[..., :-1, 0]) # [num_envs, K, T]; transitions is T - 1
-        self._weights = torch.zeros_like(self._reward_values[..., 0]) # [num_envs, K]
+        self._returns = torch.zeros_like(self._z_rollouts[..., :-1, 0]) # [num_envs, K, T]; transitions is T - 1
+        self._weights = torch.zeros_like(self._returns[..., 0]) # [num_envs, K]
         self._opt_states = torch.zeros_like(self._z_rollouts[:, 0, ...])
 
         self._pred_obs = self.decoder is not None
@@ -128,8 +136,45 @@ class Planner(torch.nn.Module):
             print(f"[INFO] \tDecoder: {sum(p.numel() for p in self.decoder.parameters())}")
         print(f"[INFO] \tDynamics: {sum(p.numel() for p in self.dynamics.parameters())}")
         print(f"[INFO] \tSampling: {sum(p.numel() for p in self.sampling.parameters())}")
-        print(f"[INFO] \tTDReturn: {sum(p.numel() for p in self.td_return.parameters())}")
+        print(f"[INFO] \tReward: {sum(p.numel() for p in self.reward.parameters())}")
+        print(f"[INFO] \tValue: {sum(p.numel() for p in self.value.parameters())}")
         print(self) # Prints torch summary of the model
+
+    def td_return(self, rollouts: torch.Tensor, actions: torch.Tensor) -> torch.Tensor:
+        '''Evaluate rollouts using learned reward and value functions.
+
+        Computes TD-style returns: single-step rewards for intermediate steps,
+        and value estimates for the terminal state.
+
+        Args:
+            rollouts: Latent state trajectories, shape (num_envs, K, horizon + 1, latent_dim)
+            actions: Action sequences, shape (num_envs, K, horizon, action_dim)
+
+        Returns:
+            Returns tensor of shape (num_envs, K, horizon) where:
+            - [:, :, :-1] contains single-step rewards r(s, s')
+            - [:, :, -1] contains terminal value estimates V(s_T, a_T)
+        '''
+        rewards = torch.zeros_like(actions[..., 0])  # [num_envs, K, horizon]
+
+        # Evaluate single step rewards
+        states = rollouts[..., :-1, :]
+        next_states = rollouts[..., 1:, :]
+        rewards[...] = self.reward(state=states, action=actions, next_state=next_states)
+
+        # Evaluate terminal state value
+        ts_states = states[..., -1, :]
+        ts_actions = actions[..., -1, :]
+        # Override last step reward with terminal state value
+        rewards[..., -1] = self.value(state=ts_states, action=ts_actions, return_type='avg')
+
+        if self.gamma is not None:
+            _gam_factors = self.gamma ** torch.arange(
+                rewards.shape[-1], device=rollouts.device, dtype=rollouts.dtype
+            )
+            rewards *= _gam_factors
+
+        return rewards
 
     @property
     def temperature(self) -> torch.Tensor:
@@ -205,7 +250,7 @@ class Planner(torch.nn.Module):
 
         plan = self.optimize(
             obs, iter=self.cfg.opt_iters - 1, deterministic=deterministic
-        ) # Last optimization is deterministic
+        )
 
         return plan[:, :self.u_per_command, :] # Forward pass and next best control
 
@@ -227,11 +272,11 @@ class Planner(torch.nn.Module):
             self._z_rollouts[:] = self.dynamics(z0, self._prior_controls)
             if self._pred_obs:
                 self._rollouts[:] = self.decoder(self._z_rollouts)
-            self._reward_values[:] = self.td_return(rollouts=self._z_rollouts, actions=self._prior_controls)  # [num_envs, K, T]
+            self._returns[:] = self.td_return(rollouts=self._z_rollouts, actions=self._prior_controls)  # [num_envs, K, T]
 
         # Update weights and optimal controls via CEM-MPPI
-        _elite_idxs = torch.topk(self._reward_values.sum(dim=-1), k=self.cfg.num_elites).indices
-        _elite_values = self._reward_values.gather(
+        _elite_idxs = torch.topk(self._returns.sum(dim=-1), k=self.cfg.num_elites).indices
+        _elite_values = self._returns.gather(
             dim=-2,
             index=_elite_idxs.unsqueeze(-1)
         ) # [num_envs, num_elites, T]
@@ -267,7 +312,7 @@ class Planner(torch.nn.Module):
             (iter_mean + iter_std * noise) instead of multinomial sampling from rollouts.
         :return: sampled plan [..., T, nu]
         '''
-        # Sample from the fitted Gaussian (TD-MPC2 style)
+        # Sample from the fitted Gaussian
         noise = torch.randn_like(self.sampling._iter_mean)
         sampled_plan = self.sampling._iter_mean + self.sampling._iter_std * noise
         sampled_plan = torch.tanh(sampled_plan)  # Ensure actions are in [-1, 1]
@@ -288,7 +333,7 @@ class Planner(torch.nn.Module):
         self._obs_normalizer = obs_normalizer
 
     def compute_stats(self) -> Dict[str, Any]:
-        _rewards = self._reward_values.detach().clone()
+        _rewards = self._returns.detach().clone()
         mean_ss_rewards = _rewards[..., :-1].mean()
         min_ss_rewards = _rewards[..., :-1].min().detach().clone()
         max_ss_rewards = _rewards[..., :-1].max().detach().clone()
@@ -337,7 +382,7 @@ class Planner(torch.nn.Module):
 
             vis_env_ids = list(range(self.vis.vis_n_envs))
             vis_rollouts = self._rollouts[vis_env_ids, :, :-1, :] # [n_envs, n_rollouts, horizon, state_dim]
-            vis_rewards = self._reward_values[vis_env_ids] # [n_envs, n_rollouts, horizon]
+            vis_rewards = self._returns[vis_env_ids] # [n_envs, n_rollouts, horizon]
             horizon, state_dim = vis_rollouts.shape[2:]
 
             # Get topk rollouts
