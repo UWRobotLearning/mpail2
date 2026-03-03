@@ -1,0 +1,21 @@
+[package]
+
+# Semantic Versioning is used: https://semver.org/
+version = "0.1.0"
+
+# Description
+category = "Algorithms"
+readme  = "docs/README.md"
+
+title = "MPAIL2"
+author = "Tyler Han, Siyang Shen, Rohan Baijal, Harine Ravichandiran, Bat Nemekhbold, Kevin Huang, Sanghun Jung, Byron Boots"
+maintainer = "Tyler Han (than123@uw.edu)"
+description= "Model Predictive Adversarial Imitation Learning 2"
+repository = "mpail2"
+keywords = []
+
+[dependencies]
+# NOTE: Add additional dependencies here
+
+[[python.module]]
+name = "mpail2"
