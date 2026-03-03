@@ -18,8 +18,9 @@ This script:
 - Does NOT require Isaac Sim
 
 Usage:
-    python train_mpail_gym.py --env Ant-v5 --demo-path ./demos/ant_expert.pt
-    python train_mpail_gym.py --env Hopper-v5 --demo-path ./demos/hopper_expert.pt --num-envs 8
+    python train_mpail_gym.py --env Ant-v5
+    python train_mpail_gym.py --env Humanoid-v5
+    python train_mpail_gym.py --env Hopper-v5 --num-envs 8
 """
 
 import os
