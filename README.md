@@ -1,6 +1,7 @@
 # MPAIL2
 
-<video src="media/mpail2-teaser.mp4#t=20" autoplay muted controls width="100%"></video>
+![MPAIL2 Demo](media/mpail2-teaser.gif)
+https://www.youtube.com/watch?v=yQw0JmvOVwM
 
 [Website](https://uwrobotlearning.github.io/mpail2/) | [Paper](https://arxiv.org/pdf/2602.24121)
 
