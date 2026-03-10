@@ -1,0 +1,55 @@
+<section class="project-info scroll-section" id="method-section">
+    <div class="project-info-inner">
+        <h2 class="section-header">The Algorithm - MPAIL2
+            <span class="section-subtitle">
+                We introduce Model Predictive Adversarial Imitation Learning 2 (MPAIL2), an
+                <span class="term term--bold" data-tooltip-html="Inverse Reinforcement Learning (IRL) learns a reward function in addition to a policy using demonstration data.
+                ">IRL</span> algorithm
+                that learns a
+                <span class="term term--bold" data-tooltip-html="A world model predicts the next state of the world based on the current state and action.
+                ">world model</span>
+                and performs
+                <span class="term term--bold" data-tooltip-html="Rather directly predicting the learner's observations (e.g. camera images), latent planning operates on reduced, low-dimensional representations of the world, enabling reactive planning and more efficient learning.
+                ">latent planning</span>.
+            </span>
+        </h2>
+        <div style="display: flex; gap: 20px; justify-content: center; align-items: center; margin: 20px auto 0 auto;">
+            <!-- <div class="summary-main-image" style="flex: 3; margin-bottom: 0;"><img src="Media/Image/main.jpg" alt="Method Overview"></div> -->
+            <div class="summary-main-image" style="flex: 3; margin-bottom: 0;"><img src="Media/Image/mpail2.drawio.png" alt="Method Overview"></div>
+            <!-- <div style="flex: 1; display: flex; flex-direction: column; gap: 0; align-self: stretch;"> -->
+                <!-- <div style="flex: 1; overflow: hidden;">
+                    <video id="vis-render" autoplay muted playsinline style="width: 100%; height: 100%; display: block; object-fit: cover;">
+                        <source src="Media/Video/Vis/render.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div style="flex: 1; overflow: hidden;">
+                    <video id="vis-rollout" autoplay muted playsinline style="width: 100%; height: 100%; display: block; object-fit: cover;">
+                        <source src="Media/Video/Vis/rollout-vis.mp4" type="video/mp4">
+                    </video>
+                </div> -->
+            <!-- </div> -->
+        </div>
+        <br>
+        <div class="card-grid">
+            <div class="info-card">
+                <p><strong>1.</strong>&nbsp;Five (5) components comprise MPAIL2's world model:
+                encoder, dynamics, reward, value, and policy.
+                Online, a planner uses these components to sample plans, predict their outcomes, evaluate them, and finally select a plan.</p>
+                <p><strong>2.</strong>&nbsp;The learner's task is given through observations of task demonstrations, like watching a person cook. They are used only when learning the reward.
+                <br>
+                <br>
+                <i>
+                See this in action on the right. Notice that the block's predicted trajectory (orange) goes from static to dynamic as the robot (green) plans through it.
+                </i>
+            </div>
+            <div class="card-outline">
+                <div class="summary-main-image" style="flex: 1; margin-bottom: 0;"><img src="Media/Video/Vis/overlay.gif" alt="Method Overview"></div>
+                <i>
+                    <small>
+                        Note that planning occurs in latent space. This visualization is made possible by training a separate decoder.
+                    </small>
+                </i>
+            </div>
+        </div>
+    </div>
+</section>

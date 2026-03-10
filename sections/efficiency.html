@@ -1,0 +1,165 @@
+        <section class="tasks-section scroll-section" id="efficiency-section">
+            <h2 class="section-header" id="experiments-section">Experiments
+                <span class="section-subtitle">
+                    All experiments are trained <strong>entirely from scratch in the real world</strong> with <strong>no pre-training or prior data of any kind</strong> (beyond task observations). Demonstrations are all the expert data used in training; Training time-lapses show the training process.
+                </span>
+            </h2>
+            <h2 class="section-header experiment-sub-header">Sample Efficiency</h2>
+
+            <div class="content-block" id="demonstrations-block">
+                <h3 class="subsection-header">Demonstrations</h3>
+                <div class="demonstrations-grid" id="demonstrations-grid">
+                    <div class="demo-video-wrapper">
+                        <div class="video-display">
+                            <video class="demo-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Demonstrations/Push/demo_1.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                    <div class="demo-video-wrapper">
+                        <div class="video-display">
+                            <video class="demo-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Demonstrations/Push/demo_2.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                    <div class="demo-video-wrapper">
+                        <div class="video-display">
+                            <video class="demo-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Demonstrations/Push/demo_3.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                    <div class="demo-video-wrapper">
+                        <div class="video-display">
+                            <video class="demo-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Demonstrations/Push/demo_4.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                    <div class="demo-video-wrapper">
+                        <div class="video-display">
+                            <video class="demo-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Demonstrations/Push/demo_5.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                    <div class="demo-video-wrapper">
+                        <div class="video-display">
+                            <video class="demo-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Demonstrations/Push/demo_6.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                    <div class="demo-video-wrapper">
+                        <div class="video-display">
+                            <video class="demo-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Demonstrations/Push/demo_7.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                    <div class="demo-video-wrapper">
+                        <div class="video-display">
+                            <video class="demo-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Demonstrations/Push/demo_8.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                    <div class="demo-video-wrapper">
+                        <div class="video-display">
+                            <video class="demo-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Demonstrations/Push/demo_9.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                    <div class="demo-video-wrapper">
+                        <div class="video-display">
+                            <video class="demo-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Demonstrations/Push/demo_10.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                </div>
+                <div class="demonstrations-caption">Only these <span style="font-weight:700; font-size:1.15em; color:#667eea;">10</span> Demonstrations are provided to the learner.</div>
+            </div>
+
+            
+            <div class="content-block" id="time-lapses-block">
+                <h3 class="subsection-header">Training Time-lapse</h3>
+
+                
+                <div class="iteration-control-area">
+                    <div class="iteration-info-row">
+                        <div class="iteration-info-item">
+                            <label>Iteration:</label>
+                            <span class="value" id="iteration-display">0</span>
+                        </div>
+                        <div class="iteration-info-item">
+                            <label>Time Spent:</label>
+                            <span class="value" id="time-spent">0</span>
+                        </div>
+                    </div>
+                    <div class="slider-track-container">
+                        <input type="range" class="iteration-slider" id="iteration-slider" 
+                               min="0" max="100" value="0" step="10" oninput="updateIteration(this.value)">
+                        <div class="slider-dots" id="slider-dots"></div>
+                        <div class="slider-checkmarks" id="slider-checkmarks"></div>
+                    </div>
+                </div>
+
+                <div class="transfer-videos-container">
+                    <div class="transfer-video-wrapper">
+                        <p class="video-label highlighted sample-mpail2-title" style="margin-bottom: 10px;">MPAIL2</p>
+                        <div class="video-display">
+                            <video id="task-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Push/iter_0.mp4" type="video/mp4">
+                                Your browser does not support video playback.
+                            </video>
+                        </div>
+                        <a class="full-video-link" style="margin-top: 20px;" onclick="openVideoModal('sample')">
+                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                            Full Training Video
+                        </a>
+                    </div>
+                    <div class="transfer-video-wrapper">
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 10px; flex-wrap: nowrap;">
+                            <div style="white-space: nowrap;">
+                                <strong>Compare:</strong>
+                            </div>
+                            <div class="sample-method-row" style="justify-content: center; margin-bottom: 0; flex-wrap: nowrap;">
+                                <button type="button" class="sample-method-btn active" data-method="mpail2-p" onclick="selectSampleMethod('mpail2-p')">Without Planning</button>
+                                <button type="button" class="sample-method-btn" data-method="mpail2-pm" onclick="selectSampleMethod('mpail2-pm')">Model-Free</button>
+                                <button type="button" class="sample-method-btn" data-method="rlpd" onclick="selectSampleMethod('rlpd')">RLPD</button>
+                            </div>
+                        </div>
+                        <div class="video-display">
+                            <video id="sample-method-video" autoplay muted loop playsinline>
+                                <source src="Media/Video/Comparison/mpail2_p/Push/iter_0.mp4" type="video/mp4">
+                                Your browser does not support video playback.
+                            </video>
+                        </div>
+                        <p class="video-label" id="sample-method-label" style="display:none;">Without Planning</p>
+                        <a class="full-video-link" style="margin-top: 20px;" onclick="openVideoModal('comparison')">
+                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                            Full Training Video
+                        </a>
+                    </div>
+                </div>
+
+            <div class="content-block" id="results-block">
+                <div class="results-panel">
+                    <h3 class="subsection-header">Plots and Tables</h3>
+                    <div class="collapsible-body">
+                        <div style="display: flex; gap: 10px; justify-content: center; align-items: center; max-width: 1200px; margin: 5px auto 0 auto;" id="results-images">
+                            <div style="flex: 1; max-width: 550px;">
+                                <img id="results-chart-img" src="Media/Image/Results/Push_chart.png" alt="Results Chart" style="width: 100%; border-radius: 8px;">
+                            </div>
+                            <div style="flex: 1; max-width: 550px;">
+                                <img id="results-table-img" src="Media/Image/Results/Push_table.png" alt="Results Table" style="width: 100%; border-radius: 8px;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </section>
