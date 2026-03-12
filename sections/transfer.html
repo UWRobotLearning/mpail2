@@ -1,5 +1,7 @@
         <section class="tasks-section scroll-section" id="transfer-section">
-            <h2 class="section-header experiment-sub-header">Transfer Learning</h2>
+            <h2 class="section-header experiment-sub-header">Transfer Learning
+                <span class="section-subtitle">Robot is trained using an initial set of demonstrations for one task. Then, the model weights are directly transferred for training on a new set of demonstrations for a different task. Since the tasks are similar, we expect the robot to learn new skills quickly by relying on its continual experience. However, this has not been true of most RL methods without specialized methods or massive data coverage.</span>
+            </h2>
 
             <div class="content-block" id="transfer-initial-demonstrations-block">
                 <h3 class="subsection-header">Demonstrations</h3>
@@ -176,10 +178,19 @@
                         </div>
                     </div>
                     <div class="slider-track-container">
-                        <input type="range" class="iteration-slider" id="transfer-iteration-slider" 
-                               min="0" max="100" value="0" step="10" oninput="updateTransferIteration(this.value)">
+                        <input
+                            type="range"
+                            class="iteration-slider"
+                            id="transfer-iteration-slider" 
+                            min="0"
+                            max="100"
+                            value="0"
+                            step="10"
+                            oninput="updateTransferIteration(this.value)"
+                        >
                         <div class="slider-dots" id="transfer-slider-dots"></div>
                         <div class="slider-checkmarks" id="transfer-slider-checkmarks"></div>
+                        <div class="slider-hint slider-hint--transfer">Tip: drag to compare transfer vs. from-scratch training.</div>
                     </div>
                 </div>
 

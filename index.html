@@ -10,36 +10,6 @@
 </head>
 <body>
     
-    <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode" aria-label="Toggle dark and light mode">
-        <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke-width="2">
-            <defs>
-                <linearGradient id="moonGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#667eea"/>
-                    <stop offset="100%" stop-color="#764ba2"/>
-                </linearGradient>
-            </defs>
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="url(#moonGrad)"/>
-        </svg>
-        <span class="theme-slash">/</span>
-        <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke-width="2">
-            <defs>
-                <linearGradient id="sunGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#667eea"/>
-                    <stop offset="100%" stop-color="#764ba2"/>
-                </linearGradient>
-            </defs>
-            <circle class="sun-circle" cx="12" cy="12" r="5" stroke="url(#sunGrad)" fill="url(#sunGrad)"/>
-            <line x1="12" y1="1" x2="12" y2="3" stroke="url(#sunGrad)"/>
-            <line x1="12" y1="21" x2="12" y2="23" stroke="url(#sunGrad)"/>
-            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="url(#sunGrad)"/>
-            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="url(#sunGrad)"/>
-            <line x1="1" y1="12" x2="3" y2="12" stroke="url(#sunGrad)"/>
-            <line x1="21" y1="12" x2="23" y2="12" stroke="url(#sunGrad)"/>
-            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="url(#sunGrad)"/>
-            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="url(#sunGrad)"/>
-        </svg>
-    </button>
-
     <section class="video-section">
         <div class="video-container" id="hero-video-container">
             <img class="hero-poster" src="Media/Video/Background/poster.jpg" alt="" aria-hidden="true">
@@ -64,23 +34,8 @@
                     GitHub
                 </a>
             </div>
-            
-            <!-- Authors Toggle Button -->
-            <button id="authors-toggle" class="authors-toggle-btn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="9" cy="7" r="4"></circle>
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                </svg>
-                Authors
-                <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="6 9 12 15 18 9"></polyline>
-                </svg>
-            </button>
-            
-            <!-- Authors Section (hidden by default) -->
-            <div id="authors-section" class="authors-section">
+            <!-- Authors Section -->
+            <div id="authors-section" class="authors-section authors-section--always-visible">
                 <div class="authors-list">
                     <a href="https://thanandnow.github.io/" target="_blank" rel="noopener noreferrer">Tyler Han</a>
                     <a href="http://www.andyshensiyang.com/" target="_blank" rel="noopener noreferrer">Siyang Shen</a>
@@ -109,17 +64,17 @@
             <span class="timeline-dot"></span>
             <span class="timeline-label">Method</span>
         </a>
-        <a href="#efficiency-section" class="timeline-item" data-section="experiments">
+        <a href="#efficiency-section" class="timeline-item" data-section="results">
             <span class="timeline-dot"></span>
-            <span class="timeline-label">Experiments</span>
+            <span class="timeline-label">Results</span>
         </a>
         <a href="#generalization-section" class="timeline-item" data-section="generalization">
             <span class="timeline-dot"></span>
             <span class="timeline-label">Generalization</span>
         </a>
-        <a href="#tablecam-section" class="timeline-item" data-section="tablecam">
+        <a href="#your-turn-section" class="timeline-item" data-section="your-turn">
             <span class="timeline-dot"></span>
-            <span class="timeline-label">Minimal Observations</span>
+            <span class="timeline-label">Your Turn</span>
         </a>
     </nav>
 
@@ -155,7 +110,7 @@
         <div id="efficiency-section-container"></div>
         <div id="transfer-section-container"></div>
         <div id="generalization-section-container"></div>
-        <div id="tablecam-section-container"></div>
+        <div id="your-turn-section-container"></div>
 
     </div>
 

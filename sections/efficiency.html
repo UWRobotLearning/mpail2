@@ -1,10 +1,13 @@
         <section class="tasks-section scroll-section" id="efficiency-section">
-            <h2 class="section-header" id="experiments-section">Experiments
+            <h2 class="section-header" id="experiments-section">Results
                 <span class="section-subtitle">
-                    All experiments are trained <strong>entirely from scratch in the real world</strong> with <strong>no pre-training or prior data of any kind</strong> (beyond task observations). Demonstrations are all the expert data used in training; Training time-lapses show the training process.
+                    All experiments are trained <strong>entirely from scratch in the real world</strong> with <strong>no pre-training or prior data of any kind</strong> (beyond task observations). Behavior Cloning via Diffusion Policy is also evaluated and its results can be viewed in the evaluation tables as it is an offline algorithm.
+                    <br>
                 </span>
             </h2>
-            <h2 class="section-header experiment-sub-header">Sample Efficiency</h2>
+            <h2 class="section-header experiment-sub-header">Sample Efficiency
+                <span class="section-subtitle">Watch the robot train from scratch in the real world using various methods. RL has been notoriously inefficient at real-world training for various reasons.</span>
+            </h2>
 
             <div class="content-block" id="demonstrations-block">
                 <h3 class="subsection-header">Demonstrations</h3>
@@ -100,10 +103,19 @@
                         </div>
                     </div>
                     <div class="slider-track-container">
-                        <input type="range" class="iteration-slider" id="iteration-slider" 
-                               min="0" max="100" value="0" step="10" oninput="updateIteration(this.value)">
+                        <input
+                            type="range"
+                            class="iteration-slider"
+                            id="iteration-slider" 
+                            min="0"
+                            max="100"
+                            value="0"
+                            step="10"
+                            oninput="updateIteration(this.value)"
+                        >
                         <div class="slider-dots" id="slider-dots"></div>
                         <div class="slider-checkmarks" id="slider-checkmarks"></div>
+                        <div class="slider-hint">Tip: drag to scrub through training iterations.</div>
                     </div>
                 </div>
 
@@ -127,9 +139,33 @@
                                 <strong>Compare:</strong>
                             </div>
                             <div class="sample-method-row" style="justify-content: center; margin-bottom: 0; flex-wrap: nowrap;">
-                                <button type="button" class="sample-method-btn active" data-method="mpail2-p" onclick="selectSampleMethod('mpail2-p')">Without Planning</button>
-                                <button type="button" class="sample-method-btn" data-method="mpail2-pm" onclick="selectSampleMethod('mpail2-pm')">Model-Free</button>
-                                <button type="button" class="sample-method-btn" data-method="rlpd" onclick="selectSampleMethod('rlpd')">RLPD</button>
+                                <button
+                                    type="button"
+                                    class="sample-method-btn active"
+                                    data-method="mpail2-p"
+                                    onclick="selectSampleMethod('mpail2-p')"
+                                    data-tooltip-html="MPAIL2 without online planning.<br>Uses the learned explicit policy only, with no lookahead planning at test time. Similar to <a href='https://ieeexplore.ieee.org/document/9361118' target='_blank'>Model-based AIRL (MAIRL)</a>, Sun et al. 2021"
+                                >
+                                    Without Planning
+                                </button>
+                                <button
+                                    type="button"
+                                    class="sample-method-btn"
+                                    data-method="mpail2-pm"
+                                    onclick="selectSampleMethod('mpail2-pm')"
+                                    data-tooltip-html="MPAIL2 Implementation without dynamics model usage (e.g. Q-targets, policy optimization). Similar to <a href='https://arxiv.org/abs/1809.02925' target='_blank'>DAC</a>, Kostrikov et al. 2018"
+                                >
+                                    Model-Free
+                                </button>
+                                <button
+                                    type="button"
+                                    class="sample-method-btn"
+                                    data-method="rlpd"
+                                    onclick="selectSampleMethod('rlpd')"
+                                    data-tooltip-html=" <a href='https://proceedings.mlr.press/v202/ball23a/ball23a.pdf' target='_blank'>Reinforcement Learning with Prior Data (RLPD)</a>, Ball et al. 2023<br>State-of-the-art model-free baseline that leverages demonstration data."
+                                >
+                                    RLPD
+                                </button>
                             </div>
                         </div>
                         <div class="video-display">

@@ -6,7 +6,7 @@ async function loadSections() {
         'efficiency-section-container': 'sections/efficiency.html',
         'transfer-section-container': 'sections/transfer.html',
         'generalization-section-container': 'sections/generalization.html',
-        'tablecam-section-container': 'sections/tablecam.html'
+        'your-turn-section-container': 'sections/your-turn.html'
     };
 
     const loadPromises = Object.entries(sectionMappings).map(async ([containerId, sectionFile]) => {
@@ -118,17 +118,17 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     document.addEventListener('mouseover', function(e) {
-        var term = e.target.closest && e.target.closest('.term[data-tooltip-html]');
-        if (term) {
+        var el = e.target.closest && e.target.closest('[data-tooltip-html]');
+        if (el) {
             cancelScheduleHide();
-            showRichTooltip(term);
+            showRichTooltip(el);
         } else if (e.target === richTooltip || richTooltip.contains(e.target)) {
             cancelScheduleHide();
         }
     });
 
     document.addEventListener('mouseout', function(e) {
-        var term = e.target.closest && e.target.closest('.term[data-tooltip-html]');
+        var term = e.target.closest && e.target.closest('[data-tooltip-html]');
         var enteringTooltip = e.relatedTarget && (e.relatedTarget === richTooltip || richTooltip.contains(e.relatedTarget));
         if (term && !term.contains(e.relatedTarget) && !enteringTooltip) scheduleHide();
         if (term && !e.relatedTarget) scheduleHide();
@@ -272,10 +272,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const efficiencySection = document.getElementById('efficiency-section');
         const transferSection = document.getElementById('transfer-section');
         const generalizationSection = document.getElementById('generalization-section');
-        const tablecamSection = document.getElementById('tablecam-section');
+        const yourTurnSection = document.getElementById('your-turn-section');
 
         // If core sections are not yet present, skip the rest of the scroll logic
-        if (!summarySection || !methodSection || !efficiencySection || !transferSection || !generalizationSection || !tablecamSection) {
+        if (!summarySection || !methodSection || !efficiencySection || !transferSection || !generalizationSection || !yourTurnSection) {
             return;
         }
 
@@ -285,7 +285,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const efficiencyRect = efficiencySection.getBoundingClientRect();
         const transferRect = transferSection.getBoundingClientRect();
         const generalizationRect = generalizationSection.getBoundingClientRect();
-        const tablecamRect = tablecamSection.getBoundingClientRect();
+        const yourTurnRect = yourTurnSection.getBoundingClientRect();
         
         // Show/hide left task buttons
         if (taskButtonsLeft) {
@@ -310,23 +310,23 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        // Determine active section
+        // Determine active section (matches data-section values in the timeline)
         let activeSection = 'summary';
-        if (tablecamRect.top < windowHeight * 0.5) {
-            activeSection = 'tablecam';
+        if (yourTurnRect.top < windowHeight * 0.5) {
+            activeSection = 'your-turn';
         } else if (generalizationRect.top < windowHeight * 0.5) {
             activeSection = 'generalization';
         } else if (transferRect.top < windowHeight * 0.5) {
-            activeSection = 'experiments';
+            activeSection = 'results';
         } else if (efficiencyRect.top < windowHeight * 0.5) {
-            activeSection = 'experiments';
+            activeSection = 'results';
         } else if (methodRect.top < windowHeight * 0.5) {
             activeSection = 'method';
         }
 
-        // Show a one-time hint to use the left sidebar during Experiments
+        // Show a one-time hint to use the left sidebar during Results
         const leftButtonsVisible = taskButtonsLeft && taskButtonsLeft.classList.contains('visible');
-        if (!dismissedLeftHint && leftButtonsVisible && activeSection === 'experiments') {
+        if (!dismissedLeftHint && leftButtonsVisible && activeSection === 'results') {
             leftSidebarHint.classList.add('visible');
             positionLeftSidebarHint();
         } else {
@@ -343,7 +343,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         // Section visibility management
-        const showTablecam = tablecamRect.top < windowHeight * 0.75;
         const showGeneralization = generalizationRect.top < windowHeight * 0.75;
         const showTransfer = transferRect.top < windowHeight * 0.75;
         const showEfficiency = efficiencyRect.top < windowHeight * 0.75;
@@ -353,37 +352,26 @@ document.addEventListener('DOMContentLoaded', function() {
         efficiencySection.classList.remove('fade-in', 'fade-out', 'hidden-below');
         transferSection.classList.remove('fade-in', 'fade-out', 'hidden-below');
         generalizationSection.classList.remove('fade-in', 'fade-out', 'hidden-below');
-        tablecamSection.classList.remove('fade-in', 'fade-out', 'hidden-below');
 
-        if (showTablecam) {
-            summarySection.classList.add('fade-out');
-            efficiencySection.classList.add('fade-out');
-            transferSection.classList.add('fade-out');
-            generalizationSection.classList.add('fade-out');
-            tablecamSection.classList.add('fade-in');
-        } else if (showGeneralization) {
+        if (showGeneralization) {
             summarySection.classList.add('fade-out');
             efficiencySection.classList.add('fade-out');
             transferSection.classList.add('fade-out');
             generalizationSection.classList.add('fade-in');
-            tablecamSection.classList.add('hidden-below');
         } else if (showTransfer) {
             summarySection.classList.add('fade-out');
             efficiencySection.classList.add('fade-out');
             transferSection.classList.add('fade-in');
             generalizationSection.classList.add('hidden-below');
-            tablecamSection.classList.add('hidden-below');
         } else if (showEfficiency) {
             summarySection.classList.add('fade-out');
             efficiencySection.classList.add('fade-in');
             transferSection.classList.add('hidden-below');
             generalizationSection.classList.add('hidden-below');
-            tablecamSection.classList.add('hidden-below');
         } else {
             efficiencySection.classList.add('hidden-below');
             transferSection.classList.add('hidden-below');
             generalizationSection.classList.add('hidden-below');
-            tablecamSection.classList.add('hidden-below');
         }
 
     });
@@ -393,21 +381,20 @@ document.addEventListener('DOMContentLoaded', function() {
 function initializeInteractiveSections() {
     const dotsContainer = document.getElementById('slider-dots');
     const iterationSlider = document.getElementById('iteration-slider');
+    const sliderHint = document.querySelector('#time-lapses-block .slider-hint');
     
     // Initialize for efficiency section (only if elements are present)
     if (dotsContainer && iterationSlider) {
-        iterationSlider.value = 0;
+        // Start at the first success checkmark (iteration 60)
+        const initialIteration = 60;
         iterationSlider.max = 100;
-        const iterationDisplay = document.getElementById('iteration-display');
-        const timeSpent = document.getElementById('time-spent');
-        if (iterationDisplay) iterationDisplay.textContent = '0';
-        if (timeSpent) timeSpent.textContent = '0';
+        iterationSlider.value = initialIteration;
         
         // Create dots for efficiency slider
         if (!dotsContainer.hasChildNodes()) {
             for (let i = 0; i <= 100; i += 10) {
                 const dot = document.createElement('div');
-                dot.className = 'slider-dot' + (i === 0 ? ' active' : '');
+                dot.className = 'slider-dot' + (i <= initialIteration ? ' active' : '');
                 dot.dataset.value = i;
                 dotsContainer.appendChild(dot);
             }
@@ -421,25 +408,37 @@ function initializeInteractiveSections() {
                 checkmarksContainer.appendChild(span);
             }
         }
+        // Ensure all dependent UI (labels, videos, time) match initial position
+        updateIteration(initialIteration);
+
+        // Show a one-time hint above the slider until the user interacts
+        if (sliderHint) {
+            sliderHint.classList.add('visible');
+            const dismissHint = () => {
+                sliderHint.classList.remove('visible');
+            };
+            iterationSlider.addEventListener('input', dismissHint, { once: true });
+            iterationSlider.addEventListener('mousedown', dismissHint, { once: true });
+            iterationSlider.addEventListener('touchstart', dismissHint, { once: true });
+        }
     }
 
     // Initialize for transfer section
     const transferDotsContainer = document.getElementById('transfer-slider-dots');
     const transferSlider = document.getElementById('transfer-iteration-slider');
+    const transferSliderHint = document.querySelector('#transfer-time-lapses-block .slider-hint');
     
     if (transferDotsContainer && transferSlider) {
-        transferSlider.value = 0;
+        // Start at the first success checkmark (iteration 30)
+        const initialTransferIteration = 30;
         transferSlider.max = 100;
-        const transferIterationDisplay = document.getElementById('transfer-iteration-display');
-        const transferTimeSpent = document.getElementById('transfer-time-spent');
-        if (transferIterationDisplay) transferIterationDisplay.textContent = '0';
-        if (transferTimeSpent) transferTimeSpent.textContent = '0';
+        transferSlider.value = initialTransferIteration;
         
         // Create dots for transfer slider
         if (!transferDotsContainer.hasChildNodes()) {
             for (let i = 0; i <= 100; i += 10) {
                 const dot = document.createElement('div');
-                dot.className = 'slider-dot' + (i === 0 ? ' active' : '');
+                dot.className = 'slider-dot' + (i <= initialTransferIteration ? ' active' : '');
                 dot.dataset.value = i;
                 transferDotsContainer.appendChild(dot);
             }
@@ -452,6 +451,19 @@ function initializeInteractiveSections() {
                 span.textContent = transferPushCheckValues.includes(i) ? '✓' : '';
                 transferCheckmarksContainer.appendChild(span);
             }
+        }
+        // Ensure all dependent UI (labels, videos, time) match initial position
+        updateTransferIteration(initialTransferIteration);
+
+        // Show a one-time hint above the transfer slider until the user interacts
+        if (transferSliderHint) {
+            transferSliderHint.classList.add('visible');
+            const dismissTransferHint = () => {
+                transferSliderHint.classList.remove('visible');
+            };
+            transferSlider.addEventListener('input', dismissTransferHint, { once: true });
+            transferSlider.addEventListener('mousedown', dismissTransferHint, { once: true });
+            transferSlider.addEventListener('touchstart', dismissTransferHint, { once: true });
         }
     }
 
@@ -844,14 +856,16 @@ document.querySelectorAll('.timeline-item').forEach(item => {
         const efficiencySection = document.getElementById('efficiency-section');
         const transferSection = document.getElementById('transfer-section');
         const generalizationSection = document.getElementById('generalization-section');
-        const tablecamSection = document.getElementById('tablecam-section');
+        const yourTurnSection = document.getElementById('your-turn-section');
         
         // Reset all classes
         summarySection.classList.remove('fade-out', 'instant-show');
         efficiencySection.classList.remove('fade-in', 'fade-out', 'hidden-below');
         transferSection.classList.remove('fade-in', 'fade-out', 'hidden-below');
         generalizationSection.classList.remove('fade-in', 'fade-out', 'hidden-below');
-        tablecamSection.classList.remove('fade-in', 'fade-out', 'hidden-below');
+        if (yourTurnSection) {
+            yourTurnSection.classList.remove('fade-in', 'fade-out', 'hidden-below');
+        }
         
         // Update active timeline item
         document.querySelectorAll('.timeline-item').forEach(ti => {
@@ -872,35 +886,33 @@ document.querySelectorAll('.timeline-item').forEach(item => {
             efficiencySection.classList.add('hidden-below');
             transferSection.classList.add('hidden-below');
             generalizationSection.classList.add('hidden-below');
-            tablecamSection.classList.add('hidden-below');
-        } else if (sectionName === 'efficiency') {
+            if (yourTurnSection) yourTurnSection.classList.add('hidden-below');
+        } else if (sectionName === 'results') {
             scrollTarget = efficiencySection.offsetTop;
             summarySection.classList.add('fade-out');
             efficiencySection.classList.add('fade-in');
             transferSection.classList.add('hidden-below');
             generalizationSection.classList.add('hidden-below');
-            tablecamSection.classList.add('hidden-below');
-        } else if (sectionName === 'transfer') {
-            scrollTarget = transferSection.offsetTop;
-            summarySection.classList.add('fade-out');
-            efficiencySection.classList.add('fade-out');
-            transferSection.classList.add('fade-in');
-            generalizationSection.classList.add('hidden-below');
-            tablecamSection.classList.add('hidden-below');
+            if (yourTurnSection) yourTurnSection.classList.add('hidden-below');
         } else if (sectionName === 'generalization') {
             scrollTarget = generalizationSection.offsetTop;
             summarySection.classList.add('fade-out');
             efficiencySection.classList.add('fade-out');
             transferSection.classList.add('fade-out');
             generalizationSection.classList.add('fade-in');
-            tablecamSection.classList.add('hidden-below');
-        } else if (sectionName === 'tablecam') {
-            scrollTarget = tablecamSection.offsetTop;
+            if (yourTurnSection) yourTurnSection.classList.add('hidden-below');
+        } else if (sectionName === 'your-turn' && yourTurnSection) {
+            scrollTarget = yourTurnSection.offsetTop;
             summarySection.classList.add('fade-out');
             efficiencySection.classList.add('fade-out');
             transferSection.classList.add('fade-out');
             generalizationSection.classList.add('fade-out');
-            tablecamSection.classList.add('fade-in');
+            yourTurnSection.classList.add('fade-in');
+        } else if (sectionName === 'method') {
+            const methodSection = document.getElementById('method-section');
+            if (methodSection) {
+                scrollTarget = methodSection.offsetTop;
+            }
         }
         
         // Smooth scroll to target
@@ -912,7 +924,6 @@ document.querySelectorAll('.timeline-item').forEach(item => {
         // Reset navigation flag after scroll
         setTimeout(() => {
             window.isTimelineNavigating = false;
-            
             summarySection.classList.remove('instant-show');
         }, 800);
     });
@@ -1034,6 +1045,68 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     observer.observe(document.body, { childList: true, subtree: true });
+
+    // Copy-to-clipboard for BibTeX
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest && e.target.closest('.copy-bibtex-btn');
+        if (!btn) return;
+
+        const targetSelector = btn.getAttribute('data-copy-target');
+        if (!targetSelector) return;
+        const targetEl = document.querySelector(targetSelector);
+        if (!targetEl) return;
+
+        const text = targetEl.textContent.trim();
+        if (!text) return;
+
+        const statusEl = btn.parentElement.querySelector('.copy-bibtex-status');
+
+        function showCopied() {
+            if (statusEl) {
+                statusEl.textContent = 'Copied!';
+            }
+            const originalTitle = btn.getAttribute('title') || '';
+            btn.setAttribute('data-original-title', originalTitle);
+            btn.setAttribute('title', 'Copied!');
+            btn.disabled = true;
+            setTimeout(() => {
+                const savedTitle = btn.getAttribute('data-original-title') || originalTitle;
+                if (savedTitle) {
+                    btn.setAttribute('title', savedTitle);
+                } else {
+                    btn.removeAttribute('title');
+                }
+                btn.removeAttribute('data-original-title');
+                btn.disabled = false;
+                if (statusEl) {
+                    statusEl.textContent = '';
+                }
+            }, 1500);
+        }
+
+        const fallbackCopy = () => {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                showCopied();
+            } catch (err) {
+                console.error('Failed to copy BibTeX:', err);
+            } finally {
+                document.body.removeChild(textarea);
+            }
+        };
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(showCopied).catch(fallbackCopy);
+        } else {
+            fallbackCopy();
+        }
+    });
 });
 
 // Theme toggle functionality

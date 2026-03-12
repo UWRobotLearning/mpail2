@@ -11,6 +11,15 @@
     text-align: left;
 }
 
+.highlight-box ul {
+    margin: 0.4em 0 0.4em 1.2em;
+    padding-left: 0;
+}
+
+.highlight-box li {
+    margin: 0.1em 0;
+}
+
 body.dark-mode .highlight-box {
     background: #181a2a;
     border-left: 5px solid #a5b4fc;
@@ -341,6 +350,55 @@ li {
     width: auto;
     max-width: 100%;
     margin: 0.75rem 0;
+}
+
+.copy-bibtex-btn {
+    padding: 4px 10px;
+    font-family: inherit;
+    border-radius: 999px;
+    border: 1px solid #c5ccd6;
+    background: #ffffff;
+    color: #4b5563;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.copy-bibtex-btn:hover {
+    border-color: #667eea;
+    color: #667eea;
+    box-shadow: 0 2px 6px rgba(102, 126, 234, 0.25);
+}
+
+.copy-bibtex-btn svg {
+    width: 14px;
+    height: 14px;
+    display: block;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.4;
+    stroke-linejoin: round;
+}
+
+body.dark-mode .copy-bibtex-btn {
+    background: #0f172a;
+    border-color: #4b5563;
+    color: #e5e7eb;
+}
+
+body.dark-mode .copy-bibtex-btn:hover {
+    border-color: #a5b4fc;
+    color: #a5b4fc;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.copy-bibtex-status {
+    font-size: 0.78rem;
+    color: #16a34a;
+    min-width: 0;
+}
+
+body.dark-mode .copy-bibtex-status {
+    color: #4ade80;
 }
 
 .card-auto img {
@@ -829,17 +887,13 @@ body.dark-mode .slider-dot.active {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    top: calc(50% + 150px);
+    top: calc(50% + 120px);
     width: 90%;
     max-width: 800px;
-    max-height: 0;
-    overflow: hidden;
-    opacity: 0;
-    transition: max-height 0.4s ease, opacity 0.3s ease;
 }
 
-.authors-section.expanded {
-    max-height: 200px;
+.authors-section--always-visible {
+    max-height: none;
     opacity: 1;
 }
 
@@ -1842,6 +1896,37 @@ body.dark-mode .left-sidebar-hint::before {
 .slider-track-container {
     position: relative;
     padding: 5px 0 25px 0;
+}
+
+.slider-hint {
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-4px);
+    padding: 4px 10px;
+    background: #111827;
+    color: #f9fafb;
+    font-size: 0.78rem;
+    font-weight: 400;
+    line-height: 1.4;
+    border-radius: 999px;
+    white-space: nowrap;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 3;
+}
+
+.slider-hint.visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-6px);
+}
+
+body.dark-mode .slider-hint {
+    background: #e5e7eb;
+    color: #111827;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
 }
 
 .iteration-slider {
