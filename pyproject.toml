@@ -1,3 +1,53 @@
 [build-system]
-requires = ["setuptools>=61.0", "toml"]
+requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "mpail2"
+version = "0.1.0"
+description = "Model Predictive Adversarial Imitation Learning 2"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10,<3.11"
+authors = [
+  { name = "Tyler Han, Siyang Shen, Rohan Baijal, Harine Ravichandiran, Bat Nemekhbold, Kevin Huang, Sanghun Jung, Byron Boots" }
+]
+maintainers = [
+  { name = "Tyler Han", email = "than123@uw.edu" }
+]
+keywords = []
+classifiers = [
+  "Natural Language :: English",
+  "Programming Language :: Python :: 3.10",
+]
+dependencies = [
+  "psutil",
+  "torch",
+  "numpy>=1.20",
+  "pyyaml",
+  "toml",
+  "gymnasium[mujoco]>=1.0",
+  "tqdm",
+  "wandb",
+  "imageio",
+  "imageio-ffmpeg",
+  "av",
+  "matplotlib",
+  "scipy",
+  "hydra-core",
+]
+
+[project.optional-dependencies]
+franka = [
+  "opencv-python",
+  "pyzmq",
+  "franky-control",
+  "pyrealsense2",
+]
+
+[tool.setuptools.packages.find]
+include = ["mpail2*"]
+
+[project.scripts]
+mpail2-train = "mpail2.train.train:main"
+mpail2-train-isaac = "mpail2.train.train:main"

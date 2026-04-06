@@ -276,4 +276,4 @@ class MPAIL2Runner:
 
     @property
     def video_interval_its(self):
-        return self.log_cfg.video_interval // self._num_steps_per_env
+        return max(1, self.log_cfg.video_interval // self._num_steps_per_env)

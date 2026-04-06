@@ -1,45 +1,43 @@
 # MPAIL2
 
-![MPAIL2 Demo](media/mpail2-teaser.gif)
-https://www.youtube.com/watch?v=yQw0JmvOVwM
+![MPAIL2 Demo](docs/media/mpail2-teaser.gif)
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=yQw0JmvOVwM">🎥 Demo Video</a> •
+  <a href="https://uwrobotlearning.github.io/mpail2/">🌐 Website</a> •
+  <a href="https://arxiv.org/pdf/2602.24121">📄 Paper</a>
+</p>
 
-[Website](https://uwrobotlearning.github.io/mpail2/) | [Paper](https://arxiv.org/pdf/2602.24121)
 
-**3/2/2026**: This repository contains the MPAIL2 algorithm implementation. Examples of IsaacLab or real-world workflows will be included later or in a separate repository.
-
-## Quick Start (~2 minutes)
+## Quick Start
 
 ### Installation
 
+> Tested on **Ubuntu 22.04** with **Python 3.10**
+
 ```
-git clone git@github.com:UWRobotLearning/mpail2.git
-cd mpail2
-conda create -n mp2 python=3.10
-conda activate mp2
+conda create -n mpail2 python=3.10
+conda activate mpail2
+pip install --upgrade pip
 pip install -e .
 ```
 
-### (Gymnasium) Training
+This is the default install for `mpail2`, including Gym / MuJoCo and the Python packages used by the real-robot stacks. IsaacLab and the real-robot environments still require their own system-level setup first, so install Isaac Sim / IsaacLab, ROS 2 / `ros2_kortex`, or the Franka control stack before using those backends. See [`docs/INSTALL.md`](docs/INSTALL.md) for environment-specific setup.
 
-Ant:
-```
-python train/train_mpail_gym.py # Defaults to Ant-v5
+### Training (Isaac or Gymnasium)
+
+One entry point: [`python -m mpail2.train.train`](mpail2/train/train.py) or `mpail2-train`. If ``--env`` matches an Isaac task (default is ``push`` when omitted), Hydra + Isaac Lab run; otherwise the Gymnasium / MuJoCo script runs (e.g. ``Ant-v5``).
+
+```bash
+python mpail2/train/train.py --env push --headless log.no_wandb=True   # Isaac
+python mpail2/train/train.py --env Ant-v5                              # Gym (MuJoCo)
+python mpail2/train/train.py --env Humanoid-v5 log.video=True
 ```
 
-Humanoid with video:
-```
-python train/train_mpail_gym.py --env Humanoid-v5 --video
-```
-
-Hopper with video and wandb:
-```
-python train/train_mpail_gym.py --env Hopper-v5 --video --wandb True
-```
+See [`mpail2/train/README.md`](mpail2/train/README.md).
 
 ## About the Files
 
-![MPAIL2 Overview](media/mpail2.drawio.png)
-
+![MPAIL2 Overview](docs/media/mpail2.drawio.png)
 
 ### Agent
 1. `runner.py` : Outer-most loop. Steps environment and calls `act()` on the learner.
@@ -59,5 +57,15 @@ Composed by the planner are the component models in the above figure and discuss
 
 Except for `sampling.py`, these files are primarily `torch.nn.Modules` with `forward` definitions as you expect their mathematical representations to be.
 
-- `layers.py`
-- `storage.py`
+# BibTex
+
+If you found this work useful in your efforts, please consider citing:
+
+```
+@article{han2026planning,
+  title   = {Planning from Observation and Interaction},
+  author  = {Han, Tyler and Shen, Siyang and Baijal, Rohan and Ravichandran, Harine and Nemekhbold, Bat and Huang, Kevin and Jung, Sanghun and Boots, Byron},
+  journal = {arXiv preprint arXiv:2602.24121},
+  year    = {2026}
+}
+```
