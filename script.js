@@ -3,6 +3,7 @@ async function loadSections() {
     const sectionMappings = {
         'summary-section-container': 'sections/summary.html',
         'method-section-container': 'sections/method.html',
+        'experiments-overview-section-container': 'sections/experiments-overview.html',
         'efficiency-section-container': 'sections/efficiency.html',
         'transfer-section-container': 'sections/transfer.html',
         'generalization-section-container': 'sections/generalization.html',

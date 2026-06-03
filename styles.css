@@ -2324,6 +2324,27 @@ body.dark-mode .transfer-demo-btn {
     margin: 0 auto;
 }
 
+.experiments-overview-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 10px auto 0 auto;
+}
+
+@media (max-width: 900px) {
+    .experiments-overview-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 520px) {
+    .experiments-overview-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 .generalization-video-wrapper {
     width: 100%;
 }
