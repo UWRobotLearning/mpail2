@@ -3,7 +3,7 @@ async function loadSections() {
     const sectionMappings = {
         'summary-section-container': 'sections/summary.html',
         'method-section-container': 'sections/method.html',
-        'experiments-overview-section-container': 'sections/experiments-overview.html',
+        'results-overview-section-container': 'sections/experiments-overview.html',
         'efficiency-section-container': 'sections/efficiency.html',
         'transfer-section-container': 'sections/transfer.html',
         'generalization-section-container': 'sections/generalization.html',
@@ -270,19 +270,21 @@ document.addEventListener('DOMContentLoaded', function() {
         // Get section references (they are loaded dynamically)
         const summarySection = document.getElementById('summary-section');
         const methodSection = document.getElementById('method-section');
+        const resultsOverviewSection = document.getElementById('results-overview-section');
         const efficiencySection = document.getElementById('efficiency-section');
         const transferSection = document.getElementById('transfer-section');
         const generalizationSection = document.getElementById('generalization-section');
         const yourTurnSection = document.getElementById('your-turn-section');
 
         // If core sections are not yet present, skip the rest of the scroll logic
-        if (!summarySection || !methodSection || !efficiencySection || !transferSection || !generalizationSection || !yourTurnSection) {
+        if (!summarySection || !methodSection || !resultsOverviewSection || !efficiencySection || !transferSection || !generalizationSection || !yourTurnSection) {
             return;
         }
 
         // Get section positions
         const summaryRect = summarySection.getBoundingClientRect();
         const methodRect = methodSection.getBoundingClientRect();
+        const resultsOverviewRect = resultsOverviewSection.getBoundingClientRect();
         const efficiencyRect = efficiencySection.getBoundingClientRect();
         const transferRect = transferSection.getBoundingClientRect();
         const generalizationRect = generalizationSection.getBoundingClientRect();
@@ -318,16 +320,18 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (generalizationRect.top < windowHeight * 0.5) {
             activeSection = 'generalization';
         } else if (transferRect.top < windowHeight * 0.5) {
-            activeSection = 'results';
+            activeSection = 'side-by-side';
         } else if (efficiencyRect.top < windowHeight * 0.5) {
-            activeSection = 'results';
+            activeSection = 'side-by-side';
+        } else if (resultsOverviewRect.top < windowHeight * 0.5) {
+            activeSection = 'results-overview';
         } else if (methodRect.top < windowHeight * 0.5) {
             activeSection = 'method';
         }
 
-        // Show a one-time hint to use the left sidebar during Results
+        // Show a one-time hint to use the left sidebar during Side-by-Side
         const leftButtonsVisible = taskButtonsLeft && taskButtonsLeft.classList.contains('visible');
-        if (!dismissedLeftHint && leftButtonsVisible && activeSection === 'results') {
+        if (!dismissedLeftHint && leftButtonsVisible && activeSection === 'side-by-side') {
             leftSidebarHint.classList.add('visible');
             positionLeftSidebarHint();
         } else {
@@ -471,8 +475,9 @@ function initializeInteractiveSections() {
     // Ensure comparison / transfer videos have speed badges and playback rate set
     document.querySelectorAll('.video-display').forEach(display => {
         const isDemo = display.closest('.demo-video-wrapper');
-        const isIter = display.closest('.transfer-video-wrapper');
         const isTeaser = display.classList.contains('teaser-video');
+        const isMethodCard = display.closest('.method-mppi-video') || display.closest('.method-card-media');
+        if (isMethodCard) return;
         if (!isDemo && !isTeaser && !display.querySelector('.video-speed-badge')) {
             const badge = document.createElement('span');
             badge.className = 'video-speed-badge';
@@ -497,6 +502,42 @@ function initializeInteractiveSections() {
     // Keep sample method and transfer demo in a consistent initial state
     updateSampleMethodVideo();
     switchTransferDemo('initial');
+    initializeMethodVideos();
+}
+
+function initializeMethodVideos() {
+    const methodVideoIds = ['method-mppi-video', 'method-card-video-right'];
+    methodVideoIds.forEach(id => {
+        const v = document.getElementById(id);
+        if (!v || v.dataset.initialized === 'true') return;
+        v.dataset.initialized = 'true';
+        v.playbackRate = 1;
+        v.muted = true;
+        v.defaultMuted = true;
+
+        const tryPlay = () => { if (v.paused) v.play().catch(() => {}); };
+        if (v.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+            tryPlay();
+        } else {
+            v.addEventListener('loadeddata', tryPlay, { once: true });
+            v.addEventListener('canplay', tryPlay, { once: true });
+        }
+    });
+
+    const methodSection = document.getElementById('method-section');
+    if (methodSection && 'IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    methodVideoIds.forEach(id => {
+                        const v = document.getElementById(id);
+                        if (v && v.paused) v.play().catch(() => {});
+                    });
+                }
+            });
+        }, { threshold: 0.25 });
+        observer.observe(methodSection);
+    }
 }
 
 function updateIteration(value) {
@@ -859,6 +900,9 @@ document.querySelectorAll('.timeline-item').forEach(item => {
         const generalizationSection = document.getElementById('generalization-section');
         const yourTurnSection = document.getElementById('your-turn-section');
         
+        const methodSection = document.getElementById('method-section');
+        const resultsOverviewSection = document.getElementById('results-overview-section');
+
         // Reset all classes
         summarySection.classList.remove('fade-out', 'instant-show');
         efficiencySection.classList.remove('fade-in', 'fade-out', 'hidden-below');
@@ -888,7 +932,9 @@ document.querySelectorAll('.timeline-item').forEach(item => {
             transferSection.classList.add('hidden-below');
             generalizationSection.classList.add('hidden-below');
             if (yourTurnSection) yourTurnSection.classList.add('hidden-below');
-        } else if (sectionName === 'results') {
+        } else if (sectionName === 'results-overview' && resultsOverviewSection) {
+            scrollTarget = resultsOverviewSection.offsetTop;
+        } else if (sectionName === 'side-by-side') {
             scrollTarget = efficiencySection.offsetTop;
             summarySection.classList.add('fade-out');
             efficiencySection.classList.add('fade-in');
@@ -909,11 +955,8 @@ document.querySelectorAll('.timeline-item').forEach(item => {
             transferSection.classList.add('fade-out');
             generalizationSection.classList.add('fade-out');
             yourTurnSection.classList.add('fade-in');
-        } else if (sectionName === 'method') {
-            const methodSection = document.getElementById('method-section');
-            if (methodSection) {
-                scrollTarget = methodSection.offsetTop;
-            }
+        } else if (sectionName === 'method' && methodSection) {
+            scrollTarget = methodSection.offsetTop;
         }
         
         // Smooth scroll to target
@@ -998,24 +1041,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Video synchronization and controls
 document.addEventListener('DOMContentLoaded', function() {
-    var visRender = document.getElementById('vis-render');
-    var visRollout = document.getElementById('vis-rollout');
-    if (visRender && visRollout) {
-        var visMaxDuration = 6;
-        function syncVisVideos() {
-            visRender.currentTime = 0;
-            visRollout.currentTime = 0;
-            visRender.play();
-            visRollout.play();
-        }
-        visRender.addEventListener('timeupdate', function() {
-            if (this.currentTime >= visMaxDuration) syncVisVideos();
-        });
-        visRollout.addEventListener('timeupdate', function() {
-            if (this.currentTime >= visMaxDuration) syncVisVideos();
-        });
-    }
-
     document.querySelectorAll('video').forEach(function(video) {
         video.muted = true;
         video.addEventListener('volumechange', function() {
