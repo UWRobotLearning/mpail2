@@ -2349,7 +2349,7 @@ body.dark-mode .transfer-demo-btn {
 
 .experiments-overview-grid {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
     gap: 24px;
     width: 100%;
     max-width: 900px;
@@ -2358,7 +2358,7 @@ body.dark-mode .transfer-demo-btn {
 
 @media (max-width: 900px) {
     .experiments-overview-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
@@ -2391,6 +2391,71 @@ body.dark-mode .transfer-demo-btn {
     font-size: 1.4em;
     color: #888;
     font-weight: 600;
+}
+
+#results-overview-section .gen-video-label {
+    margin-top: 20px;
+    margin-bottom: 32px;
+}
+
+/* Experiment settings table */
+.experiment-settings-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.92em;
+    text-align: left;
+}
+
+.experiment-settings-table th {
+    padding: 10px 14px;
+    font-weight: 700;
+    color: #667eea;
+    border-bottom: 2px solid rgba(102, 126, 234, 0.25);
+    white-space: nowrap;
+}
+
+.experiment-settings-table td {
+    padding: 9px 14px;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+    vertical-align: top;
+}
+
+.experiment-settings-table tr:last-child td {
+    border-bottom: none;
+}
+
+.experiment-settings-table tr.table-group-header td {
+    background: rgba(102, 126, 234, 0.07);
+    font-size: 0.88em;
+    font-style: italic;
+    font-weight: 700;
+    color: #667eea;
+    padding: 6px 14px;
+    border-bottom: none;
+}
+
+.experiment-settings-table .reset-region {
+    color: #888;
+    font-size: 0.9em;
+}
+
+.experiment-settings-table .trans-count {
+    color: #888;
+    font-size: 0.9em;
+}
+
+body.dark-mode .experiment-settings-table th {
+    color: #a5b4fc;
+    border-bottom-color: rgba(165, 180, 252, 0.25);
+}
+
+body.dark-mode .experiment-settings-table td {
+    border-bottom-color: rgba(148, 163, 184, 0.15);
+}
+
+body.dark-mode .experiment-settings-table tr.table-group-header td {
+    background: rgba(165, 180, 252, 0.08);
+    color: #a5b4fc;
 }
 
 .demonstrations-grid {

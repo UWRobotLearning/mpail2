@@ -19,7 +19,7 @@
             <div class="generalization-video-wrapper">
                 <div class="video-display">
                     <video autoplay muted loop playsinline preload="metadata">
-                        <source src="Media/Video/Pick/iter_150.mp4" type="video/mp4">
+                        <source src="Media/Video/Pick/iter_140.mp4" type="video/mp4">
                         Your browser does not support video playback.
                     </video>
                 </div>
@@ -28,20 +28,11 @@
             <div class="generalization-video-wrapper">
                 <div class="video-display">
                     <video autoplay muted loop playsinline preload="metadata">
-                        <source src="Media/Video/Transfer/Pick/iter_120.mp4" type="video/mp4">
+                        <source src="Media/Video/MoP/iter_190.mp4" type="video/mp4">
                         Your browser does not support video playback.
                     </video>
                 </div>
                 <div class="gen-video-label">Mug-on-plate</div>
-            </div>
-            <div class="generalization-video-wrapper">
-                <div class="video-display">
-                    <video autoplay muted loop playsinline preload="metadata">
-                        <source src="Media/Video/TableCam/video_1.mp4" type="video/mp4">
-                        Your browser does not support video playback.
-                    </video>
-                </div>
-                <div class="gen-video-label">Video only</div>
             </div>
             <div class="generalization-video-wrapper">
                 <div class="video-display">
@@ -51,6 +42,53 @@
                     </video>
                 </div>
                 <div class="gen-video-label">Disturbance robustness</div>
+            </div>
+        </div>
+
+        <div class="content-block" id="experiment-settings-block" style="margin-top: 32px; text-align: left;">
+            <h3 class="subsection-header">Experiment Settings</h3>
+            <div class="collapsible-body">
+                <div style="overflow-x: auto; margin-top: 8px;">
+                    <table class="experiment-settings-table">
+                        <thead>
+                            <tr>
+                                <th>Task</th>
+                                <th>Observations</th>
+                                <th>Object Dimension (Reset Region)</th>
+                                <th># of Demonstrations</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="table-group-header">
+                                <td colspan="4">Real &mdash; 64&times;64 RGB (fixed + wrist) &nbsp;&middot;&nbsp; Franka: Push &nbsp;&middot;&nbsp; Kinova Gen3: PnP &nbsp;&middot;&nbsp; 3 seeds</td>
+                            </tr>
+                            <tr>
+                                <td>Block Push</td>
+                                <td>image</td>
+                                <td>5&times;5&times;5 cm &nbsp;<span class="reset-region">(18&times;18 cm)</span></td>
+                                <td>10 <span class="trans-count">(1,451 trans.)</span></td>
+                            </tr>
+                            <tr>
+                                <td>Pick-and-Place</td>
+                                <td>image</td>
+                                <td>4&times;4&times;3 cm &nbsp;<span class="reset-region">(8&times;16 cm)</span></td>
+                                <td>10 <span class="trans-count">(1,025 trans.)</span></td>
+                            </tr>
+                            <tr>
+                                <td>Mug-on-Plate</td>
+                                <td>image</td>
+                                <td>mug &empty;8&times;9 cm <span class="reset-region">(18&times;18 cm)</span>, plate &empty;14 cm <span class="reset-region">(20&times;30 cm)</span></td>
+                                <td>15 <span class="trans-count">(1,802 trans.)</span></td>
+                            </tr>
+                            <tr>
+                                <td>Block Push <em>(Video)</em></td>
+                                <td>fixed-only</td>
+                                <td>5&times;5&times;5 cm &nbsp;<span class="reset-region">(18&times;18 cm)</span></td>
+                                <td>10 <span class="trans-count">(914 trans.)</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

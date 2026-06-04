@@ -49,7 +49,11 @@
                 <div class="summary-main-image" style="flex: 1; margin-bottom: 0;"><img src="Media/Video/Vis/overlay.gif" alt="Rollout Visualization"></div>
                 <i>
                     <small>
-                        Note that planning occurs in latent space. This visualization is made possible by training a separate decoder.
+                        <B>RGB Video:</B> MPAIL2 on Block Push (state) task on sim.<br>
+                        <B>Plots:</B> Predicted plans in the YZ and XY planes (Green: End-effector, Orange: Block).
+                         <!-- End-effector plans in green; block plans in orange. -->
+                         Block trajectories are static until contact, illustrating causal world modeling.
+                         A separately trained decoder is used for visualization.
                     </small>
                 </i>
             </div>
@@ -61,7 +65,7 @@
                 </div>
                 <i>
                     <small>
-                        Note that planning occurs in latent space. This visualization is made possible by training a separate decoder.
+                        <b>MPPI rollout visualization</b> for Block Push task.
                     </small>
                 </i>
             </div>
@@ -78,6 +82,14 @@
                     preload="auto"
                 ></video>
             </div>
+            <p style="text-align: center; margin-top: 12px;">
+                <i>
+                    <small>
+                        <b>MPPI rollout visualization</b> for Mug-on-Plate task.<br>
+                        Note that planning occurs in latent space. This visualization is made possible by training a separate decoder.
+                    </small>
+                </i>
+            </p>
         </div>
     </div>
 </section>
