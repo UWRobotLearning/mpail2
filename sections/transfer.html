@@ -228,13 +228,102 @@
                     <div class="results-panel">
                         <h3 class="subsection-header">Plots and Tables</h3>
                         <div class="collapsible-body">
-                            <div style="display: flex; gap: 10px; justify-content: center; align-items: center; max-width: 1200px; margin: 5px auto 0 auto;" id="transfer-results-images">
-                                <div style="flex: 1; max-width: 550px;">
-                                    <img id="transfer-results-chart-img" src="Media/Image/Results/Transfer_Push_chart.png" alt="Transfer Results Chart" style="width: 100%; border-radius: 8px;">
+                            <div class="results-chart-container results-chart-full">
+                                <div class="broken-axis-wrapper">
+                                    <div class="broken-chart-top">
+                                        <canvas id="transfer-chart-top"></canvas>
+                                    </div>
+                                    <div class="broken-axis-break" id="transfer-chart-break"></div>
+                                    <div class="broken-chart-bottom">
+                                        <canvas id="transfer-chart-bottom"></canvas>
+                                    </div>
+                                    <div id="transfer-chart-legend"></div>
                                 </div>
-                                <div style="flex: 1; max-width: 550px;">
-                                    <img id="transfer-results-table-img" src="Media/Image/Results/Transfer_Push_table.png" alt="Transfer Results Table" style="width: 100%; border-radius: 8px;">
-                                </div>
+                            </div>
+                            <div style="margin-top: 24px; overflow-x: auto;">
+                                <table class="results-html-table transfer-results-table">
+                                    <thead>
+                                        <tr>
+                                            <th rowspan="2" class="col-model">Method</th>
+                                            <th colspan="2" class="col-group col-divider">Supervision</th>
+                                            <th colspan="3" class="col-group col-divider">Components</th>
+                                            <th colspan="1" class="col-group col-divider"></th>
+                                            <th colspan="1" class="col-group">Transfer</th>
+                                            <th colspan="1" class="col-group">Scratch</th>
+                                        </tr>
+                                        <tr>
+                                            <th class="col-divider col-small">Reward</th>
+                                            <th class="col-small">Actions</th>
+                                            <th class="col-divider col-small">Plan.</th>
+                                            <th class="col-small">Model</th>
+                                            <th class="col-small">Off-Policy</th>
+                                            <th class="col-divider col-small">BP</th>
+                                            <th class="col-small">BP (rt.)</th>
+                                            <th class="col-small">BP (rt.)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="table-highlight-row">
+                                            <td><strong>MPAIL2</strong></td>
+                                            <td class="col-divider"></td>
+                                            <td></td>
+                                            <td class="col-divider">✓</td>
+                                            <td>✓</td>
+                                            <td>✓</td>
+                                            <td class="col-divider"><strong>100±0</strong></td>
+                                            <td><strong>90±5</strong></td>
+                                            <td><strong>88±6</strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td>[−P] (MAIRL)</td>
+                                            <td class="col-divider"></td>
+                                            <td></td>
+                                            <td class="col-divider"></td>
+                                            <td>✓</td>
+                                            <td>✓</td>
+                                            <td class="col-divider">64±18</td>
+                                            <td>14±13</td>
+                                            <td>53±12</td>
+                                        </tr>
+                                        <tr>
+                                            <td>[−PM] (DAC)</td>
+                                            <td class="col-divider"></td>
+                                            <td></td>
+                                            <td class="col-divider"></td>
+                                            <td></td>
+                                            <td>✓</td>
+                                            <td class="col-divider">0±0</td>
+                                            <td>0±0</td>
+                                            <td>0±0</td>
+                                        </tr>
+                                        <tr class="row-separator">
+                                            <td colspan="9"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>BC (Diffusion)</td>
+                                            <td class="col-divider"></td>
+                                            <td>✓</td>
+                                            <td class="col-divider"></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td class="col-divider"><strong>94±6</strong></td>
+                                            <td>16±8</td>
+                                            <td>34±10</td>
+                                        </tr>
+                                        <tr>
+                                            <td>RLPD</td>
+                                            <td class="col-divider">✓<sup>*</sup></td>
+                                            <td>✓</td>
+                                            <td class="col-divider"></td>
+                                            <td></td>
+                                            <td>✓</td>
+                                            <td class="col-divider">0±0</td>
+                                            <td>0±0</td>
+                                            <td>0±0</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <p class="table-footnote"><sup>*</sup> RLPD uses offline data (demonstrations) as prior data in the replay buffer.</p>
                             </div>
                         </div>
                     </div>

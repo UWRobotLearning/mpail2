@@ -1251,6 +1251,80 @@ body.dark-mode .results-panel {
     box-shadow: 0 14px 40px rgba(0, 0, 0, 0.7);
 }
 
+.results-charts-wrapper {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    align-items: flex-start;
+    max-width: 1200px;
+    margin: 10px auto 0 auto;
+    flex-wrap: wrap;
+}
+
+.results-chart-container {
+    flex: 1;
+    min-width: 280px;
+    max-width: 560px;
+    background: #fff;
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.07);
+}
+
+.results-chart-container.results-chart-full {
+    max-width: 100%;
+    flex: unset;
+    width: 100%;
+}
+
+/* ── HTML/SVG legend ── */
+.chart-html-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+    justify-content: center;
+    padding: 10px 0 4px;
+}
+
+.chart-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    cursor: default;
+}
+
+/* ── Broken-axis layout (transfer chart) ── */
+.broken-axis-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.broken-chart-top {
+    width: 100%;
+    height: 100px;      /* small strip for the ~141 BC baseline */
+    position: relative;
+}
+
+.broken-axis-break {
+    position: relative;
+    height: 16px;
+    /* No background – the plugin draws the slash marks directly on the canvases */
+}
+
+.broken-chart-bottom {
+    width: 100%;
+    height: 360px;
+    position: relative;
+}
+
+body.dark-mode .results-chart-container {
+    background: #0d1630;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+
 .section-text {
     font-size: 0.98rem;
     color: #4b5563;
@@ -2456,6 +2530,149 @@ body.dark-mode .experiment-settings-table td {
 body.dark-mode .experiment-settings-table tr.table-group-header td {
     background: rgba(165, 180, 252, 0.08);
     color: #a5b4fc;
+}
+
+/* Results HTML table (sample efficiency, transfer) */
+.results-html-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.93em;
+    text-align: center;
+    margin: 0 auto;
+}
+
+.results-html-table .col-model {
+    text-align: center;
+    min-width: 140px;
+}
+
+.results-html-table thead th {
+    padding: 8px 14px;
+    font-weight: 700;
+    white-space: nowrap;
+    color: inherit;
+}
+
+.results-html-table thead tr:first-child th {
+    border-top: 2px solid rgba(102, 126, 234, 0.35);
+    border-bottom: none;
+    padding-bottom: 4px;
+}
+
+.results-html-table thead tr:last-child th {
+    border-top: none;
+    border-bottom: 2px solid rgba(102, 126, 234, 0.35);
+    padding-top: 4px;
+}
+
+.results-html-table tbody td {
+    padding: 8px 14px;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.results-html-table tbody tr:last-child td {
+    border-bottom: 2px solid rgba(102, 126, 234, 0.35);
+}
+
+.results-html-table tbody tr.table-group-header td {
+    background: rgba(102, 126, 234, 0.07);
+    font-style: italic;
+    font-weight: 700;
+    text-align: left;
+    padding: 6px 14px;
+    color: #667eea;
+    border-bottom: none;
+    font-size: 0.9em;
+}
+
+.results-html-table tbody tr.table-highlight-row td {
+    background: rgba(242, 89, 18, 0.05);
+}
+
+body.dark-mode .results-html-table thead th {
+    border-color: rgba(165, 180, 252, 0.35);
+}
+
+body.dark-mode .results-html-table thead tr:first-child th {
+    border-top-color: rgba(165, 180, 252, 0.35);
+}
+
+body.dark-mode .results-html-table thead tr:last-child th {
+    border-bottom-color: rgba(165, 180, 252, 0.35);
+}
+
+body.dark-mode .results-html-table tbody td {
+    border-bottom-color: rgba(148, 163, 184, 0.15);
+}
+
+body.dark-mode .results-html-table tbody tr:last-child td {
+    border-bottom-color: rgba(165, 180, 252, 0.35);
+}
+
+body.dark-mode .results-html-table tbody tr.table-group-header td {
+    background: rgba(165, 180, 252, 0.08);
+    color: #a5b4fc;
+}
+
+body.dark-mode .results-html-table tbody tr.table-highlight-row td {
+    background: rgba(242, 89, 18, 0.07);
+}
+
+.results-html-table .col-divider {
+    border-left: 2px solid rgba(102, 126, 234, 0.35);
+}
+
+body.dark-mode .results-html-table .col-divider {
+    border-left-color: rgba(165, 180, 252, 0.35);
+}
+
+.results-html-table .col-small {
+    font-size: 0.85em;
+    white-space: nowrap;
+}
+
+.transfer-results-table td {
+    white-space: nowrap;
+}
+
+.results-html-table tbody tr.row-separator td {
+    padding: 0;
+    height: 0;
+    border-bottom: 2px solid rgba(102, 126, 234, 0.35);
+}
+
+body.dark-mode .results-html-table tbody tr.row-separator td {
+    border-bottom-color: rgba(165, 180, 252, 0.35);
+}
+
+.table-footnote {
+    font-size: 0.8em;
+    color: #6b7280;
+    margin-top: 8px;
+    padding-left: 4px;
+}
+
+body.dark-mode .table-footnote {
+    color: #94a3b8;
+}
+
+.results-html-table thead th[rowspan] {
+    border-top: 2px solid rgba(102, 126, 234, 0.35);
+    border-bottom: 2px solid rgba(102, 126, 234, 0.35);
+    vertical-align: middle;
+}
+
+/* Needs higher specificity to override thead tr:first-child th { border-bottom: none } */
+.results-html-table thead tr:first-child th[rowspan] {
+    border-bottom: 2px solid rgba(102, 126, 234, 0.35);
+}
+
+body.dark-mode .results-html-table thead th[rowspan] {
+    border-color: rgba(165, 180, 252, 0.35);
+}
+
+body.dark-mode .results-html-table thead tr:first-child th[rowspan] {
+    border-bottom-color: rgba(165, 180, 252, 0.35);
 }
 
 .demonstrations-grid {

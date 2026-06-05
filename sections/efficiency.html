@@ -186,13 +186,60 @@
                 <div class="results-panel">
                     <h3 class="subsection-header">Plots and Tables</h3>
                     <div class="collapsible-body">
-                        <div style="display: flex; gap: 10px; justify-content: center; align-items: center; max-width: 1200px; margin: 5px auto 0 auto;" id="results-images">
-                            <div style="flex: 1; max-width: 550px;">
-                                <img id="results-chart-img" src="Media/Image/Results/Push_chart.png" alt="Results Chart" style="width: 100%; border-radius: 8px;">
-                            </div>
-                            <div style="flex: 1; max-width: 550px;">
-                                <img id="results-table-img" src="Media/Image/Results/Push_table.png" alt="Results Table" style="width: 100%; border-radius: 8px;">
-                            </div>
+                        <div class="results-chart-container results-chart-full">
+                            <canvas id="efficiency-chart"></canvas>
+                            <div id="efficiency-chart-legend"></div>
+                        </div>
+                        <div style="margin-top: 24px; overflow-x: auto;">
+                            <table class="results-html-table">
+                                <thead>
+                                    <tr>
+                                        <th rowspan="2" class="col-model">Models</th>
+                                        <th colspan="1" class="col-group">Last</th>
+                                        <th colspan="2" class="col-group col-divider">Best Checkpoint</th>
+                                    </tr>
+                                    <tr>
+                                        <th>Success (%)</th>
+                                        <th class="col-divider">#</th>
+                                        <th>Success (%)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- <tr class="table-group-header">
+                                        <td colspan="4"><strong>Real: Block Push</strong></td>
+                                    </tr> -->
+                                    <tr class="table-highlight-row">
+                                        <td><strong>MPAIL2</strong></td>
+                                        <td>62</td>
+                                        <td class="col-divider">100</td>
+                                        <td><strong>100</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Without Planning</td>
+                                        <td>34</td>
+                                        <td class="col-divider">130</td>
+                                        <td>64</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Model-Free</td>
+                                        <td>0</td>
+                                        <td class="col-divider">—</td>
+                                        <td>0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>RLPD</td>
+                                        <td>0</td>
+                                        <td class="col-divider">—</td>
+                                        <td>0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BC</td>
+                                        <td><strong>94</strong></td>
+                                        <td class="col-divider">—</td>
+                                        <td>94</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>

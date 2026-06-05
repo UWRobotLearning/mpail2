@@ -614,6 +614,7 @@ function selectTask(task) {
     updateTransferDemonstrationVideos();
     updateInitialDemonstrationVideos();
     updateResultsImages();
+    if (typeof refreshCharts === 'function') refreshCharts();
 }
 
 function updateSliderRange() {
@@ -674,13 +675,9 @@ function rebuildDots(containerId, maxIter, currentValue) {
 
 function updateResultsImages() {
     const folder = currentTask === 'push' ? 'Push' : 'Pick';
-    const chartImg = document.getElementById('results-chart-img');
     const tableImg = document.getElementById('results-table-img');
-    if (chartImg) chartImg.src = `Media/Image/Results/${folder}_chart.png`;
     if (tableImg) tableImg.src = `Media/Image/Results/${folder}_table.png`;
-    const tChartImg = document.getElementById('transfer-results-chart-img');
     const tTableImg = document.getElementById('transfer-results-table-img');
-    if (tChartImg) tChartImg.src = `Media/Image/Results/Transfer_${folder}_chart.png`;
     if (tTableImg) tTableImg.src = `Media/Image/Results/Transfer_${folder}_table.png`;
 }
 
