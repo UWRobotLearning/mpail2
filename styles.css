@@ -2472,6 +2472,47 @@ body.dark-mode .transfer-demo-btn {
     margin-bottom: 32px;
 }
 
+/* ── Video overlay badges ── */
+.video-badge-row {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.video-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px 5px 9px;
+    border-radius: 7px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.video-badge--disabled {
+    background: rgba(0, 0, 0, 0.55);
+    color: #f9f9f9;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.video-badge__cross {
+    color: #ef4444;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1;
+}
+
 /* Experiment settings table */
 .experiment-settings-table {
     width: 100%;
