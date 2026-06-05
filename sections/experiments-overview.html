@@ -37,16 +37,16 @@
             <div class="generalization-video-wrapper">
                 <div class="video-display" style="position: relative;">
                     <video autoplay muted loop playsinline preload="metadata">
-                        <source src="Media/Video/Push/iter_100.mp4" type="video/mp4">
+                        <source src="Media/Video/Push/Video_only/push_vid_only_h264.mp4" type="video/mp4">
                         Your browser does not support video playback.
                     </video>
                     <div class="video-badge-row">
                         <div class="video-badge video-badge--disabled">
-                            <span class="video-badge__cross">✕</span>
+                            <span class="video-badge__cross">No</span>
                             Wrist Camera
                         </div>
                         <div class="video-badge video-badge--disabled">
-                            <span class="video-badge__cross">✕</span>
+                            <span class="video-badge__cross">No</span>
                             Proprioception
                         </div>
                     </div>
@@ -57,49 +57,152 @@
 
         <div class="content-block" id="experiment-settings-block" style="margin-top: 32px; text-align: left;">
             <h3 class="subsection-header">Experiment Settings</h3>
-            <div class="collapsible-body">
-                <div style="overflow-x: auto; margin-top: 8px;">
-                    <table class="experiment-settings-table">
-                        <thead>
-                            <tr>
-                                <th>Task</th>
-                                <th>Observations</th>
-                                <th>Object Dimension (Reset Region)</th>
-                                <th># of Demonstrations</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="table-group-header">
-                                <td colspan="4">Real &mdash; 64&times;64 RGB (fixed + wrist) &nbsp;&middot;&nbsp; Franka: Push &nbsp;&middot;&nbsp; Kinova Gen3: PnP &nbsp;&middot;&nbsp; 3 seeds</td>
-                            </tr>
-                            <tr>
-                                <td>Block Push</td>
-                                <td>image</td>
-                                <td>5&times;5&times;5 cm &nbsp;<span class="reset-region">(18&times;18 cm)</span></td>
-                                <td>10 <span class="trans-count">(1,451 trans.)</span></td>
-                            </tr>
-                            <tr>
-                                <td>Pick-and-Place</td>
-                                <td>image</td>
-                                <td>4&times;4&times;3 cm &nbsp;<span class="reset-region">(8&times;16 cm)</span></td>
-                                <td>10 <span class="trans-count">(1,025 trans.)</span></td>
-                            </tr>
-                            <tr>
-                                <td>Mug-on-Plate</td>
-                                <td>image</td>
-                                <td>mug &empty;8&times;9 cm <span class="reset-region">(18&times;18 cm)</span>, plate &empty;14 cm <span class="reset-region">(20&times;30 cm)</span></td>
-                                <td>15 <span class="trans-count">(1,802 trans.)</span></td>
-                            </tr>
-                            <tr>
-                                <td>Block Push <em>(Video)</em></td>
-                                <td>fixed-only</td>
-                                <td>5&times;5&times;5 cm &nbsp;<span class="reset-region">(18&times;18 cm)</span></td>
-                                <td>10 <span class="trans-count">(914 trans.)</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                    <div class="collapsible-body">
+                        <div style="overflow-x: auto; margin-top: 8px;">
+                            <table class="experiment-settings-table">
+                                <thead>
+                                    <tr>
+                                        <th>Task</th>
+                                        <th>Observations</th>
+                                        <th>Object Dimension (Reset Region)</th>
+                                        <th># of Demonstrations</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="table-group-header">
+                                        <td colspan="4">Real &mdash; 64&times;64 RGB (fixed + wrist) &nbsp;&middot;&nbsp; Franka: Push &nbsp;&middot;&nbsp; Kinova Gen3: PnP &nbsp;&middot;&nbsp; 3 seeds</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Block Push</td>
+                                        <td>image</td>
+                                        <td>5&times;5&times;5 cm &nbsp;<span class="reset-region">(18&times;18 cm)</span></td>
+                                        <td>10 <span class="trans-count">(1,451 trans.)</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Pick-and-Place</td>
+                                        <td>image</td>
+                                        <td>4&times;4&times;3 cm &nbsp;<span class="reset-region">(8&times;16 cm)</span></td>
+                                        <td>10 <span class="trans-count">(1,025 trans.)</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Mug-on-Plate</td>
+                                        <td>image</td>
+                                        <td>mug &empty;8&times;9 cm <span class="reset-region">(18&times;18 cm)</span>, plate &empty;14 cm <span class="reset-region">(20&times;30 cm)</span></td>
+                                        <td>15 <span class="trans-count">(1,802 trans.)</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Block Push <em>(Video)</em></td>
+                                        <td>fixed-only</td>
+                                        <td>5&times;5&times;5 cm &nbsp;<span class="reset-region">(18&times;18 cm)</span></td>
+                                        <td>10 <span class="trans-count">(914 trans.)</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
         </div>
+
+        <div style="margin-top: 20px; overflow-x: auto;">
+                            <!-- <p style="font-size: 1em; font-weight: 700; color: #555; margin-bottom: 8px;">Real: Block Push — Full Transfer Results</p> -->
+                            <table class="results-html-table transfer-results-table">
+                                <thead>
+                                    <tr>
+                                        <th rowspan="2" class="col-model">Method</th>
+                                        <th colspan="2" class="col-group col-divider">Supervision</th>
+                                        <th colspan="3" class="col-group col-divider">Components</th>
+                                        <th colspan="3" class="col-group col-divider"></th>
+                                        <th colspan="2" class="col-group col-divider">Transfer</th>
+                                        <th colspan="2" class="col-group col-divider">Scratch</th>
+                                        <th colspan="1" class="col-group col-divider">Video</th>
+                                    </tr>
+                                    <tr>
+                                        <th class="col-divider col-small col-sup">Reward</th>
+                                        <th class="col-small col-sup">Actions</th>
+                                        <th class="col-divider col-small col-comp">Plan.</th>
+                                        <th class="col-small col-comp">Model</th>
+                                        <th class="col-small col-comp">Off-<br>Policy</th>
+                                        <th class="col-divider col-small col-result">BP</th>
+                                        <th class="col-small col-result">PnP</th>
+                                        <th class="col-small col-result">MoP</th>
+                                        <th class="col-divider col-small col-result">BP (rt.)</th>
+                                        <th class="col-small col-result">PnP (rt.)</th>
+                                        <th class="col-divider col-small col-result">BP (rt.)</th>
+                                        <th class="col-small col-result">PnP (rt.)</th>
+                                        <th class="col-divider col-small col-result">BP</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="table-highlight-row">
+                                        <td><strong>MPAIL2</strong></td>
+                                        <td class="col-divider col-sup"></td><td class="col-sup"></td>
+                                        <td class="col-divider col-comp">●</td><td class="col-comp">●</td><td class="col-comp">●</td>
+                                        <td class="col-divider col-result"><strong>100±0</strong></td>
+                                        <td class="col-result"><strong>82±12</strong></td>
+                                        <td class="col-result"><strong>55±15</strong></td>
+                                        <td class="col-divider col-result"><strong>90±5</strong></td>
+                                        <td class="col-result"><strong>94±10</strong></td>
+                                        <td class="col-divider col-result"><strong>88±6</strong></td>
+                                        <td class="col-result"><strong>53±37</strong></td>
+                                        <td class="col-divider col-result"><strong>63±10</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td>[−P] (MAIRL)</td>
+                                        <td class="col-divider col-sup"></td><td class="col-sup"></td>
+                                        <td class="col-divider col-comp"></td><td class="col-comp">●</td><td class="col-comp">●</td>
+                                        <td class="col-divider col-result">64±18</td>
+                                        <td class="col-result">16±15</td>
+                                        <td class="col-result">3.9±2.8</td>
+                                        <td class="col-divider col-result">14±13</td>
+                                        <td class="col-result">16±18</td>
+                                        <td class="col-divider col-result">53±12</td>
+                                        <td class="col-result">12±12</td>
+                                        <td class="col-divider col-result">29±5</td>
+                                    </tr>
+                                    <tr>
+                                        <td>[−PM] (DAC)</td>
+                                        <td class="col-divider col-sup"></td><td class="col-sup"></td>
+                                        <td class="col-divider col-comp"></td><td class="col-comp"></td><td class="col-comp">●</td>
+                                        <td class="col-divider col-result">0±0</td>
+                                        <td class="col-result">0±0</td>
+                                        <td class="col-result">0±0</td>
+                                        <td class="col-divider col-result">0±0</td>
+                                        <td class="col-result">0±0</td>
+                                        <td class="col-divider col-result">0±0</td>
+                                        <td class="col-result">0±0</td>
+                                        <td class="col-divider col-result">0±0</td>
+                                    </tr>
+                                    <tr class="row-separator">
+                                        <td colspan="14"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>BC (Diffusion)</td>
+                                        <td class="col-divider col-sup"></td><td class="col-sup">●</td>
+                                        <td class="col-divider col-comp"></td><td class="col-comp"></td><td class="col-comp"></td>
+                                        <td class="col-divider col-result"><strong>94±6</strong></td>
+                                        <td class="col-result">12±6</td>
+                                        <td class="col-result">34±12</td>
+                                        <td class="col-divider col-result">16±8</td>
+                                        <td class="col-result">18±6</td>
+                                        <td class="col-divider col-result">34±10</td>
+                                        <td class="col-result">12±6</td>
+                                        <td class="col-divider col-result">26±6</td>
+                                    </tr>
+                                    <tr>
+                                        <td>RLPD</td>
+                                        <td class="col-divider col-sup">●<sup>*</sup></td><td class="col-sup">●</td>
+                                        <td class="col-divider col-comp"></td><td class="col-comp"></td><td class="col-comp">●</td>
+                                        <td class="col-divider col-result">0±0</td>
+                                        <td class="col-result">0±0</td>
+                                        <td class="col-result">0±0</td>
+                                        <td class="col-divider col-result">0±0</td>
+                                        <td class="col-result">0±0</td>
+                                        <td class="col-divider col-result">0±0</td>
+                                        <td class="col-result">0±0</td>
+                                        <td class="col-divider col-result">0±0</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <p class="table-footnote"><sup>*</sup> RLPD uses offline data (demonstrations) as prior data in the replay buffer.</p>
+                        </div>
     </div>
 </section>

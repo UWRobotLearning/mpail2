@@ -22,17 +22,12 @@
         </div> -->
         <div class="teaser-video-wrapper">
             <div class="video-display teaser-video" style="overflow: hidden;">
-                <iframe
-                    width="560"
-                    height="315"
-                    src="https://www.youtube.com/embed/yQw0JmvOVwM?autoplay=1&amp;mute=1&amp;loop=1&amp;playlist=yQw0JmvOVwM&amp;start=20"
-                    title="YouTube video player"
-                    frameborder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    referrerpolicy="strict-origin-when-cross-origin"
-                    allowfullscreen
-                    style="width: 100%; height: 100%; border: 0;"
-                ></iframe>
+                <video autoplay muted loop playsinline preload="metadata"
+                       style="width: 100%; height: 100%; object-fit: cover; display: block;"
+                       onloadedmetadata="this.muted=true">
+                    <source src="Media/Video/Teasers/mpail2_teaser.mp4" type="video/mp4">
+                    Your browser does not support video playback.
+                </video>
             </div>
         </div>
         <br>

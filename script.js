@@ -570,10 +570,12 @@ function updateIteration(value) {
 }
 
 // Task selection functionality
-let currentTask = 'push';
+var currentTask = 'push';
+window.currentTask = currentTask;
 
 function selectTask(task) {
     currentTask = task;
+    window.currentTask = task;
 
     // If there's an experiments sidebar hint showing, hide it when user changes tasks
     if (typeof window.dismissLeftSidebarHint === 'function') {
@@ -1039,6 +1041,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Video synchronization and controls
 document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('video').forEach(function(video) {
+        if (video.dataset.allowAudio !== undefined) return;
         video.muted = true;
         video.addEventListener('volumechange', function() {
             if (!this.muted) {
@@ -1051,6 +1054,7 @@ document.addEventListener('DOMContentLoaded', function() {
         mutations.forEach(function(mutation) {
             mutation.addedNodes.forEach(function(node) {
                 if (node.nodeName === 'VIDEO') {
+                    if (node.dataset.allowAudio !== undefined) return;
                     node.muted = true;
                     node.addEventListener('volumechange', function() {
                         if (!this.muted) this.muted = true;
@@ -1058,6 +1062,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 if (node.querySelectorAll) {
                     node.querySelectorAll('video').forEach(function(v) {
+                        if (v.dataset.allowAudio !== undefined) return;
                         v.muted = true;
                         v.addEventListener('volumechange', function() {
                             if (!this.muted) this.muted = true;

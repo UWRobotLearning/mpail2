@@ -1277,6 +1277,74 @@ body.dark-mode .results-panel {
     width: 100%;
 }
 
+/* ── Custom HTML tooltip ── */
+#chart-custom-tooltip {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.12s ease;
+    background: rgba(255, 255, 255, 0.97);
+    border: 1px solid rgba(0, 0, 0, 0.09);
+    border-radius: 9px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.13);
+    padding: 10px 14px;
+    min-width: 180px;
+    max-width: 280px;
+    font-family: 'Inter', sans-serif;
+}
+
+#chart-custom-tooltip.dark {
+    background: rgba(13, 22, 48, 0.97);
+    border-color: rgba(255, 255, 255, 0.09);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.ctt-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: #94a3b8;
+    margin-bottom: 7px;
+    letter-spacing: 0.02em;
+}
+
+#chart-custom-tooltip.dark .ctt-title {
+    color: #475569;
+}
+
+.ctt-row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 2px 0;
+}
+
+.ctt-label {
+    flex: 1;
+    font-size: 11px;
+    color: #374151;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#chart-custom-tooltip.dark .ctt-label {
+    color: #cbd5e1;
+}
+
+.ctt-value {
+    font-size: 11px;
+    font-weight: 700;
+    color: #0f172a;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+#chart-custom-tooltip.dark .ctt-value {
+    color: #f1f5f9;
+}
+
 /* ── HTML/SVG legend ── */
 .chart-html-legend {
     display: flex;
@@ -2394,6 +2462,12 @@ body.dark-mode .transfer-demo-btn {
     object-fit: cover;
 }
 
+/* Teaser video fills container without the -10% crop applied to other videos */
+.teaser-video video {
+    top: 0;
+    height: 100%;
+}
+
 .video-label {
     margin-top: 12px;
     font-size: 0.95rem;
@@ -2577,7 +2651,7 @@ body.dark-mode .experiment-settings-table tr.table-group-header td {
 .results-html-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.93em;
+    font-size: 0.82em;
     text-align: center;
     margin: 0 auto;
 }
@@ -2670,6 +2744,28 @@ body.dark-mode .results-html-table .col-divider {
 .results-html-table .col-small {
     font-size: 0.85em;
     white-space: nowrap;
+}
+
+/* Supervision & Components sub-columns: compact checkmark columns */
+.transfer-results-table .col-sup,
+.transfer-results-table .col-comp {
+    width: 22px;
+    min-width: 22px;
+    max-width: 28px;
+    padding-left: 2px !important;
+    padding-right: 2px !important;
+    white-space: normal;
+    line-height: 1.2;
+}
+
+/* Result data columns: larger for readability */
+.transfer-results-table .col-result {
+    min-width: 66px;
+    font-size: 1.25em !important;
+    font-weight: 600 !important;
+    white-space: nowrap;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
 }
 
 .transfer-results-table td {

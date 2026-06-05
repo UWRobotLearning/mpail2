@@ -1,5 +1,5 @@
         <section class="tasks-section scroll-section" id="efficiency-section">
-            <h2 class="section-header" id="experiments-section">Side-by-Side
+            <h2 class="section-header" id="experiments-section">Training; Side-by-Side
                 <span class="section-subtitle">
                     All experiments are trained <strong>entirely from scratch in the real world</strong> with <strong>no pre-training or prior data of any kind</strong> (beyond task observations). Behavior Cloning via Diffusion Policy is also evaluated and its results can be viewed in the evaluation tables as it is an offline algorithm.
                     <br>
@@ -184,62 +184,11 @@
 
             <div class="content-block" id="results-block">
                 <div class="results-panel">
-                    <h3 class="subsection-header">Plots and Tables</h3>
+                    <h3 class="subsection-header">Plots</h3>
                     <div class="collapsible-body">
                         <div class="results-chart-container results-chart-full">
                             <canvas id="efficiency-chart"></canvas>
                             <div id="efficiency-chart-legend"></div>
-                        </div>
-                        <div style="margin-top: 24px; overflow-x: auto;">
-                            <table class="results-html-table">
-                                <thead>
-                                    <tr>
-                                        <th rowspan="2" class="col-model">Models</th>
-                                        <th colspan="1" class="col-group">Last</th>
-                                        <th colspan="2" class="col-group col-divider">Best Checkpoint</th>
-                                    </tr>
-                                    <tr>
-                                        <th>Success (%)</th>
-                                        <th class="col-divider">#</th>
-                                        <th>Success (%)</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- <tr class="table-group-header">
-                                        <td colspan="4"><strong>Real: Block Push</strong></td>
-                                    </tr> -->
-                                    <tr class="table-highlight-row">
-                                        <td><strong>MPAIL2</strong></td>
-                                        <td>62</td>
-                                        <td class="col-divider">100</td>
-                                        <td><strong>100</strong></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Without Planning</td>
-                                        <td>34</td>
-                                        <td class="col-divider">130</td>
-                                        <td>64</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Model-Free</td>
-                                        <td>0</td>
-                                        <td class="col-divider">—</td>
-                                        <td>0</td>
-                                    </tr>
-                                    <tr>
-                                        <td>RLPD</td>
-                                        <td>0</td>
-                                        <td class="col-divider">—</td>
-                                        <td>0</td>
-                                    </tr>
-                                    <tr>
-                                        <td>BC</td>
-                                        <td><strong>94</strong></td>
-                                        <td class="col-divider">—</td>
-                                        <td>94</td>
-                                    </tr>
-                                </tbody>
-                            </table>
                         </div>
                     </div>
                 </div>
