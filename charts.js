@@ -426,7 +426,7 @@ const inlineLabelPlugin = {
     }
 };
 
-function createResultChart(canvasId, legendContainerId, title, seriesMap, bands = true, xTitle = 'Number of Iterations', inlineLabels = false, newTaskX = null, xRange = null) {
+function createResultChart(canvasId, legendContainerId, title, seriesMap, bands = true, xTitle = 'Number of Iterations', inlineLabels = false, newTaskX = null, xRange = null, labelPad = 116) {
     const canvas = document.getElementById(canvasId);
     if (!canvas) return null;
     const isDark    = document.body.classList.contains('dark-mode');
@@ -442,7 +442,7 @@ function createResultChart(canvasId, legendContainerId, title, seriesMap, bands 
             responsive: true,
             animation: false,                                          // default zoom off; grow plugin wipes L→R
             interaction: { mode: 'xValue', intersect: false },
-            layout: inlineLabels ? { padding: { right: 116 } } : {},   // room for the on-line labels
+            layout: inlineLabels ? { padding: { right: labelPad } } : {},   // room for the on-line labels
             _inlineLabels: inlineLabels,
             _grow: true,
             _newTaskX: newTaskX,                                       // vertical "New Task" separator (transfer)
@@ -677,6 +677,10 @@ const CLAIM_PLOT_METHODS = {
     video:       ['MPAIL2', '[−P] (MAIRL)'],
 };
 const PLOT_TASKS = [['push', 'Block Push', []], ['pick', 'Pick-and-Place', [7, 4]], ['mop', 'Mug on Plate', [3, 3]], ['vid', 'Block Push (Video)', [2, 3]]];
+// a claim may restrict its efficiency curves to specific task(s); default is all tasks
+const CLAIM_TASKS = { video: ['vid'] };   // the video-only claim shows only the video-only task
+const plotTasksFor = (key) => { const a = CLAIM_TASKS[key]; return a ? PLOT_TASKS.filter(([t]) => a.includes(t)) : PLOT_TASKS; };
+const taskKeysFor = (key) => plotTasksFor(key).map(([t]) => t);
 const AGG_GRID = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];   // % of training
 
 // sample a series at a fraction p∈[0,1] of its own training schedule (linear interpolation)
@@ -705,7 +709,7 @@ function aggregateEfficiency(key) {
     const out = {};
     groups.forEach(([label, methodList]) => {
         const series = [];
-        methodList.filter(m => !claimExMethods.has(m)).forEach(m => ['push', 'pick', 'mop', 'vid'].filter(t => !claimExTasks.has(t)).forEach(t => { const eff = chartData && chartData.efficiency && chartData.efficiency[t]; if (eff && eff[m]) series.push(eff[m]); }));
+        methodList.filter(m => !claimExMethods.has(m)).forEach(m => taskKeysFor(key).filter(t => !claimExTasks.has(t)).forEach(t => { const eff = chartData && chartData.efficiency && chartData.efficiency[t]; if (eff && eff[m]) series.push(eff[m]); }));
         if (!series.length) return;
         const x = [], mean = [], std = [];
         AGG_GRID.forEach(p => {
@@ -820,10 +824,10 @@ function renderClaimPlot(key) {
             show(true);
             wrap.insertAdjacentHTML('beforeend',
                 '<div class="results-chart-container results-chart-container--claim"><canvas id="claim-chart"></canvas></div><div id="claim-chart-legend"></div>');
-            // four series (MPAIL2 + MAIRL, each transferred/from-scratch) — use a legend, not on-line
-            // labels, since the labels are long and the MAIRL pair runs too close to label inline
+            // four series (MPAIL2 + MAIRL, each transferred/from-scratch) — on-line labels with extra
+            // right padding for the long names; the plugin nudges the close MAIRL pair apart vertically
             claimCharts.push(createResultChart('claim-chart', 'claim-chart-legend',
-                'Transfer — transferred vs from scratch', agg, true, 'New-task progress (%)', false));
+                'Transfer — transferred vs from scratch', agg, true, 'New-task progress (%)', true, null, null, 176));
             return;
         }
         // by task: the two per-task transfer plots, sharing ONE legend (built from the union of series)
@@ -869,7 +873,7 @@ function renderClaimPlot(key) {
 
     // by-task overlay: one line per (method × task); colour = method, dash = task
     const merged = {};
-    PLOT_TASKS.forEach(([task, taskLabel, dash]) => {
+    plotTasksFor(key).forEach(([task, taskLabel, dash]) => {
         if (claimExTasks.has(task)) return;
         const eff = chartData && chartData.efficiency && chartData.efficiency[task];
         if (!eff) return;
@@ -922,7 +926,7 @@ function renderClaimControls(key) {
     } else {                                                     // by-task: flat, each method its own colour
         methodsHtml = claimMethods.filter(hasData).map(m => chip('method', m, m, styleFor(m).line)).join('');
     }
-    const tasksHtml = PLOT_TASKS.filter(([t]) => taskHasData(t)).map(([t, tl]) => chip('task', t, tl, '#8a93a8')).join('');
+    const tasksHtml = plotTasksFor(key).filter(([t]) => taskHasData(t)).map(([t, tl]) => chip('task', t, tl, '#8a93a8')).join('');
     if (!methodsHtml && !tasksHtml) return;
 
     wrap.insertAdjacentHTML('beforeend',
