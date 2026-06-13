@@ -1,5 +1,19 @@
         <section class="tasks-section scroll-section" id="efficiency-section">
-            <h2 class="section-header" id="experiments-section">Results
+            <!-- Undirected-view controls: the task toggle (Undirected has control over tasks) + a way
+                 back to Focus. Sticks to the top while scrolling the (long) training content. -->
+            <div class="results-undirected-bar" id="results-undirected-bar">
+                <div class="results-rail__task" aria-label="Task">
+                    <button type="button" class="task-btn active" data-task="push" onclick="selectTask('push')">Push</button>
+                    <button type="button" class="task-btn" data-task="pick-place" onclick="selectTask('pick-place')">Pick and Place</button>
+                    <button type="button" class="task-btn" data-task="mug-on-plate" onclick="selectTask('mug-on-plate')">Mug on Plate</button>
+                </div>
+                <span class="results-rail__sep"></span>
+                <div class="results-mode" aria-label="View">
+                    <button type="button" class="results-mode-btn" data-mode="focus">Focus</button>
+                    <button type="button" class="results-mode-btn is-on" data-mode="undirected">Undirected</button>
+                </div>
+            </div>
+            <h2 class="section-header" id="experiments-section">Training
                 <span class="section-subtitle">
                     All experiments are trained <strong>entirely from scratch in the real world</strong> with <strong>no pre-training or prior data of any kind</strong> (beyond task observations). Behavior Cloning via Diffusion Policy is also evaluated and its results can be viewed in the evaluation tables as it is an offline algorithm.
                     <br>
@@ -184,15 +198,11 @@
 
             <div class="content-block" id="results-block">
                 <div class="results-panel">
-                    <h3 class="subsection-header">Plots and Tables</h3>
+                    <h3 class="subsection-header">Plots</h3>
                     <div class="collapsible-body">
-                        <div style="display: flex; gap: 10px; justify-content: center; align-items: center; max-width: 1200px; margin: 5px auto 0 auto;" id="results-images">
-                            <div style="flex: 1; max-width: 550px;">
-                                <img id="results-chart-img" src="Media/Image/Results/Push_chart.png" alt="Results Chart" style="width: 100%; border-radius: 8px;">
-                            </div>
-                            <div style="flex: 1; max-width: 550px;">
-                                <img id="results-table-img" src="Media/Image/Results/Push_table.png" alt="Results Table" style="width: 100%; border-radius: 8px;">
-                            </div>
+                        <div class="results-chart-container results-chart-full">
+                            <canvas id="efficiency-chart"></canvas>
+                            <div id="efficiency-chart-legend"></div>
                         </div>
                     </div>
                 </div>

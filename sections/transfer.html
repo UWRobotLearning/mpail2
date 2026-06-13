@@ -226,17 +226,20 @@
                 </div>
                 <div class="content-block" id="transfer-results-block">
                     <div class="results-panel">
-                        <h3 class="subsection-header">Plots and Tables</h3>
+                        <h3 class="subsection-header">Plots</h3>
                         <div class="collapsible-body">
-                            <div style="display: flex; gap: 10px; justify-content: center; align-items: center; max-width: 1200px; margin: 5px auto 0 auto;" id="transfer-results-images">
-                                <div style="flex: 1; max-width: 550px;">
-                                    <img id="transfer-results-chart-img" src="Media/Image/Results/Transfer_Push_chart.png" alt="Transfer Results Chart" style="width: 100%; border-radius: 8px;">
-                                </div>
-                                <div style="flex: 1; max-width: 550px;">
-                                    <img id="transfer-results-table-img" src="Media/Image/Results/Transfer_Push_table.png" alt="Transfer Results Table" style="width: 100%; border-radius: 8px;">
+                            <div class="results-chart-container results-chart-full">
+                                <div class="broken-axis-wrapper">
+                                    <div class="broken-chart-top">
+                                        <canvas id="transfer-chart-top"></canvas>
+                                    </div>
+                                    <div class="broken-axis-break" id="transfer-chart-break"></div>
+                                    <div class="broken-chart-bottom">
+                                        <canvas id="transfer-chart-bottom"></canvas>
+                                    </div>
+                                    <div id="transfer-chart-legend"></div>
                                 </div>
                             </div>
-                        </div>
                     </div>
                 </div>
             </div>

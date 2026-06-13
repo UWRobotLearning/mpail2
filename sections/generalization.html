@@ -1,103 +1,70 @@
         <section class="tasks-section scroll-section" id="generalization-section">
-            <h2 class="section-header">Generalization &amp; Minimal Observations
-                <span class="section-subtitle">Some interesting videos from when we were playing with the robot.</span>
+            <h2 class="section-header">Gallery
+                <span class="section-subtitle">A collection of qualitative results, world-model visualizations, and behaviors gathered while developing MPAIL2.</span>
             </h2>
-            <p class="demonstrations-caption">(Trained with <span style="font-weight:700; font-size:1em; color:#e6a817;">only Yellow Cube</span> in scene)</p>
 
+            <!-- Generalization -->
             <div class="content-block">
-                <h3 class="subsection-header">Generalization</h3>
+                <h3 class="subsection-header">Generalization
+                    <span class="section-subtitle">Trained with <span style="font-weight:700; color:#e6a817;">only a single yellow cube</span> in the scene, MPAIL2 still handles unseen objects and cluttered, multi-object scenes.</span>
+                </h3>
                 <div class="generalization-grid">
                     <div class="generalization-video-wrapper">
-                        <div class="video-display">
-                            <video id="gen-video-1" autoplay muted loop playsinline>
-                                <source src="Media/Video/Generalization/video_1.mp4" type="video/mp4">
-                                Your browser does not support video playback.
-                            </video>
-                        </div>
-                        <div class="gen-video-label">Novel Cube 1</div>
+                        <div class="video-display"><video autoplay muted loop playsinline preload="none"><source src="Media/Video/Generalization/video_1.mp4" type="video/mp4"></video></div>
+                        <div class="gen-video-label">Novel cube &mdash; unseen color</div>
                     </div>
                     <div class="generalization-video-wrapper">
-                        <div class="video-display">
-                            <video id="gen-video-2" autoplay muted loop playsinline>
-                                <source src="Media/Video/Generalization/video_2.mp4" type="video/mp4">
-                                Your browser does not support video playback.
-                            </video>
-                        </div>
-                        <div class="gen-video-label">Novel Cube 2</div>
+                        <div class="video-display"><video autoplay muted loop playsinline preload="none"><source src="Media/Video/Generalization/video_2.mp4" type="video/mp4"></video></div>
+                        <div class="gen-video-label">Novel cube &mdash; unseen shape</div>
                     </div>
                     <div class="generalization-video-wrapper">
-                        <div class="video-display">
-                            <video id="gen-video-3" autoplay muted loop playsinline>
-                                <source src="Media/Video/Generalization/video_3.mp4" type="video/mp4">
-                                Your browser does not support video playback.
-                            </video>
-                        </div>
-                        <div class="gen-video-label">Multi-Cube Scene 1</div>
+                        <div class="video-display"><video autoplay muted loop playsinline preload="none"><source src="Media/Video/Generalization/video_3.mp4" type="video/mp4"></video></div>
+                        <div class="gen-video-label">Multi-cube scene &mdash; distractors present</div>
                     </div>
                     <div class="generalization-video-wrapper">
-                        <div class="video-display">
-                            <video id="gen-video-4" autoplay muted loop playsinline>
-                                <source src="Media/Video/Generalization/video_4.mp4" type="video/mp4">
-                                Your browser does not support video playback.
-                            </video>
-                        </div>
-                        <div class="gen-video-label">Multi-Cube Scene 2</div>
+                        <div class="video-display"><video autoplay muted loop playsinline preload="none"><source src="Media/Video/Generalization/video_4.mp4" type="video/mp4"></video></div>
+                        <div class="gen-video-label">Multi-cube scene &mdash; cluttered table</div>
                     </div>
                 </div>
-                <div style="display: flex; justify-content: center; margin-top: 20px;">
+                <div style="display: flex; justify-content: center; margin-top: 16px;">
                     <div class="generalization-video-wrapper" style="max-width: calc(50% - 12px);">
-                        <div class="video-display">
-                            <video id="gen-video-5" autoplay muted loop playsinline>
-                                <source src="Media/Video/Generalization/video_5.mp4" type="video/mp4">
-                                Your browser does not support video playback.
-                            </video>
-                        </div>
-                        <div class="gen-video-label">Camera Disturbance</div>
+                        <div class="video-display"><video autoplay muted loop playsinline preload="none"><source src="Media/Video/Generalization/video_5.mp4" type="video/mp4"></video></div>
+                        <div class="gen-video-label">Robust to camera disturbance during a rollout</div>
                     </div>
                 </div>
             </div>
 
+            <!-- Latent-space planning visualizations -->
             <div class="content-block">
-                <h3 class="subsection-header">Minimal Observations
-                    <span class="section-subtitle">Demonstrations contain <span style="font-weight:700; font-size:1em; color:#667eea;">only the table camera</span>, with no proprioceptive / wrist-mounted camera from the robot in demonstrations using a reward conditioned on a subset of the latent state. Though it takes longer, MPAIL2 can still learn in this setting, pointing towards future work in cross-embodiment training and learning from videos.</span>
+                <h3 class="subsection-header">Latent-Space Planning
+                    <span class="section-subtitle">MPAIL2 imagines and plans entirely in a learned <span style="font-weight:700; color:#667eea;">latent space</span>. A separately trained decoder renders those imagined plans purely for visualization.</span>
                 </h3>
-                <br>
-                <div class="generalization-grid">
+                <div class="generalization-grid" style="grid-template-columns: repeat(2, 1fr);">
                     <div class="generalization-video-wrapper">
-                        <div class="video-display">
-                            <video id="tablecam-video-1" autoplay muted loop playsinline>
-                                <source src="Media/Video/TableCam/video_1.mp4" type="video/mp4">
-                                Your browser does not support video playback.
-                            </video>
-                        </div>
+                        <div class="video-display"><img src="Media/Video/Vis/overlay.gif" alt="Predicted plans overlaid on a rollout" style="width:100%;display:block;border-radius:12px;"></div>
+                        <div class="gen-video-label">Predicted plans overlaid (green: end-effector, orange: block)</div>
                     </div>
                     <div class="generalization-video-wrapper">
-                        <div class="video-display">
-                            <video id="tablecam-video-2" autoplay muted loop playsinline>
-                                <source src="Media/Video/TableCam/video_2.mp4" type="video/mp4">
-                                Your browser does not support video playback.
-                            </video>
-                        </div>
-                    </div>
-                    <div class="generalization-video-wrapper">
-                        <div class="video-display">
-                            <video id="tablecam-video-3" autoplay muted loop playsinline>
-                                <source src="Media/Video/TableCam/video_3.mp4" type="video/mp4">
-                                Your browser does not support video playback.
-                            </video>
-                        </div>
-                    </div>
-                    <div class="generalization-video-wrapper">
-                        <div class="video-display">
-                            <video id="tablecam-video-4" autoplay muted loop playsinline>
-                                <source src="Media/Video/TableCam/video_4.mp4" type="video/mp4">
-                                Your browser does not support video playback.
-                            </video>
-                        </div>
+                        <div class="video-display"><video autoplay muted loop playsinline preload="none"><source src="Media/Video/Push/rollout_vis/mppi_iters_2.mp4" type="video/mp4"></video></div>
+                        <div class="gen-video-label">MPPI candidate plans being optimized</div>
                     </div>
                 </div>
-                <div class="demonstrations-caption" style="margin-top:20px;">
-                    Achieved in ~500 iterations. The ArUco marker on the cube is used solely for trajectory recording, not as part of the observation.
+            </div>
+
+            <!-- Robustness under disturbance -->
+            <div class="content-block">
+                <h3 class="subsection-header">Robustness Under Disturbance
+                    <span class="section-subtitle">Because it re-plans every step, the MPPI planner recovers on the fly when the scene is physically perturbed mid-rollout.</span>
+                </h3>
+                <div class="generalization-grid" style="grid-template-columns: repeat(2, 1fr);">
+                    <div class="generalization-video-wrapper">
+                        <div class="video-display"><video autoplay muted loop playsinline preload="none"><source src="Media/Video/MoP/rollout_vis/mppi_iter_mug-on-plate_under_disturbance.mp4" type="video/mp4"></video></div>
+                        <div class="gen-video-label">Mug-on-Plate &mdash; re-planning after a shove (latent plan decoded)</div>
+                    </div>
+                    <div class="generalization-video-wrapper">
+                        <div class="video-display"><video autoplay muted loop playsinline preload="none"><source src="Media/Video/Push/rollout_vis/mppi_iters_3.mp4" type="video/mp4"></video></div>
+                        <div class="gen-video-label">Block Push &mdash; recovering from a disturbance</div>
+                    </div>
                 </div>
             </div>
         </section>

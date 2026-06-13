@@ -1,1 +1,5 @@
-.DS_Store
+# Raw source recordings (too large for git; keep locally only)
+*.MOV
+*.mov
+Media/Video/Comparison/Full/
+Media/Video/Full/

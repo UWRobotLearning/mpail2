@@ -1,54 +1,104 @@
 <section class="project-info scroll-section" id="method-section">
     <div class="project-info-inner">
-        <h2 class="section-header">The Algorithm - MPAIL2
+        <h2 class="section-header">The Algorithm &mdash; MPAIL2
             <span class="section-subtitle">
                 We introduce Model Predictive Adversarial Imitation Learning 2 (MPAIL2), an
-                <span class="term term--bold" data-tooltip-html="Inverse Reinforcement Learning (IRL) learns a reward function in addition to a policy using demonstration data.
-                ">IRL</span> algorithm
-                that learns a
-                <span class="term term--bold" data-tooltip-html="A world model predicts the next state of the world based on the current state and action.
-                ">world model</span>
+                <span class="term term--bold" data-tooltip-html="Inverse Reinforcement Learning (IRL) learns a reward function in addition to a policy using demonstration data.">IRL</span>
+                algorithm that learns a
+                <span class="term term--bold" data-tooltip-html="A world model predicts the next state of the world based on the current state and action.">world model</span>
                 and performs
-                <span class="term term--bold" data-tooltip-html="Rather directly predicting the learner's observations (e.g. camera images), latent planning operates on reduced, low-dimensional representations of the world, enabling reactive planning and more efficient learning.
-                ">latent planning</span>.
+                <span class="term term--bold" data-tooltip-html="Rather than directly predicting the learner's observations (e.g. camera images), latent planning operates on reduced, low-dimensional representations of the world, enabling reactive planning and more efficient learning.">latent planning</span>.
+                <em class="method-cue">Hover or tap a component in the diagram to see what it does and where it lives in the training loop.</em>
             </span>
         </h2>
-        <div style="display: flex; gap: 20px; justify-content: center; align-items: center; margin: 20px auto 0 auto;">
-            <!-- <div class="summary-main-image" style="flex: 3; margin-bottom: 0;"><img src="Media/Image/main.jpg" alt="Method Overview"></div> -->
-            <div class="summary-main-image" style="flex: 3; margin-bottom: 0;"><img src="Media/Image/mpail2.drawio.png" alt="Method Overview"></div>
-            <!-- <div style="flex: 1; display: flex; flex-direction: column; gap: 0; align-self: stretch;"> -->
-                <!-- <div style="flex: 1; overflow: hidden;">
-                    <video id="vis-render" autoplay muted playsinline style="width: 100%; height: 100%; display: block; object-fit: cover;">
-                        <source src="Media/Video/Vis/render.mp4" type="video/mp4">
-                    </video>
-                </div>
-                <div style="flex: 1; overflow: hidden;">
-                    <video id="vis-rollout" autoplay muted playsinline style="width: 100%; height: 100%; display: block; object-fit: cover;">
-                        <source src="Media/Video/Vis/rollout-vis.mp4" type="video/mp4">
-                    </video>
-                </div> -->
-            <!-- </div> -->
-        </div>
-        <br>
-        <div class="card-grid">
-            <div class="info-card">
-                <p><strong>1.</strong>&nbsp;Five (5) components comprise MPAIL2's world model:
-                encoder, dynamics, reward, value, and policy.
-                Online, a planner uses these components to sample plans, predict their outcomes, evaluate them, and finally select a plan.</p>
-                <p><strong>2.</strong>&nbsp;The learner's task is given through observations of task demonstrations, like watching a person cook. They are used only when learning the reward.
-                <br>
-                <br>
-                <i>
-                See this in action on the right. Notice that the block's predicted trajectory (orange) goes from static to dynamic as the robot (green) plans through it.
-                </i>
+
+        <!-- interactive explorer: a fixed-height dynamic caption above; the architecture figure (left,
+             with its rollout video beneath) drives the training algorithm (right) -->
+        <div class="method-explorer" id="method-explorer" data-svg="Media/Image/mpail2.arch.svg">
+            <div class="method-explain" id="method-explain" aria-live="polite">
+                <p class="method-explain__title">MPAIL2 training loop</p>
+                <p class="method-explain__body">Each iteration the agent <strong>acts with the planner</strong>, stores experience, then updates the five learned components. <em>Pick a component &mdash; in the diagram or the algorithm &mdash; to focus it.</em></p>
             </div>
-            <div class="card-outline">
-                <div class="summary-main-image" style="flex: 1; margin-bottom: 0;"><img src="Media/Video/Vis/overlay.gif" alt="Method Overview"></div>
-                <i>
-                    <small>
-                        Note that planning occurs in latent space. This visualization is made possible by training a separate decoder.
-                    </small>
-                </i>
+            <div class="method-cols">
+                <div class="method-figcol">
+                    <div class="method-figure" id="method-figure">
+                        <div class="method-figure__svg" id="method-figure-svg" aria-hidden="true"></div>
+                        <svg class="method-figure__hot" id="method-figure-hot" viewBox="0 0 1017 598" preserveAspectRatio="xMidYMid meet" aria-label="Interactive architecture diagram"></svg>
+                    </div>
+                    <div class="method-video">
+                        <div class="video-display">
+                            <video id="method-card-video-right" src="Media/Video/Push/rollout_vis/mppi_iters_1.mp4" autoplay muted loop playsinline preload="auto"></video>
+                        </div>
+                        <p class="method-video__cap"><i><small><b>MPPI rollout visualization</b> for the Block Push task under disturbance. Planning occurs in latent space; this visualization is made possible by training a separate decoder.</small></i></p>
+                    </div>
+                </div>
+                <div class="method-algo" id="method-algo" role="group" aria-label="MPAIL2 training algorithm"></div>
+            </div>
+        </div>
+
+        <!-- per-component training objectives from the appendix, tucked into expandable "file tabs":
+             collapsed by default; click a tab to slide its figure + caption open. -->
+        <div class="method-figtabs" id="method-figtabs">
+            <p class="method-figtabs__lead">Planning &amp; Architecture</span></p>
+            <div class="method-figtabs__row" role="tablist" aria-label="Component training-objective figures">
+                <button type="button" class="figtab figtab--algo" data-fig="mppi" role="tab" aria-expanded="false" aria-controls="figpanel-mppi" title="The MPPI planner used in step 1 of the training loop">
+                    <svg class="figtab__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2.5h7.5L18 7v14.5H6z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M13.5 2.5V7H18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8.5 12.5h7M8.5 15.5h4.5M8.5 18h6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                    <span class="figtab__name">Planning <span class="figtab__step">step&nbsp;1</span></span>
+                    <span class="figtab__chev" aria-hidden="true">&rsaquo;</span>
+                </button>
+                <button type="button" class="figtab" data-fig="4a" role="tab" aria-expanded="false" aria-controls="figpanel-4a">
+                    <svg class="figtab__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2.5h7.5L18 7v14.5H6z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M13.5 2.5V7H18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+                    <span class="figtab__name">Encoder &amp; Dynamics <span class="figtab__step">step&nbsp;4</span></span>
+                    <span class="figtab__chev" aria-hidden="true">&rsaquo;</span>
+                </button>
+                <button type="button" class="figtab" data-fig="4b" role="tab" aria-expanded="false" aria-controls="figpanel-4b">
+                    <svg class="figtab__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2.5h7.5L18 7v14.5H6z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M13.5 2.5V7H18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+                    <span class="figtab__name">Reward <span class="figtab__step">step&nbsp;5</span></span>
+                    <span class="figtab__chev" aria-hidden="true">&rsaquo;</span>
+                </button>
+                <button type="button" class="figtab" data-fig="5" role="tab" aria-expanded="false" aria-controls="figpanel-5">
+                    <svg class="figtab__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2.5h7.5L18 7v14.5H6z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M13.5 2.5V7H18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+                    <span class="figtab__name">&lambda;-Return <span class="figtab__step">step&nbsp;6, 7</span></span>
+                    <span class="figtab__chev" aria-hidden="true">&rsaquo;</span>
+                </button>
+            </div>
+            <div class="method-figtabs__stage" id="method-figstage">
+                <div class="method-figtabs__inner">
+                    <figure class="figpanel" id="figpanel-4a" data-fig="4a" role="tabpanel">
+                        <img src="Media/Image/method/fig4a-encoder-dynamics.png" loading="lazy" alt="Encoder and Dynamics training diagram: the encoder maps observations to latent states which the dynamics model auto-regressively predicts, trained on a multi-step MSE loss.">
+                        <figcaption><b>Encoder &amp; Dynamics training.</b> The encoder <i>e</i> maps an observation <i>o<sub>t</sub></i> to a latent state <i>z<sub>t</sub></i>. Dynamics <i>f</i> auto-regressively predicts future latents <i>&zcaron;<sub>t+1</sub>,&hellip;,&zcaron;<sub>t+H</sub></i> from action inputs, trained on a multi-step MSE loss <i>&Lscr;<sub>e,f</sub></i> against stop-gradient targets from fresh encoder passes on subsequent observations.</figcaption>
+                    </figure>
+                    <figure class="figpanel" id="figpanel-4b" data-fig="4b" role="tabpanel">
+                        <img src="Media/Image/method/fig4b-reward.png" loading="lazy" alt="Reward training diagram: agent transition scores are minimized while demonstration transition scores are maximized, with a gradient penalty.">
+                        <figcaption><b>Reward training.</b> The reward <i>r</i> is trained contrastively &mdash; agent transition scores <i>(z,&thinsp;z&prime;)</i> are pushed down while demonstration transition scores <i>(z<sub>demo</sub>,&thinsp;z&prime;<sub>demo</sub>)</i> are pushed up. A gradient penalty over interpolated latent pairs regularizes it, yielding the loss <i>&Lscr;<sub>r</sub></i>.</figcaption>
+                    </figure>
+                    <figure class="figpanel" id="figpanel-5" data-fig="5" role="tabpanel">
+                        <img src="Media/Image/method/fig5-lambda-return.png" loading="lazy" alt="MPAIL2 lambda-return diagram: encoder, policy, dynamics, reward and value unrolled over the horizon to compute the lambda-return for actor-critic updates.">
+                        <figcaption><b>MPAIL2 &lambda;-return.</b> Components unroll over horizon <i>H</i>: the encoder produces <i>z<sub>t</sub></i>, the policy proposes action sequences <i>&acirc;<sub>t</sub>,&hellip;,&acirc;<sub>t+H</sub></i>, dynamics predicts next latents, reward scores transitions, and the value <i>Q</i> estimates returns &mdash; together computing the &lambda;-return <i>G<sub>t</sub><sup>&lambda;</sup></i> for actor-critic updates.</figcaption>
+                    </figure>
+                    <figure class="figpanel figpanel--algo" id="figpanel-mppi" data-fig="mppi" role="tabpanel">
+                        <div class="figalgo">
+                            <div class="algo__title"><b>MPAIL2</b> (Planning &middot; MPPI)</div>
+                            <div class="algo__req">
+                                <div class="algo-line algo-kwline"><span class="algo-kw">require</span></div>
+                                <div class="algo-line algo-i1">\(N\) sampled plans, \(M\) drawn from the policy, \(K\) elites; horizon \(H\), \(J\) refinement iterations, temperature \(\eta\), std&nbsp;clip \((\sigma_{\min},\sigma_{\max})\)</div>
+                                <div class="algo-line algo-i1">learned components <span class="figalgo-hl">\(e\)</span>, <span class="figalgo-hl">\(f\)</span>, <span class="figalgo-hl">\(r\)</span>, <span class="figalgo-hl">\(Q\)</span>, <span class="figalgo-hl">\(\pi\)</span> from Algorithm&nbsp;1</div>
+                            </div>
+                            <div class="algo-line algo-kwline"><span class="algo-kw">procedure</span>&nbsp;Plan\((o_t,\mathbf{a}_{t-1})\)</div>
+                            <div class="algo-line algo-i1"><span class="algo-num">1</span><span class="algo-do">\(z_t \gets\) <span class="figalgo-hl">\(e(o_t)\)</span></span><span class="algo-cmt">encode the observation</span></div>
+                            <div class="algo-line algo-i1"><span class="algo-num">2</span><span class="algo-do">\(\boldsymbol{\mu}^0 \gets\) roll \(\mathbf{a}_{t-1}\) back one step, \(\ \Sigma^0 \gets \sigma_{\max}\)</span><span class="algo-cmt">warm-start the sampler</span></div>
+                            <div class="algo-line algo-kwline algo-i1"><span class="algo-kw">for</span> \(j=0\) to \(J-1\) <span class="algo-kw">do</span></div>
+                            <div class="algo-line algo-i2"><span class="algo-num">3</span><span class="algo-do">sample \(N\) plans \(\mathbf{a}^k \sim \mathcal{N}(\boldsymbol{\mu}^j,\Sigma^j)\); last \(M\) from <span class="figalgo-hl">\(\pi(\cdot\mid z_t)\)</span></span><span class="algo-cmt">parallel</span></div>
+                            <div class="algo-line algo-i2"><span class="algo-num">4</span><span class="algo-do">roll out <span class="figalgo-hl">\(\hat{z}_{t'+1} \gets f(\hat{z}_{t'},a_{t'})\)</span>, score <span class="figalgo-hl">\(\hat{r}_{t'} \gets r(\hat{z}_{t'},\hat{z}_{t'+1})\)</span></span></div>
+                            <div class="algo-line algo-i2"><span class="algo-num">5</span><span class="algo-do">return \(\mathcal{R}(\tau_k) \gets \gamma^{H}\)<span class="figalgo-hl">\(Q(\hat{z}_{t+H},a_{t+H})\)</span>\(+\textstyle\sum_{t'}\gamma^{t'}\hat{r}_{t'}\)</span></div>
+                            <div class="algo-line algo-i2"><span class="algo-num">6</span><span class="algo-do">keep the top-\(K\) elites; \(\ w(\tau_k)\propto\exp(\mathcal{R}(\tau_k)/\eta)\)</span></div>
+                            <div class="algo-line algo-i2"><span class="algo-num">7</span><span class="algo-do">\(\boldsymbol{\mu}^j,\boldsymbol{\sigma}^j \gets\) weighted mean/std of plans; clip \(\sigma\)</span><span class="algo-cmt">refine distribution</span></div>
+                            <div class="algo-line algo-kwline algo-i1"><span class="algo-kw">end for</span></div>
+                            <div class="algo-line algo-i1"><span class="algo-num">8</span><span class="algo-do"><span class="algo-kw">return</span> \(\mathbf{a}_t \sim \mathcal{N}(\boldsymbol{\mu}^J,\Sigma^J)\)</span><span class="algo-cmt">execute the optimized plan</span></div>
+                        </div>
+                        <figcaption><b>MPPI planning.</b> At act-time the planner samples action plans, rolls them through the learned <span class="figalgo-hl">dynamics</span>, scores them with the inferred <span class="figalgo-hl">reward</span> and <span class="figalgo-hl">value</span>, and over <i>J</i> iterations refines its sampling distribution toward the top-<i>K</i> elite (high&#8209;return) plans. The same components trained in Algorithm&nbsp;1 (highlighted) are dropped in &mdash; this is step&nbsp;<b>1</b>, &ldquo;Interact using the planner.&rdquo;</figcaption>
+                    </figure>
+                </div>
             </div>
         </div>
     </div>

@@ -1,0 +1,231 @@
+<section class="project-info scroll-section" id="baselines-section">
+    <div class="project-info-inner">
+        <h2 class="section-header">Baselines
+            <span class="section-subtitle">
+                Our baselines are ablations of MPAIL2's three pillars &mdash;
+                <span class="term term--bold" data-tooltip-html="A model-predictive <strong>planner</strong> samples action sequences, predicts their outcomes with the world model, and selects the best plan online.">latent&nbsp;planning&nbsp;[P]</span>,
+                a learned
+                <span class="term term--bold" data-tooltip-html="A learned <strong>dynamics model</strong> predicts the next latent state from the current state and action, enabling planning and off-policy value learning.">dynamics&nbsp;model&nbsp;[M]</span>,
+                and
+                <span class="term term--bold" data-tooltip-html="<strong>Off-policy</strong> learning reuses past interaction from a replay buffer to learn a Q&#8209;value; the on-policy variant learns a state value from fresh rollouts only.">off&#8209;policy&nbsp;learning&nbsp;[O]</span>.
+                Select a baseline, <strong>click the model boxes</strong> to toggle the pillars and discover each ablation, or hover a block to learn what it does.
+            </span>
+        </h2>
+
+        <!-- baseline selector -->
+        <div class="baseline-picker" id="baseline-picker" role="tablist" aria-label="Baseline model">
+            <button class="baseline-btn active" data-baseline="mpail2" role="tab" aria-selected="true">
+                <span class="baseline-btn__name">MPAIL2</span>
+                <span class="baseline-btn__sub">P&nbsp;+&nbsp;M&nbsp;+&nbsp;O</span>
+            </button>
+            <button class="baseline-btn" data-baseline="o" role="tab" aria-selected="false">
+                <span class="baseline-btn__name">[&minus;O] MPAIL</span>
+                <span class="baseline-btn__sub">on&#8209;policy value</span>
+            </button>
+            <button class="baseline-btn" data-baseline="p" role="tab" aria-selected="false">
+                <span class="baseline-btn__name">[&minus;P] MAIRL</span>
+                <span class="baseline-btn__sub">no planning</span>
+            </button>
+            <button class="baseline-btn" data-baseline="pm" role="tab" aria-selected="false">
+                <span class="baseline-btn__name">[&minus;PM] DAC</span>
+                <span class="baseline-btn__sub">no planning, no model</span>
+            </button>
+            <button class="baseline-btn" data-baseline="pmo" role="tab" aria-selected="false">
+                <span class="baseline-btn__name">[&minus;PMO] AIRL</span>
+                <span class="baseline-btn__sub">on&#8209;policy, model&#8209;free</span>
+            </button>
+            <button class="baseline-btn baseline-btn--gap" data-baseline="rlpd" role="tab" aria-selected="false">
+                <span class="baseline-btn__name">RLPD</span>
+                <span class="baseline-btn__sub">RL + prior data</span>
+            </button>
+            <button class="baseline-btn" data-baseline="bc" role="tab" aria-selected="false">
+                <span class="baseline-btn__name">BC</span>
+                <span class="baseline-btn__sub">behavior cloning</span>
+            </button>
+        </div>
+
+        <div class="baseline-stage">
+            <!-- legend / pillar chips -->
+            <div class="baseline-pillars" id="baseline-pillars">
+                <span class="pillar-chip" data-pillar="P"><span class="pillar-dot"></span>Planning</span>
+                <span class="pillar-chip" data-pillar="M"><span class="pillar-dot"></span>Dynamics Model</span>
+                <span class="pillar-chip" data-pillar="O"><span class="pillar-dot"></span>Off&#8209;policy</span>
+            </div>
+
+            <div class="bl-layout">
+            <svg class="baseline-diagram" id="baseline-diagram" viewBox="0 -28 740 406"
+                 role="img" aria-label="MPAIL2 architecture diagram for the selected baseline"
+                 preserveAspectRatio="xMidYMid meet">
+                <defs>
+                    <marker id="bl-arr-muted" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                        <path d="M0,0 L10,5 L0,10 z" fill="#8A93A3"/>
+                    </marker>
+                    <marker id="bl-arr-purple" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                        <path d="M0,0 L10,5 L0,10 z" fill="#A99BF5"/>
+                    </marker>
+                    <marker id="bl-arr-replay" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+                        <path d="M0,0 L10,5 L0,10 z" fill="#C58BE0"/>
+                    </marker>
+                    <marker id="bl-arr-gold" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                        <path d="M0,0 L10,5 L0,10 z" fill="#E0A53B"/>
+                    </marker>
+                    <clipPath id="bl-clip-obs"><rect x="20" y="31" width="180" height="98" rx="13"/></clipPath>
+                    <clipPath id="bl-clip-int"><rect x="20" y="222" width="180" height="98" rx="13"/></clipPath>
+                </defs>
+
+                <!-- ===== electron / off-policy replay: stems from the dynamics right border,
+                         flows above the value text, arrowhead at the value->policy connector base ===== -->
+                <g class="bl-comp bl-comp--fade" data-comp="replay">
+                    <path class="bl-wire bl-wire--replay" d="M388,165 H600" marker-end="url(#bl-arr-replay)"/>
+                    <path class="bl-hit" d="M388,165 H600" data-tip="electron"/>
+                </g>
+
+                <!-- ===== arrows ===== -->
+                <!-- inputs -> encoders -->
+                <path class="bl-wire" d="M200,80 H218" marker-end="url(#bl-arr-muted)"/>
+                <g class="bl-comp bl-comp--fade" data-comp="int-enc">
+                    <path class="bl-wire" d="M200,271 H218" marker-end="url(#bl-arr-muted)"/>
+                </g>
+                <!-- IRL: obs encoder -> reward (top), interaction encoder -> reward (bottom) -->
+                <g class="bl-comp bl-comp--fade" data-comp="obs-reward">
+                    <path class="bl-wire" d="M262,80 H428 V141" marker-end="url(#bl-arr-muted)"/>
+                </g>
+                <g class="bl-comp bl-comp--fade" data-comp="int-reward">
+                    <path class="bl-wire" d="M262,271 H428 V209" marker-end="url(#bl-arr-muted)"/>
+                </g>
+                <!-- interaction encoder -> dynamics -->
+                <g class="bl-comp bl-comp--fade" data-comp="dynamics-wire">
+                    <path class="bl-wire" d="M262,271 H344 V207" marker-end="url(#bl-arr-muted)"/>
+                </g>
+                <!-- reward -> value -->
+                <g class="bl-comp bl-comp--fade" data-comp="reward-value">
+                    <path class="bl-wire" d="M492,175 H512" marker-end="url(#bl-arr-muted)"/>
+                </g>
+                <!-- RLPD: observation -> value.  BC: observation -> policy.
+                     Routed right-then-down into the box top, mirroring the interaction -> value wire
+                     (which goes right-then-up into the box bottom). -->
+                <g class="bl-comp bl-comp--fade" data-comp="obs-value">
+                    <path class="bl-wire" d="M262,80 H560 V143" marker-end="url(#bl-arr-muted)"/>
+                </g>
+                <g class="bl-comp bl-comp--fade" data-comp="obs-policy">
+                    <path class="bl-wire" d="M262,80 H644 V143" marker-end="url(#bl-arr-muted)"/>
+                </g>
+                <!-- RLPD: real interaction replays into the value (off-policy) -->
+                <g class="bl-comp bl-comp--fade" data-comp="int-value">
+                    <path class="bl-wire" d="M262,271 H560 V207" marker-end="url(#bl-arr-muted)"/>
+                </g>
+                <!-- BC: interaction is collected but never learned from — the path is severed -->
+                <g class="bl-comp bl-comp--fade" data-comp="int-dead">
+                    <path class="bl-wire bl-wire--dead" d="M200,271 H300"/>
+                    <path class="bl-wire--cut" d="M306,264 L318,278 M318,264 L306,278"/>
+                </g>
+                <!-- supervision (human) -> learner: reward box (above obs) -> value, actions box -> policy.
+                     Routed along the top so they don't overlap the core for RLPD. -->
+                <g class="bl-comp bl-comp--fade" data-comp="hand-reward-value">
+                    <path class="bl-wire bl-wire--rew" d="M200,11 H536 V143" marker-end="url(#bl-arr-gold)"/>
+                </g>
+                <g class="bl-comp bl-comp--fade" data-comp="actions-policy">
+                    <path class="bl-wire bl-wire--purple" d="M62,0 V-6 H684 V143" marker-end="url(#bl-arr-purple)"/>
+                </g>
+                <!-- value <-> policy : off-policy actor-critic (bidirectional) -->
+                <g class="bl-comp bl-comp--fade" data-comp="ac-bidir">
+                    <path class="bl-wire bl-wire--purple" d="M600,167 H620" marker-end="url(#bl-arr-purple)"/>
+                    <path class="bl-wire bl-wire--purple" d="M620,183 H600" marker-end="url(#bl-arr-purple)"/>
+                </g>
+                <!-- value -> policy : on-policy (single arrow) -->
+                <g class="bl-comp bl-comp--fade" data-comp="ac-single">
+                    <path class="bl-wire bl-wire--purple" d="M600,175 H620" marker-end="url(#bl-arr-purple)"/>
+                </g>
+                <!-- act in environment: the origin slides between the Planner (planning methods)
+                     and the Policy (model-free) — animated in JS. Hidden for offline methods (BC). -->
+                <path class="bl-wire" id="bl-feedback" d="M504,230 V350 H44 V320" marker-end="url(#bl-arr-muted)"/>
+
+                <!-- ===== planner enclosure (wraps the whole row) ===== -->
+                <g class="bl-comp" data-comp="planner">
+                    <rect class="bl-planner" x="284" y="120" width="440" height="110" rx="15" data-tip="planner"/>
+                    <text class="bl-planner-label" x="504" y="113">Planner</text>
+                </g>
+                <!-- ===== supervision enclosure (human guidance): wraps the observation + actions + reward ===== -->
+                <!-- supervision enclosure: confined to the task-observation area (wraps the obs image + the
+                     reward/actions boxes that sit above it). No label. -->
+                <g class="bl-comp" data-comp="supervision">
+                    <rect class="bl-supervision" x="10" y="-8" width="200" height="168" rx="14" data-tip="supervision"/>
+                    <text class="bl-supervision-label" x="110" y="-15">Manual Supervision</text>
+                </g>
+
+                <!-- ===== input panels + encoders ===== -->
+                <g class="bl-input" data-tip="obs">
+                    <rect class="bl-panel-bg" x="20" y="31" width="180" height="98" rx="13"/>
+                    <image href="Media/Image/obs_baseball.png" x="20" y="31" width="180" height="98"
+                           preserveAspectRatio="xMidYMid slice" clip-path="url(#bl-clip-obs)"/>
+                    <rect class="bl-panel-frame" x="20" y="31" width="180" height="98" rx="13"/>
+                    <text class="bl-label" x="110" y="146">Task Observation</text>
+                </g>
+                <g class="bl-input" data-comp="interaction" data-tip="int">
+                    <rect class="bl-panel-bg" x="20" y="222" width="180" height="98" rx="13"/>
+                    <image href="Media/Image/int_baseball.png" x="20" y="222" width="180" height="98"
+                           preserveAspectRatio="xMidYMid slice" clip-path="url(#bl-clip-int)"/>
+                    <rect class="bl-panel-frame" x="20" y="222" width="180" height="98" rx="13"/>
+                    <text class="bl-label" x="110" y="337">Direct Interaction</text>
+                </g>
+                <polygon class="bl-enc" points="218,112 262,98 262,62 218,48" data-tip="encoder"/>
+                <text class="bl-enc-label" x="238" y="85">Enc</text>
+                <g class="bl-comp bl-comp--fade" data-comp="int-encoder">
+                    <polygon class="bl-enc" points="218,303 262,289 262,253 218,239" data-tip="encoder"/>
+                    <text class="bl-enc-label" x="238" y="276">Enc</text>
+                </g>
+
+                <!-- ===== core components: one in-line row ===== -->
+                <!-- dynamics -->
+                <g class="bl-comp bl-box bl-box--dynamics" data-comp="dynamics" data-tip="dynamics">
+                    <rect x="300" y="143" width="88" height="64" rx="12"/>
+                    <text x="344" y="179">Dynamics</text>
+                </g>
+                <!-- reward (right-pointing trapezoid) -->
+                <g class="bl-comp bl-box bl-box--reward" data-comp="reward" data-tip="reward">
+                    <polygon class="bl-poly" points="408,138 492,153 492,197 408,212"/>
+                    <text x="448" y="179">Reward</text>
+                </g>
+                <!-- value head: Q-Value (off-policy) -->
+                <g class="bl-comp bl-box bl-box--value bl-value-q" data-comp="value-q" data-tip="value">
+                    <rect x="512" y="143" width="88" height="64" rx="12"/>
+                    <text x="556" y="181">Q-Value</text>
+                    <text class="bl-box-sub" x="556" y="196">off-policy</text>
+                </g>
+                <!-- value head: state Value (on-policy) -->
+                <g class="bl-comp bl-box bl-box--value-on bl-value-v" data-comp="value-v" data-tip="value">
+                    <rect x="512" y="143" width="88" height="64" rx="12"/>
+                    <text x="556" y="181">Value</text>
+                    <text class="bl-box-sub" x="556" y="196">on-policy</text>
+                </g>
+                <!-- policy -->
+                <g class="bl-box bl-box--policy" data-tip="policy">
+                    <rect x="620" y="143" width="88" height="64" rx="12"/>
+                    <text x="664" y="179">Policy</text>
+                </g>
+                <!-- supervision blocks sit above the Task Observation image (Actions left, Reward right) -->
+                <g class="bl-comp bl-box bl-box--actions" data-comp="actions" data-tip="actions">
+                    <rect x="20" y="0" width="84" height="22" rx="8"/>
+                    <text x="62" y="15">Actions</text>
+                </g>
+                <g class="bl-comp bl-box bl-box--handrew" data-comp="hand-reward" data-tip="hand-reward">
+                    <rect x="116" y="0" width="84" height="22" rx="8"/>
+                    <text x="158" y="15">Reward</text>
+                </g>
+            </svg>
+            <aside class="bl-side">
+                <div class="bl-side__box bl-side__info">
+                    <div class="bl-side__eyebrow">Method</div>
+                    <div class="bl-side__title" id="bl-info-title">MPAIL2</div>
+                    <div class="bl-side__body" id="bl-info-body"></div>
+                </div>
+                <div class="bl-side__box bl-side__tip" id="bl-tip">
+                    <div class="bl-side__eyebrow">Component</div>
+                    <div class="bl-side__title" id="bl-tip-title">Hover a block</div>
+                    <div class="bl-side__body" id="bl-tip-body">Mouse over any block in the diagram to read what it does.</div>
+                </div>
+            </aside>
+            </div>
+        </div>
+    </div>
+</section>

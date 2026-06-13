@@ -1,0 +1,298 @@
+<section class="project-info scroll-section" id="results-overview-section">
+    <div class="project-info-inner">
+        <h2 class="section-header">Results
+            <span class="section-subtitle">
+                We evaluate MPAIL2 across a diverse suite of real-world tasks. Each is trained
+                <strong>entirely from scratch in the real world</strong>. Explore the detailed results below.
+            </span>
+        </h2>
+        <div class="experiments-overview-grid">
+            <div class="generalization-video-wrapper">
+                <div class="video-display">
+                    <video autoplay muted loop playsinline preload="metadata">
+                        <source src="Media/Video/Push/iter_100.mp4" type="video/mp4">
+                        Your browser does not support video playback.
+                    </video>
+                </div>
+                <div class="gen-video-label">Push</div>
+            </div>
+            <div class="generalization-video-wrapper">
+                <div class="video-display">
+                    <video autoplay muted loop playsinline preload="metadata">
+                        <source src="Media/Video/Pick/iter_140.mp4" type="video/mp4">
+                        Your browser does not support video playback.
+                    </video>
+                </div>
+                <div class="gen-video-label">Pick and Place</div>
+            </div>
+            <div class="generalization-video-wrapper">
+                <div class="video-display">
+                    <video autoplay muted loop playsinline preload="metadata">
+                        <source src="Media/Video/MoP/iter_190.mp4" type="video/mp4">
+                        Your browser does not support video playback.
+                    </video>
+                </div>
+                <div class="gen-video-label">Mug-on-plate</div>
+            </div>
+            <div class="generalization-video-wrapper">
+                <div class="video-display" style="position: relative;">
+                    <video autoplay muted loop playsinline preload="metadata">
+                        <source src="Media/Video/Push/Video_only/push_vid_only_h264.mp4" type="video/mp4">
+                        Your browser does not support video playback.
+                    </video>
+                    <div class="video-badge-row">
+                        <div class="video-badge video-badge--disabled">
+                            <span class="video-badge__cross">No</span>
+                            Wrist Camera
+                        </div>
+                        <div class="video-badge video-badge--disabled">
+                            <span class="video-badge__cross">No</span>
+                            Proprioception
+                        </div>
+                    </div>
+                </div>
+                <div class="gen-video-label">Push (Video-only)</div>
+            </div>
+        </div>
+
+        <div class="content-block" id="experiment-settings-block" style="margin-top: 28px; text-align: left;">
+            <h3 class="subsection-header">Experiment Settings</h3>
+                    <div class="collapsible-body">
+                        <div style="overflow-x: auto; margin-top: 8px;">
+                            <table class="experiment-settings-table">
+                                <thead>
+                                    <tr>
+                                        <th>Task</th>
+                                        <th>Observations</th>
+                                        <th>Object Dimension (Reset Region)</th>
+                                        <th># of Demonstrations</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="table-group-header">
+                                        <td colspan="4">Real &mdash; 64&times;64 RGB (external + wrist) &nbsp;&middot;&nbsp; Franka: Push &nbsp;&middot;&nbsp; Kinova Gen3: PnP &nbsp;&middot;&nbsp; 3 seeds</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Block Push</td>
+                                        <td>images + proprioception</td>
+                                        <td>5&times;5&times;5 cm &nbsp;<span class="reset-region">(18&times;18 cm)</span></td>
+                                        <td>10 <span class="trans-count">(1,451 trans.)</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Pick-and-Place</td>
+                                        <td>images + proprioception</td>
+                                        <td>4&times;4&times;3 cm &nbsp;<span class="reset-region">(8&times;16 cm)</span></td>
+                                        <td>10 <span class="trans-count">(1,025 trans.)</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Mug-on-Plate</td>
+                                        <td>images + proprioception</td>
+                                        <td>mug &empty;8&times;9 cm <span class="reset-region">(18&times;18 cm)</span>, plate &empty;14 cm <span class="reset-region">(20&times;30 cm)</span></td>
+                                        <td>15 <span class="trans-count">(1,802 trans.)</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Block Push <em>(Video)</em></td>
+                                        <td>external image only</td>
+                                        <td>5&times;5&times;5 cm &nbsp;<span class="reset-region">(18&times;18 cm)</span></td>
+                                        <td>10 <span class="trans-count">(914 trans.)</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+        </div>
+
+        <!-- interactive explorer: Research Questions | Table | Plots side-by-side (hover a panel to
+             focus it); the table is a control surface — selecting cells / row & column headers stages
+             videos on the results stage below. "Full width" sizes this whole block to the table. -->
+        <div class="results-interactive" id="results-interactive">
+        <div class="results-controls">
+            <div class="results-controls__right">
+                <button type="button" class="results-reset" id="results-fullwidth" title="Expand the explorer to the full window width" aria-pressed="false">&#8596;&nbsp;Full width</button>
+                <button type="button" class="results-reset" id="results-reset" title="Clear all selections and claims">&#8634;&nbsp;Reset</button>
+            </div>
+        </div>
+        <div class="results-explore" id="results-explore">
+            <section class="results-panel results-panel--q" data-panel="questions">
+            <div class="results-questions" id="results-questions">
+                <h3 class="subsection-header">Research Questions</h3>
+                <p class="results-questions__intro">Expand a question and click a finding, or hover the table and click cells / row &amp; column headers to stage videos below.</p>
+            <div class="rq-group is-open" data-rq="q1">
+                <button type="button" class="rq-group__q" aria-expanded="true">
+                    <span class="rq-group__tag">Q1</span>
+                    <span class="rq-group__text">How does MPAIL2's design enable real-world IRLfO?</span>
+                    <span class="rq-group__chev" aria-hidden="true">&rsaquo;</span>
+                </button>
+                <div class="rq-group__claims">
+                    <button type="button" class="rq-claim" data-claim="world" data-rq="q1"><strong>World modeling is critical.</strong> Only IRL learners with a learned dynamics model gain any real-world traction; dropping the model collapses to 0%.</button>
+                    <button type="button" class="rq-claim" data-claim="planning" data-rq="q1"><strong>Planning enables robustness.</strong> The planner mitigates adversarial instability, yielding far more robust behavior than the policy alone.</button>
+                </div>
+            </div>
+            <div class="rq-group" data-rq="q2">
+                <button type="button" class="rq-group__q" aria-expanded="false">
+                    <span class="rq-group__tag">Q2</span>
+                    <span class="rq-group__text">Does less supervision mean less performance?</span>
+                    <span class="rq-group__chev" aria-hidden="true">&rsaquo;</span>
+                </button>
+                <div class="rq-group__claims">
+                    <button type="button" class="rq-claim" data-claim="supervision" data-rq="q2"><strong>Less supervision &ne; less performance.</strong> MPAIL2 and its IRL ablations match or beat RLPD and BC despite using no hand-designed reward and no action labels.</button>
+                </div>
+            </div>
+            <div class="rq-group" data-rq="q3">
+                <button type="button" class="rq-group__q" aria-expanded="false">
+                    <span class="rq-group__tag">Q3</span>
+                    <span class="rq-group__text">How does MPAIL2 scale beyond single-task imitation?</span>
+                    <span class="rq-group__chev" aria-hidden="true">&rsaquo;</span>
+                </button>
+                <div class="rq-group__claims">
+                    <button type="button" class="rq-claim" data-claim="transfer" data-rq="q3"><strong>Positive online transfer.</strong> Initialized from a related task, MPAIL2 reaches higher success in roughly half the real-world training time.</button>
+                    <button type="button" class="rq-claim" data-claim="video" data-rq="q3"><strong>Video-only demonstration.</strong> It learns from a single fixed, table-mounted camera &mdash; no wrist camera and no proprioception.</button>
+                </div>
+            </div>
+        </div>
+            </section>
+
+            <section class="results-panel results-panel--right" data-panel="data">
+            <div class="results-block results-block--table">
+            <h3 class="results-panel__title">Results table <span class="results-panel__hint">click cells / headers to stage videos</span></h3>
+            <p class="tv-caption" id="tv-caption" aria-live="polite"></p>
+            <div class="results-table-scroll">
+                            <!-- <p style="font-size: 1em; font-weight: 700; color: #555; margin-bottom: 8px;">Real: Block Push — Full Transfer Results</p> -->
+                            <table class="results-html-table transfer-results-table" id="tv-table">
+                                <thead>
+                                    <tr>
+                                        <th rowspan="2" class="col-model">Method</th>
+                                        <th colspan="2" class="col-group col-divider">Supervision</th>
+                                        <th colspan="3" class="col-group col-divider">Components</th>
+                                        <th colspan="3" class="col-group col-divider"></th>
+                                        <th colspan="2" class="col-group col-divider">Transfer</th>
+                                        <th colspan="2" class="col-group col-divider">Scratch</th>
+                                        <th colspan="1" class="col-group col-divider">Video</th>
+                                    </tr>
+                                    <tr>
+                                        <th class="col-divider col-small col-sup">Reward</th>
+                                        <th class="col-small col-sup">Actions</th>
+                                        <th class="col-divider col-small col-comp">Plan.</th>
+                                        <th class="col-small col-comp">Model</th>
+                                        <th class="col-small col-comp">Off-<br>Policy</th>
+                                        <th class="col-divider col-small col-result">BP</th>
+                                        <th class="col-small col-result">PnP</th>
+                                        <th class="col-small col-result">MoP</th>
+                                        <th class="col-divider col-small col-result">BP (rt.)</th>
+                                        <th class="col-small col-result">PnP (rt.)</th>
+                                        <th class="col-divider col-small col-result">BP (rt.)</th>
+                                        <th class="col-small col-result">PnP (rt.)</th>
+                                        <th class="col-divider col-small col-result">BP</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="table-highlight-row" data-method="mpail2">
+                                        <td><strong>MPAIL2</strong></td>
+                                        <td class="col-divider col-sup"></td><td class="col-sup"></td>
+                                        <td class="col-divider col-comp"><span class="tbl-check">✓</span></td><td class="col-comp"><span class="tbl-check">✓</span></td><td class="col-comp"><span class="tbl-check">✓</span></td>
+                                        <td class="col-divider col-result"><strong>100±0</strong></td>
+                                        <td class="col-result"><strong>82±12</strong></td>
+                                        <td class="col-result"><strong>55±15</strong></td>
+                                        <td class="col-divider col-result"><strong>90±5</strong></td>
+                                        <td class="col-result"><strong>94±10</strong></td>
+                                        <td class="col-divider col-result"><strong>88±6</strong></td>
+                                        <td class="col-result"><strong>53±37</strong></td>
+                                        <td class="col-divider col-result"><strong>63±10</strong></td>
+                                    </tr>
+                                    <tr data-method="mairl">
+                                        <td>[−P] (MAIRL)</td>
+                                        <td class="col-divider col-sup"></td><td class="col-sup"></td>
+                                        <td class="col-divider col-comp"></td><td class="col-comp"><span class="tbl-check">✓</span></td><td class="col-comp"><span class="tbl-check">✓</span></td>
+                                        <td class="col-divider col-result">64±18</td>
+                                        <td class="col-result">16±15</td>
+                                        <td class="col-result">3.9±2.8</td>
+                                        <td class="col-divider col-result">14±13</td>
+                                        <td class="col-result">16±18</td>
+                                        <td class="col-divider col-result">53±12</td>
+                                        <td class="col-result">12±12</td>
+                                        <td class="col-divider col-result">29±5</td>
+                                    </tr>
+                                    <tr data-method="dac">
+                                        <td>[−PM] (DAC)</td>
+                                        <td class="col-divider col-sup"></td><td class="col-sup"></td>
+                                        <td class="col-divider col-comp"></td><td class="col-comp"></td><td class="col-comp"><span class="tbl-check">✓</span></td>
+                                        <td class="col-divider col-result">0±0</td>
+                                        <td class="col-result">0±0</td>
+                                        <td class="col-result">0±0</td>
+                                        <td class="col-divider col-result">0±0</td>
+                                        <td class="col-result">0±0</td>
+                                        <td class="col-divider col-result">0±0</td>
+                                        <td class="col-result">0±0</td>
+                                        <td class="col-divider col-result">0±0</td>
+                                    </tr>
+                                    <tr class="row-separator">
+                                        <td colspan="14"></td>
+                                    </tr>
+                                    <tr data-method="bc">
+                                        <td>BC (Diffusion)</td>
+                                        <td class="col-divider col-sup"></td><td class="col-sup"><span class="tbl-check">✓</span></td>
+                                        <td class="col-divider col-comp"></td><td class="col-comp"></td><td class="col-comp"></td>
+                                        <td class="col-divider col-result"><strong>94±6</strong></td>
+                                        <td class="col-result">12±6</td>
+                                        <td class="col-result">34±12</td>
+                                        <td class="col-divider col-result">16±8</td>
+                                        <td class="col-result">18±6</td>
+                                        <td class="col-divider col-result">34±10</td>
+                                        <td class="col-result">12±6</td>
+                                        <td class="col-divider col-result">26±6</td>
+                                    </tr>
+                                    <tr data-method="rlpd">
+                                        <td>RLPD</td>
+                                        <td class="col-divider col-sup"><span class="tbl-check">✓</span><sup>*</sup></td><td class="col-sup"><span class="tbl-check">✓</span></td>
+                                        <td class="col-divider col-comp"></td><td class="col-comp"></td><td class="col-comp"><span class="tbl-check">✓</span></td>
+                                        <td class="col-divider col-result">0±0</td>
+                                        <td class="col-result">0±0</td>
+                                        <td class="col-result">0±0</td>
+                                        <td class="col-divider col-result">0±0</td>
+                                        <td class="col-result">0±0</td>
+                                        <td class="col-divider col-result">0±0</td>
+                                        <td class="col-result">0±0</td>
+                                        <td class="col-divider col-result">0±0</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+            <p class="table-footnote">Results of over 96 real-world training runs from scratch. Entries are success rates.<br><sup>*</sup> RLPD uses dense reward where available, otherwise classifier-based reward.</p>
+            </div><!-- /.results-block--table -->
+
+            <div class="results-block results-block--plot">
+                <div class="results-plot-head">
+                    <h3 class="results-panel__title">Efficiency</h3>
+                    <div class="results-plot-views" id="results-plot-views" role="group" aria-label="Plot view">
+                        <button type="button" class="plot-view-btn is-on" data-view="claim" title="The claim's aggregated curves — select a finding to enable">Claim</button>
+                        <button type="button" class="plot-view-btn" data-view="bytask" title="A separate curve per selected method × task">Individual</button>
+                    </div>
+                </div>
+                <p class="results-plot-tip">Also observe where <strong>curves first lift off the x-axis</strong>, indicating time-to-first-success.</p>
+                <!-- canvases are injected by renderClaimPlot (one combined, or two stacked for transfer) -->
+                <div class="results-plot" id="results-plot" style="display:none;"></div>
+                <p class="results-plot__hint" id="results-plot-hint">Pick a finding to see its efficiency curves.</p>
+            </div><!-- /.results-block--plot -->
+            </section>
+        </div><!-- /.results-explore -->
+
+        <!-- results stage: the staged comparison videos (claim / research-question / table selection) -->
+        <div class="results-stage-head">
+            <h3 class="results-panel__title">Training Videos</h3>
+            <div class="results-stage-opts" id="results-stage-opts">
+                <label class="results-stage-size" title="Resize the staged videos">
+                    <span class="results-stage-opts__label">Size</span>
+                    <input type="range" id="stage-size" min="150" max="440" step="10" value="210" aria-label="Staged video size">
+                </label>
+                <span class="results-stage-opts__label">Group by</span>
+                <div class="results-mode" role="group" aria-label="Group staged videos by">
+                    <button type="button" class="stage-group-btn" data-group="none">None</button>
+                    <button type="button" class="stage-group-btn is-on" data-group="method">Method</button>
+                    <button type="button" class="stage-group-btn" data-group="task">Task</button>
+                </div>
+            </div>
+        </div>
+        <div class="results-media" id="results-media" aria-live="polite"></div>
+        </div><!-- /.results-interactive -->
+    </div>
+</section>

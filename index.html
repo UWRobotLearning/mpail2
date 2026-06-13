@@ -2,52 +2,49 @@
 <html lang="en" style="scroll-behavior: smooth;">
 <head>
     <meta charset="UTF-8">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planning from Observation and Interaction</title>
+    <title>MPAIL2</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
     <script src="script.js"></script>
+    <script src="charts.js"></script>
 </head>
 <body>
     
-    <section class="video-section">
-        <div class="video-container" id="hero-video-container">
-            <img class="hero-poster" src="Media/Video/Background/poster.jpg" alt="" aria-hidden="true">
-            <video id="hero-video" autoplay muted loop playsinline preload="metadata">
-                <source src="Media/Video/Background/background.mp4" type="video/mp4">
-                Your browser does not support video playback.
-            </video>
-        </div>
-        <div class="video-overlay">
-            <h1>Planning from Observation and Interaction</h1>
-            <div class="hero-links">
-                <a href="Media/Paper/paper.pdf" target="_blank" class="hero-link-btn" title="Paper">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-                    Paper
-                </a>
-                <a href="https://arxiv.org/abs/2602.24121" target="_blank" rel="noopener noreferrer" class="hero-link-btn" title="arXiv">
-                    <img src="Media/Image/arxiv-logomark-small.svg" alt="arXiv" style="height: 18px; width: auto; display: block;">
-                    arXiv
-                </a>
-                <a href="https://github.com/UWRobotLearning/mpail2/" target="_blank" rel="noopener noreferrer" class="hero-link-btn">
-                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
-                    GitHub
-                </a>
-            </div>
-            <!-- Authors Section -->
-            <div id="authors-section" class="authors-section authors-section--always-visible">
-                <div class="authors-list">
-                    <a href="https://thanandnow.github.io/" target="_blank" rel="noopener noreferrer">Tyler Han</a>
-                    <a href="http://www.andyshensiyang.com/" target="_blank" rel="noopener noreferrer">Siyang Shen</a>
-                    <a href="https://rohanblueboybaijal.github.io/" target="_blank" rel="noopener noreferrer">Rohan Baijal</a>
-                    <a href="https://harine.github.io/" target="_blank" rel="noopener noreferrer">Harine Ravichandran</a>
-                    <a href="https://bxtbold.github.io/" target="_blank" rel="noopener noreferrer">Bat Nemekhbold</a>
-                    <a href="https://kevinhuang8.github.io/" target="_blank" rel="noopener noreferrer">Kevin Huang</a>
-                    <a href="https://shjung13.github.io/" target="_blank" rel="noopener noreferrer">Sanghun Jung</a>
-                    <a href="https://homes.cs.washington.edu/~bboots/" target="_blank" rel="noopener noreferrer">Byron Boots</a>
+    <section class="hero-section" id="hero">
+        <div class="hero-inner">
+            <!-- <h1 class="hero-title">Online World Modeling<br>Enables<br>Real-World Inverse Reinforcement Learning from Observation</h1> -->
+            <!-- <h1 class="hero-title">Online World Modeling<br>enables<br><u>real-world</u> inverse reinforcement learning from observation.</h1> -->
+            <h1 class="hero-title">Online world modeling<br>enables <u>real-world</u><br> Inverse Reinforcement Learning from Observation</h1>
+            <div class="hero-showcase">
+                <div class="hero-claim">
+                    <span class="hero-claim__lead">meaning...</span>
+                    <span class="hero-claim__no" id="hero-no">NO</span>
+                    <div class="hero-list-mask">
+                    <ul class="hero-list" id="hero-rotator" aria-label="assumptions MPAIL2 does not rely on">
+                        <!-- add / reorder assumptions freely; the rotator picks them up automatically -->
+                        <li class="rotator__word is-active">rewards</li>
+                        <li class="rotator__word">action supervision</li>
+                        <li class="rotator__word">pre-training</li>
+                        <li class="rotator__word">play data</li>
+                        <li class="rotator__word">failure examples</li>
+                        <li class="rotator__word">prior models</li>
+                        <li class="rotator__word">interventions</li>
+                        <li class="rotator__word">simulation</li>
+                    </ul>
+                    </div>
                 </div>
-                <div class="authors-affiliation">
-                    <img src="Media/Image/uw_signature.png" alt="University of Washington">
+                <div class="hero-media">
+                    <div class="hero-rollout">
+                        <video autoplay muted loop playsinline preload="metadata">
+                            <source src="Media/Video/MoP/rollout_vis/mppi_iter_mug-on-plate_under_disturbance2.mp4" type="video/mp4">
+                            Your browser does not support video playback.
+                        </video>
+                    </div>
+                    <p class="hero-tagline">Only <strong>15 observation-only demonstrations</strong> and <strong>&lt; 40 minutes</strong> of real-world training <strong>from scratch</strong></p>
                 </div>
             </div>
         </div>
@@ -56,61 +53,106 @@
     
     <nav class="timeline-nav" id="timeline-nav">
         <div class="timeline-line"></div>
+        <a href="#hero" class="timeline-brand" aria-label="MPAIL2 — back to top"><span class="timeline-brand__box"><span style="color:#5BB1E8">M</span><span style="color:#E0705A">P</span><span style="color:#7FB069">A</span><span style="color:#E0A53B">I</span><span style="color:#A99BF5">L</span></span><span class="timeline-brand__num">2</span></a>
         <a href="#summary-section" class="timeline-item active" data-section="summary">
             <span class="timeline-dot"></span>
-            <span class="timeline-label">Overview</span>
+            <span class="timeline-label">Intro</span>
         </a>
         <a href="#method-section" class="timeline-item" data-section="method">
             <span class="timeline-dot"></span>
             <span class="timeline-label">Method</span>
         </a>
-        <a href="#efficiency-section" class="timeline-item" data-section="results">
+        <a href="#baselines-section" class="timeline-item" data-section="baselines">
+            <span class="timeline-dot"></span>
+            <span class="timeline-label">Baselines</span>
+        </a>
+        <a href="#results-overview-section" class="timeline-item" data-section="results-overview">
             <span class="timeline-dot"></span>
             <span class="timeline-label">Results</span>
         </a>
-        <a href="#generalization-section" class="timeline-item" data-section="generalization">
+        <a href="#generalization-section" class="timeline-item timeline-item--standalone" data-section="generalization">
             <span class="timeline-dot"></span>
-            <span class="timeline-label">Generalization</span>
+            <span class="timeline-label">Gallery</span>
         </a>
-        <a href="#your-turn-section" class="timeline-item" data-section="your-turn">
-            <span class="timeline-dot"></span>
-            <span class="timeline-label">Your Turn</span>
+        <a href="https://arxiv.org/pdf/2602.24121" class="timeline-ext timeline-ext--paper" target="_blank" rel="noopener noreferrer" aria-label="Read the paper on arXiv" title="Read the paper (arXiv)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5.5 3.5h8L18.5 8.5V20.5H5.5z"/><path d="M13.5 3.5V8.5h5"/><path d="M8 12.5h6.5M8 15.5h6.5M8 18.5h4"/></svg>
+        </a>
+        <a href="https://github.com/UWRobotLearning/mpail2" class="timeline-ext timeline-ext--gh" target="_blank" rel="noopener noreferrer" aria-label="View the source code on GitHub" title="View the source on GitHub">
+            <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path fill="currentColor" fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
         </a>
     </nav>
 
-    
-    <div class="task-buttons-fixed" id="task-buttons-left">
-        <div class="task-btn-wrapper active" data-task="push">
-            <div class="task-icon push-icon">
-                <div class="icon-block"></div>
-                <div class="icon-block-dest"></div>
-                <div class="icon-arrow">→</div>
+    <!-- Compact claim bar: a condensed form of the text questions above; appears (fixed under the nav)
+         only once the readable questions block has scrolled above the top. Body-level so fixed
+         positioning resolves to the viewport. -->
+    <div class="results-selector" id="results-selector" aria-label="Research questions, claims, and training scrubber">
+        <div class="results-rail__focusctl">
+            <div class="results-rail__rqs" role="tablist">
+                <button type="button" class="results-rq is-on" data-rq="q1" title="How does MPAIL2's design enable real-world IRLfO?">Q1</button>
+                <button type="button" class="results-rq" data-rq="q2" title="Does less supervision mean less performance?">Q2</button>
+                <button type="button" class="results-rq" data-rq="q3" title="How does MPAIL2 scale beyond single-task imitation?">Q3</button>
             </div>
-            <button class="task-btn active" data-task="push" onclick="selectTask('push')">Push</button>
+            <span class="results-rail__sep"></span>
+            <div class="results-rail__claims" id="results-claims">
+                <button type="button" class="tv-chip" data-claim="world" data-rq="q1">World modeling is critical</button>
+                <button type="button" class="tv-chip" data-claim="planning" data-rq="q1">Planning enables robustness</button>
+                <button type="button" class="tv-chip" data-claim="supervision" data-rq="q2">Less supervision &ne; less performance</button>
+                <button type="button" class="tv-chip" data-claim="transfer" data-rq="q3">Positive online transfer</button>
+                <button type="button" class="tv-chip" data-claim="video" data-rq="q3">Video-only demonstration</button>
+            </div>
         </div>
-        <div class="task-btn-wrapper" data-task="pick-place">
-            <div class="task-icon pick-icon">
-                <div class="pick-arrow arrow-up">↑</div>
-                <div class="pick-arrow arrow-right">→</div>
-                <div class="pick-arrow arrow-down">↓</div>
-                <div class="icon-block"></div>
-                <div class="icon-block-dest"></div>
-            </div>
-            <button class="task-btn" data-task="pick-place" onclick="selectTask('pick-place')">Pick and Place</button>
+        <!-- training scrubber, surfaced here only when the stage's own scrubber has scrolled out of frame -->
+        <span class="results-rail__sep results-rail__sep--scrub"></span>
+        <div class="results-rail__scrub" id="results-railscrub">
+            <span class="results-scrub__label">Training <b class="results-scrub__val" id="results-railscrub-val">100%</b></span>
+            <input type="range" class="results-scrub__slider" id="results-railscrub-slider" min="0" max="100" step="10" value="100" aria-label="Training progress">
+            <span class="results-keyhint" title="Use the left/right arrow keys to scrub"><kbd>&larr;</kbd><kbd>&rarr;</kbd></span>
         </div>
     </div>
 
-    
     <div class="container">
         
         <div id="summary-section-container"></div>
-        
+
         <div id="method-section-container"></div>
+
+        <div id="baselines-section-container"></div>
+
+        <div id="results-overview-section-container"></div>
 
         <div id="efficiency-section-container"></div>
         <div id="transfer-section-container"></div>
         <div id="generalization-section-container"></div>
-        <div id="your-turn-section-container"></div>
+
+        <!-- Citation + author contacts -->
+        <section class="project-info scroll-section" id="citation-section">
+            <div class="project-info-inner">
+                <h2 class="section-header">Citation</h2>
+                <p class="section-subtitle">If you find this work useful, please cite:</p>
+                <div class="citation-block">
+                    <button type="button" class="citation-copy" onclick="copyBibtex(this)" aria-label="Copy BibTeX to clipboard">Copy</button>
+                    <pre class="citation-bibtex"><code id="bibtex-entry">@article{han2026mpail2,
+  title   = {Online World Modeling Enables Real-World Inverse Reinforcement Learning from Observation},
+  author  = {Han, Tyler and Nemekhbold, Bat and Shen, Siyang and Baijal, Rohan and
+             Ebock, Richard and Ravichandiran, Harine and Jung, Sanghun and
+             Huang, Kevin and Boots, Byron},
+  year    = {2026},
+}</code></pre>
+                </div>
+                <h3 class="citation-contacts__header">Authors</h3>
+                <ul class="citation-contacts">
+                    <li><span class="cc-name">Tyler Han</span><a class="cc-mail" href="mailto:than123@cs.washington.edu">than123</a></li>
+                    <li><span class="cc-name">Bat Nemekhbold</span><a class="cc-mail" href="mailto:bxtbold@cs.washington.edu">bxtbold</a></li>
+                    <li><span class="cc-name">Siyang Shen</span><a class="cc-mail" href="mailto:andyshen@cs.washington.edu">andyshen</a></li>
+                    <li><span class="cc-name">Rohan Baijal</span><a class="cc-mail" href="mailto:rbaijal@cs.washington.edu">rbaijal</a></li>
+                    <li><span class="cc-name">Richard Ebock</span><a class="cc-mail" href="mailto:ebockr@cs.washington.edu">ebockr</a></li>
+                    <li><span class="cc-name">Harine Ravichandiran</span><a class="cc-mail" href="mailto:harine@cs.washington.edu">harine</a></li>
+                    <li><span class="cc-name">Sanghun Jung</span><a class="cc-mail" href="mailto:shjung@cs.washington.edu">shjung</a></li>
+                    <li><span class="cc-name">Kevin Huang</span><a class="cc-mail" href="mailto:kehuang@cs.washington.edu">kehuang</a></li>
+                    <li><span class="cc-name">Byron Boots</span><a class="cc-mail" href="mailto:bboots@cs.washington.edu">bboots</a></li>
+                </ul>
+            </div>
+        </section>
 
     </div>
 

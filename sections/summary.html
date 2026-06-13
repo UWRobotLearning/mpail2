@@ -1,74 +1,291 @@
-<section class="project-info scroll-section" id="summary-section">
-    <div class="project-info-inner">
-        <h2 class="section-header">
-            Observational Learning for Robots
-            <span class="section-subtitle">
-                Animals and humans often learn by observing tasks being performed by others.
-                We can then learn to perform the task ourselves according to what we saw. 
-                If robots could learn this way, they would no longer require expert supervision from hand-designed
-                <span class="term term--bold" data-tooltip="Mathematical reward definitions can be challenging to design.
+<!-- Scroll-scrubbed narrative: LfO motivation -> IRL -> AIL -> MPAIL -> MPAIL2 -->
+<section class="story" id="summary-section" data-duration="120">
+    <div class="story__track">
+        <div class="story__stage">
+            <!-- mode toggle: scroll-driven diagram vs. the narrated overview video -->
+            <div class="story__mode" id="story-mode" role="tablist" aria-label="Overview mode">
+                <button type="button" class="story__mode-btn is-active" data-mode="scroll" role="tab" aria-selected="true">Scroll</button>
+                <button type="button" class="story__mode-btn" data-mode="narrated" role="tab" aria-selected="false">&#9654;&nbsp;Narrated</button>
+            </div>
 
-                For example, specifying pushing a block to a location with only camera images may require complex computer vision algorithms to first identify then reward.">rewards</span>
-                or
-                <span class="term term--bold" data-tooltip="Remotely controlling a robot via human operator. This can be challenging for complex robots (like humanoids or tactile hands) or for non-expert users!">tele-operation</span>.
-            </span>
-        </h2>
-        <p>
-        </p>
-        <br>
-        <!-- </div> -->
-        <!-- <div class="highlight-box">
-            We introduce <strong>MPAIL2</strong> for real-world observational learning on robots
-        </div> -->
-        <div class="teaser-video-wrapper">
-            <div class="video-display teaser-video" style="overflow: hidden;">
-                <iframe
-                    width="560"
-                    height="315"
-                    src="https://www.youtube.com/embed/yQw0JmvOVwM?si=V8i7W222w4sMjpPq&amp;start=20&amp;autoplay=1&amp;mute=1&amp;loop=1&amp;playlist=yQw0JmvOVwM"
-                    title="YouTube video player"
-                    frameborder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    referrerpolicy="strict-origin-when-cross-origin"
-                    allowfullscreen
-                    style="width: 100%; height: 100%; border: 0;"
-                ></iframe>
+            <!-- narrated overview (hidden until the Narrated mode is selected) -->
+            <video class="story__video" id="story-video" controls playsinline preload="metadata" data-allow-audio>
+                <source src="Media/Video/Teasers/corl-mp2-video-high-res.mp4" type="video/mp4">
+                Your browser does not support video playback.
+            </video>
+
+            <!-- Native scroll-driven diagram: assembles the baselines-section MPAIL2 architecture.
+                 Reuses the .bl-* SVG vocabulary; coordinates match sections/baselines.html so the
+                 final beat IS that diagram. Components start hidden (.is-off) and the beat engine in
+                 initStoryScrub() reveals/relabels them as scroll progress crosses each beat. -->
+            <svg class="story__diagram" id="story-diagram" viewBox="0 2 792 398"
+                 role="img" aria-label="MPAIL2 architecture, assembled step by step"
+                 preserveAspectRatio="xMidYMid meet">
+                <defs>
+                    <marker id="st-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                        <path d="M0,0 L10,5 L0,10 z" fill="#8A93A3"/>
+                    </marker>
+                    <marker id="st-arr-purple" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                        <path d="M0,0 L10,5 L0,10 z" fill="#A99BF5"/>
+                    </marker>
+                    <marker id="st-arr-replay" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+                        <path d="M0,0 L10,5 L0,10 z" fill="#C58BE0"/>
+                    </marker>
+                    <marker id="st-arr-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                        <path d="M0,0 L10,5 L0,10 z" fill="#E0705A"/>
+                    </marker>
+                    <marker id="st-arr-gold-sm" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M0,0 L10,5 L0,10 z" fill="#E0705A"/>
+                    </marker>
+                    <clipPath id="st-clip-obs"><rect x="20" y="31" width="180" height="98" rx="13"/></clipPath>
+                    <clipPath id="st-clip-int"><rect x="20" y="222" width="180" height="98" rx="13"/></clipPath>
+                </defs>
+
+                <!-- ===== feeder wires into the core (drawn under the boxes). The reward-side
+                         endpoints are repositioned by the layout engine as the cluster centers. ===== -->
+                <g class="bl-comp bl-comp--fade is-off" data-comp="wObsReward">
+                    <path class="bl-wire st-wire-grow" pathLength="1" d="M200,80 H456 V141"/>
+                    <path class="st-arrowhead" d="M450.4,132 L461.6,132 L456,143.2 Z"/>
+                </g>
+                <g class="bl-comp bl-comp--fade is-off" data-comp="wIntReward">
+                    <path class="bl-wire st-wire-grow" pathLength="1" d="M200,271 H456 V209"/>
+                    <path class="st-arrowhead" d="M450.4,218 L461.6,218 L456,206.8 Z"/>
+                </g>
+                <!-- interaction -> dynamics (only present once dynamics is learned online) -->
+                <g class="bl-comp bl-comp--fade is-off" data-comp="wIntDyn">
+                    <path class="bl-wire bl-wire--red" d="M200,271 H364 V207" marker-end="url(#st-arr-red)"/>
+                </g>
+                <!-- off-policy replay "electron": dynamics -> value -->
+                <g class="bl-comp bl-comp--fade is-off" data-comp="replay">
+                    <path class="bl-wire bl-wire--replay" d="M408,165 H636" marker-end="url(#st-arr-replay)"/>
+                </g>
+                <!-- act-in-environment return loop into the interaction; origin is computed each
+                     frame from whichever actor is present: planner > policy > value/RL box -->
+                <g class="bl-comp bl-comp--fade is-off" data-comp="return">
+                    <path class="bl-wire st-return" id="st-return" d="M592,207 V350 H44 V320" marker-end="url(#st-arr)"/>
+                </g>
+
+                <!-- ===== planner enclosure (rect grows to wrap the current core boxes) ===== -->
+                <g class="bl-comp st-planner is-off" data-comp="planner">
+                    <rect class="bl-planner" id="st-planner-rect" x="295" y="120" width="480" height="110" rx="15"/>
+                    <text class="bl-planner-label" id="st-planner-label" x="535" y="113">Planner</text>
+                </g>
+
+                <!-- ===== data decks (story-only primitive): stacked translucent copies ===== -->
+                <!-- manual-data stack (LfO): frames are fanned via CSS and collapse back in as IRL begins -->
+                <g class="st-deck-grp is-off" data-comp="obsDeck">
+                    <rect class="st-deck" x="20" y="31" width="180" height="98" rx="13"/>
+                    <rect class="st-deck" x="20" y="31" width="180" height="98" rx="13"/>
+                    <rect class="st-deck" x="20" y="31" width="180" height="98" rx="13"/>
+                </g>
+                <!-- interaction deck. Plain red stack (interaction inefficiency) at the IRL con; it
+                     crossfades to a terminal/code-style stack (simulation dependency) at the MPAIL con. -->
+                <g class="st-deck-grp is-off" data-comp="intDeck">
+                    <g class="st-deck-plain">
+                        <rect class="st-deck st-deck--red" x="44" y="186" width="180" height="98" rx="13"/>
+                        <rect class="st-deck st-deck--red" x="36" y="198" width="180" height="98" rx="13"/>
+                        <rect class="st-deck st-deck--red" x="28" y="210" width="180" height="98" rx="13"/>
+                    </g>
+                    <g class="st-deck-sim">
+                        <g class="st-term-frame st-term-1">
+                            <rect class="st-term" x="20" y="222" width="180" height="98" rx="9"/>
+                            <rect class="st-term-bar" x="20" y="222" width="180" height="14" rx="9"/>
+                        </g>
+                        <g class="st-term-frame st-term-2">
+                            <rect class="st-term" x="20" y="222" width="180" height="98" rx="9"/>
+                            <rect class="st-term-bar" x="20" y="222" width="180" height="14" rx="9"/>
+                        </g>
+                        <g class="st-term-frame st-term-3">
+                            <rect class="st-term" x="20" y="222" width="180" height="98" rx="9"/>
+                            <rect class="st-term-bar" x="20" y="222" width="180" height="14" rx="9"/>
+                            <text class="st-term-prompt" x="28" y="233">sim&nbsp;rollout</text>
+                            <text class="st-term-prompt" x="28" y="252">&gt;&nbsp;step 4096 / 8192&#8230;</text>
+                            <rect class="st-term-line" x="28" y="260" width="120" height="3" rx="1.5"/>
+                            <rect class="st-term-line" x="28" y="269" width="92" height="3" rx="1.5"/>
+                            <rect class="st-term-line" x="28" y="278" width="138" height="3" rx="1.5"/>
+                        </g>
+                    </g>
+                </g>
+
+                <!-- ===== input image panels + encoders ===== -->
+                <g class="bl-input st-panel is-off" data-comp="obsPanel" id="st-obs">
+                    <rect class="bl-panel-bg" x="20" y="31" width="180" height="98" rx="13"/>
+                    <image href="Media/Image/obs_baseball.png" x="20" y="31" width="180" height="98"
+                           preserveAspectRatio="xMidYMid slice" clip-path="url(#st-clip-obs)"/>
+                    <rect class="bl-panel-frame" x="20" y="31" width="180" height="98" rx="13"/>
+                    <text class="bl-label" x="110" y="146">Task Observation</text>
+                </g>
+                <g class="bl-input st-panel is-off" data-comp="intPanel">
+                    <rect class="bl-panel-bg" x="20" y="222" width="180" height="98" rx="13"/>
+                    <image href="Media/Image/int_baseball.png" x="20" y="222" width="180" height="98"
+                           preserveAspectRatio="xMidYMid slice" clip-path="url(#st-clip-int)"/>
+                    <rect class="bl-panel-frame" x="20" y="222" width="180" height="98" rx="13"/>
+                    <text class="bl-label" x="110" y="337">Direct Interaction</text>
+                </g>
+                <!-- encoders. The feeder runs the full width underneath; each wedge has an OPAQUE backing
+                     (bg-colored) so it occludes the feeder where it sits (no wire crosses the label, and
+                     nothing shows through the translucent wedge). The connector therefore persists even
+                     while the wedge fades in/out on the loop. -->
+                <g class="bl-comp bl-comp--fade is-off" data-comp="obsEnc">
+                    <polygon class="bl-enc-bg" points="230,112 274,98 274,62 230,48"/>
+                    <polygon class="bl-enc" points="230,112 274,98 274,62 230,48"/>
+                    <text class="bl-enc-label" x="250" y="85">Enc</text>
+                </g>
+                <g class="bl-comp bl-comp--fade is-off" data-comp="intEnc">
+                    <polygon class="bl-enc-bg" points="230,303 274,289 274,253 230,239"/>
+                    <polygon class="bl-enc" points="230,303 274,289 274,253 230,239"/>
+                    <text class="bl-enc-label" x="250" y="276">Enc</text>
+                </g>
+
+                <!-- ===== core row =====
+                     Dynamics is fixed at the left of the box stage. Reward + Value + Policy and the
+                     wires between them ride in #st-rvp, which the layout engine slides as a unit so
+                     the cluster stays centered and only spreads to make room when a box is added. -->
+                <!-- outer wrapper carries the layout translate (attribute); the inner box owns the
+                     entrance scale (CSS, about its own center) so the two transforms don't collide -->
+                <g id="st-dyn-pos">
+                    <g class="bl-comp bl-box bl-box--dynamics is-off" data-comp="dynamics" id="st-dyn">
+                        <rect x="320" y="143" width="88" height="64" rx="12"/>
+                        <text x="364" y="175">Dynamics</text>
+                        <text class="bl-box-sub st-dyn-sub" id="st-dyn-sub" x="364" y="193">(prior)</text>
+                        <line class="st-strike" id="st-dyn-strike" x1="338" y1="189" x2="390" y2="189"/>
+                    </g>
+                </g>
+
+                <g id="st-rvp">
+                    <!-- reward -> value -->
+                    <g class="bl-comp bl-comp--fade is-off" data-comp="wRewardVal">
+                        <path class="bl-wire" d="M520,175 H548" marker-end="url(#st-arr)"/>
+                    </g>
+                    <!-- value -> policy : on-policy (single) -->
+                    <g class="bl-comp bl-comp--fade is-off" data-comp="wAc">
+                        <path class="bl-wire bl-wire--purple" d="M636,175 H662" marker-end="url(#st-arr-purple)"/>
+                    </g>
+                    <!-- value <-> policy : off-policy actor-critic (bidirectional) -->
+                    <g class="bl-comp bl-comp--fade is-off" data-comp="wAcBidir">
+                        <path class="bl-wire bl-wire--purple" d="M636,167 H662" marker-end="url(#st-arr-purple)"/>
+                        <path class="bl-wire bl-wire--purple" d="M662,183 H636" marker-end="url(#st-arr-purple)"/>
+                    </g>
+                    <!-- reward -->
+                    <g class="bl-comp bl-box bl-box--reward is-off" data-comp="reward">
+                        <polygon class="bl-poly" points="436,138 520,153 520,197 436,212"/>
+                        <text x="476" y="179">Reward</text>
+                    </g>
+                    <!-- value / RL head (relabels RL -> Value -> Q-Value) -->
+                    <g class="bl-comp bl-box bl-box--value is-off" data-comp="valbox">
+                        <rect x="548" y="143" width="88" height="64" rx="12"/>
+                        <text id="st-val-label" x="592" y="179">RL</text>
+                        <text class="bl-box-sub st-val-sub" id="st-val-sub" x="592" y="196">off-policy</text>
+                    </g>
+                    <!-- policy (relabels Policy -> Multi-Step Policy) -->
+                    <g class="bl-comp bl-box bl-box--policy is-off" data-comp="policy">
+                        <rect x="662" y="143" width="88" height="64" rx="12"/>
+                        <text id="st-policy-label" x="706" y="179">Policy</text>
+                    </g>
+                    <!-- recycle loop (RL runs to convergence, over and over) + its kill mark;
+                         centered on the value box's top-right corner (636,143) -->
+                    <g class="bl-comp bl-comp--fade is-off" data-comp="recycle">
+                        <path class="st-recycle" d="M631.6,155.2 A13,13 0 1 1 640.5,155.2" marker-end="url(#st-arr-gold-sm)"/>
+                    </g>
+                    <g class="bl-comp bl-comp--fade is-off" data-comp="recycleX">
+                        <path class="st-recycle st-recycle--dim" d="M631.6,155.2 A13,13 0 1 1 640.5,155.2"/>
+                        <path class="st-cut" d="M626,133 L646,153 M646,133 L626,153"/>
+                    </g>
+                </g>
+            </svg>
+
+            <!-- chapter rail (each chip jumps to that method; the skip button jumps to the end) -->
+            <div class="story__chapters" id="story-chapters">
+                <button type="button" class="story__chip" data-t="0">LfO</button>
+                <button type="button" class="story__chip" data-t="19">IRL</button>
+                <button type="button" class="story__chip" data-t="49">AIL</button>
+                <button type="button" class="story__chip" data-t="66">MPAIL</button>
+                <button type="button" class="story__chip" data-t="81">MPAIL2</button>
+                <button type="button" class="story__chip story__skip" id="story-skip" title="Jump to the end">Skip&nbsp;&#8595;</button>
             </div>
+
+            <!-- animation-loop progress bar (sits just above the caption) -->
+            <div class="story__animbar" id="story-animbar"><span></span></div>
+
+            <!-- captions (only the active one shows; data-t = beat threshold on the 0..duration scale) -->
+            <div class="story__captions" id="story-captions">
+                <p class="story__cap" data-t="0">You're learning how to play baseball by <b>watching a demonstration</b>.</p>
+                <p class="story__cap" data-t="5">Without privileged supervision like rewards and actions, you are necessarily <b>Learning from Observation</b> (LfO).</p>
+                <p class="story__cap story__cap--con" data-t="12">LfO is ideal for robot learning too, since observations are passively abundant. But, today's LfO methods still depend on <b>large amounts of manual data and supervision</b>.</p>
+                <p class="story__cap" data-t="19"><b>Inverse RL</b> drastically reduces manual supervision by learning instead from interaction and self-supervision, like <i>practicing</i>.</p>
+                <p class="story__cap" data-t="25">In IRL, the learner must infer the demonstrator's intent via the <b>reward</b> by comparing observations of them to their own.</p>
+                <p class="story__cap" data-t="32">Then <b>RL</b> optimizes that reward into a policy, whose new interactions refine the reward again.</p>
+                <p class="story__cap story__cap--con" data-t="38">But running RL to convergence, over and over, for many different rewards is <b>impractically expensive</b>.</p>
+                <p class="story__cap" data-t="49"><b>Adversarial Imitation Learning</b> updates the value and policy just once or twice per reward step.</p>
+                <p class="story__cap story__cap--con" data-t="58">But its policies are often <b>brittle</b>, generalizing poorly on real robots.</p>
+                <!-- <p class="story__cap" data-t="66"><b>MPAIL</b> adds a dynamics model, swapping the policy for a robust <b>planner</b> when acting.</p> -->
+                <p class="story__cap" data-t="66"><b>MPAIL</b> interacts using a more robust <b>planner</b>, instead of a policy, by introducing a dynamics model.</p>
+                <p class="story__cap story__cap--con" data-t="72">But it still needs a <b>prior dynamics model</b> and <b>simulation</b>, since interaction is too inefficient.</p>
+                <p class="story__cap story__cap--hero" data-t="81">We introduce <b>MPAIL2</b> for real-world learning from observation while minimizing manual effort, like simulation and modeling.</p>
+                <p class="story__cap" data-t="90">1/3: It <b>learns its dynamics online</b>, in a shared <b>latent space</b> self-supervised by the encoder and dynamics models only.</p>
+                <p class="story__cap" data-t="98">2/3: Reward and value are learned <b>off-policy</b>, adding a policy network for value optimization.</p>
+                <p class="story__cap" data-t="105">3/3: A <b>multi-step policy</b> with a TD&#8209;&lambda; objective blends model-based and model-free returns.</p>
+                <p class="story__cap story__cap--hero" data-t="115">The result is real-world LfO with <b>no simulation, no pre-training, no rewards, and no action labels</b>, all learned from scratch.</p>
+            </div>
+
+            <!-- per-method paper citation (swaps as each method comes on screen) -->
+            <a class="story__cite" id="story-cite" target="_blank" rel="noopener"></a>
+
+            <!-- subtle frame counter (bottom-left) -->
+            <div class="story__counter" id="story-counter"></div>
+
+            <div class="story__progress"><span id="story-bar"></span></div>
+            <div class="story__hint" id="story-hint">scroll or press <span>&darr;</span> to play</div>
         </div>
-        <br>
-        <!-- <h2>Model Predictive Adversarial Imitation Learning 2 (MPAIL2)</h2> -->
-        <h2>Key Results</h2>
-        <div class="highlight-box-group">
-            <div class="highlight-box highlight-box--emerald">
-                <strong>A First in Real-World Observational Learning</strong>
-                <br>
-                This work demonstrates the first work in observational learning 
-                (<span class="term term--bold" data-tooltip-html="Inverse Reinforcement Learning from Observation. IRLfO is a type of inverse reinforcement learning that learns a reward function from observations of a task being performed by an expert.
-                <br>
-                <br>
-                <i>While other observational learning frameworks exist, they do not readily admit improvement with experience.</i>
-                ">IRLfO</span>)
-                <span class="term term--bold" data-tooltip-html="Achieved without offline pre-training, prior data, models, or simulations. All learning is done in the real-world with model weights initialized randomly.
-                <br>
-                <br>
-                While it is possible to pre-train MPAIL2, this work aims to remain as general as possible. For instance, non-manipulation settings often do not have readily available pre-trained policy models.
-                "
-                >purely in the real-world from scratch</span>.
-            </div>
-            <div class="highlight-box highlight-box--emerald">
-                <strong>A First in Transfer Learning</strong>
-                <br>
-                This work is the first to demonstrate
-                <span class="term term--bold" data-tooltip-html="Currently one of the primary differences between man and machine, Transfer learning is the process of transferring knowledge from one task to another.
-                </i>
-                ">transfer learning</span> from scratch in the real-world.
-            </div>
-            <div class="highlight-box highlight-box--orange">
-                <strong>Real-World Sample Efficiency</strong>
-                <br>
-                Where a state-of-the-art baseline in RL with demonstrations (<span class="term term--bold" data-tooltip-html="<a href='https://proceedings.mlr.press/v202/ball23a/ball23a.pdf' target='_blank'>Reinforcement Learning with Prior Data (RLPD)</a>, Ball et al. 2023.
-                ">RLPD</span>) sees no success after over an hour of real-world training, MPAIL2 sees consistent success in under 40 minutes.
-            </div>
+    </div>
+</section>
+
+<!-- Key contributions (from the paper) — each card expands into its claims on hover/focus -->
+<section class="project-info scroll-section" id="key-results-section">
+    <div class="project-info-inner">
+        <h2 class="section-header">Main Contributions</h2>
+        <p class="section-subtitle contrib-sub">Hover a contribution to read more.</p>
+        <div class="contrib-list">
+            <article class="contrib contrib--a" tabindex="0">
+                <div class="contrib__head">
+                    <span class="contrib__num">1</span>
+                    <h3 class="contrib__title">Online world modeling, supervised by observation and interaction alone</h3>
+                    <span class="contrib__more" aria-hidden="true">+</span>
+                </div>
+                <div class="contrib__claims"><div class="contrib__claims-inner">
+                    <p class="contrib__lead">A single framework that improves encoder, dynamics, reward, value, and policy online, without hand-designed rewards, simulation, pre-training, or action supervision.</p>
+                </div></div>
+            </article>
+            <article class="contrib contrib--b" tabindex="0">
+                <div class="contrib__head">
+                    <span class="contrib__num">2</span>
+                    <h3 class="contrib__title">World modeling and planning are each critical for real-world IRLfO</h3>
+                    <span class="contrib__more" aria-hidden="true">+</span>
+                </div>
+                <div class="contrib__claims"><div class="contrib__claims-inner">
+                    <p class="contrib__lead">Simulated and real-world experiments isolating what makes practical, on-robot inverse RL from observation actually work.</p>
+                </div></div>
+            </article>
+            <article class="contrib contrib--c" tabindex="0">
+                <div class="contrib__head">
+                    <span class="contrib__num">3</span>
+                    <h3 class="contrib__title">Scalable real-world robot learning through positive online transfer and video-only demonstration</h3>
+                    <span class="contrib__more" aria-hidden="true">+</span>
+                </div>
+                <div class="contrib__claims"><div class="contrib__claims-inner">
+                    <p class="contrib__lead">Experiments supporting robot learning approaches that can scale directly in the real world.</p>
+                </div></div>
+            </article>
+            <article class="contrib contrib--d" tabindex="0">
+                <div class="contrib__head">
+                    <span class="contrib__num contrib__num--emoji" role="img" aria-label="Bonus">&#127891;</span>
+                    <h3 class="contrib__title">Open-source, low-cost robot learning directly in the real world</h3>
+                    <span class="contrib__more" aria-hidden="true">+</span>
+                </div>
+                <div class="contrib__claims"><div class="contrib__claims-inner">
+                    <p class="contrib__lead">Open-source code + fast, robust training from scratch means you can experiment at home! Stay tuned for SO-101 and LeRobot integrations coming soon!</p>
+                </div></div>
+            </article>
         </div>
     </div>
 </section>
