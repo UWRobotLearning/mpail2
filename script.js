@@ -775,8 +775,9 @@ function initResultsTunnel() {
 
     // each claim stages a small set of (method, column) cells, plus an explanatory note
     const CLAIM_CELLS = {
-        world:       [['mpail2', 'res-bp'], ['dac', 'res-bp'], ['mpail2', 'res-pnp'], ['dac', 'res-pnp'],
-                      ['mpail2', 'res-mop'], ['dac', 'res-mop']],
+        world:       [['mpail2', 'res-bp'], ['mairl', 'res-bp'], ['dac', 'res-bp'],
+                      ['mpail2', 'res-pnp'], ['mairl', 'res-pnp'], ['dac', 'res-pnp'],
+                      ['mpail2', 'res-mop'], ['mairl', 'res-mop'], ['dac', 'res-mop']],
         planning:    [['mpail2', 'res-bp'], ['mairl', 'res-bp'], ['mpail2', 'res-pnp'], ['mairl', 'res-pnp'],
                       ['mpail2', 'res-mop'], ['mairl', 'res-mop']],
         supervision: [['mpail2', 'res-bp'], ['mairl', 'res-bp'], ['dac', 'res-bp'], ['rlpd', 'res-bp'],
