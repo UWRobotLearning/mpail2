@@ -658,8 +658,10 @@ function renderCharts() {
         }
     } catch (e) { console.error('training/transfer chart render failed:', e); }
 
-    // (re)render the focused claim's plot now that data is loaded
-    if (window.resultsActiveClaim) renderClaimPlot(window.resultsActiveClaim);
+    // (re)render whatever plot is currently shown (so a width change / data load doesn't reset the state)
+    if (window.resultsCustomMode) renderCustomPlot();
+    else if (currentSelection && currentSelection.length) renderSelectionPlot(currentSelection);
+    else if (window.resultsActiveClaim) renderClaimPlot(window.resultsActiveClaim);
 }
 
 function refreshCharts() {
@@ -792,6 +794,7 @@ let currentClaimKey = null, currentSelection = null, plotView = 'claim', claimCh
 let claimExMethods = new Set(), claimExTasks = new Set();
 function clearClaimCharts() { claimCharts.forEach(c => c && c.destroy()); claimCharts = []; }
 function renderClaimPlot(key) {
+    window.resultsCustomMode = false;
     if (key && key[0] !== '_') {
         if (key !== currentClaimKey) { claimExMethods.clear(); claimExTasks.clear(); }   // fresh filters per claim
         currentClaimKey = key; currentSelection = null;                                  // entering claim mode
@@ -940,6 +943,7 @@ window.renderClaimPlot = renderClaimPlot;
 // plot the table's hand-picked cells: one efficiency curve per selected (method × task) cell that has
 // data (the BP / PnP result columns). Always shown alongside a selection; the "Claim" view is greyed.
 function renderSelectionPlot(cells) {
+    window.resultsCustomMode = false;
     currentSelection = cells || [];
     clearClaimCharts();
     const wrap = document.getElementById('results-plot');
@@ -974,6 +978,129 @@ function renderSelectionPlot(cells) {
     claimCharts.push(createResultChart('claim-chart', 'claim-chart-legend', 'Selected Sample Efficiency', merged, false));
 }
 window.renderSelectionPlot = renderSelectionPlot;
+
+// ─── Q4 "Your Research Question": user-built method groups → one averaged curve each ─────────
+// Each group is averaged over its methods × the selected tasks, on the training-progress (%) grid
+// (the same standardization as the claim aggregate) so curves of different task lengths line up.
+const CUSTOM_METHODS = ['mpail2', 'mairl', 'dac', 'rlpd'];        // methods with efficiency curves (BC has none)
+const CUSTOM_TASKS = [['push', 'Block Push'], ['pick', 'Pick-and-Place'], ['mop', 'Mug on Plate'], ['vid', 'Block Push (Video)']];
+let customGroups = [['mpail2'], ['mairl'], ['dac'], ['rlpd']];   // default: one method per group
+let customTaskSel = new Set(CUSTOM_TASKS.map(t => t[0]));        // default: all tasks selected
+const groupLabel = (ms, gi) => ms.length ? ms.map(m => EFF_METHOD[m]).join(' + ') : 'Group ' + (gi + 1);
+const groupColor = (ms) => ms.length ? styleFor(EFF_METHOD[ms[0]]).line : '#9aa3b2';
+
+function aggregateCustom() {
+    const out = {};
+    customGroups.forEach((methodKeys, gi) => {
+        const ms = methodKeys.filter(m => CUSTOM_METHODS.includes(m));
+        if (!ms.length) return;
+        const series = [];
+        ms.forEach(mk => CUSTOM_TASKS.forEach(([t]) => {
+            if (!customTaskSel.has(t)) return;
+            const eff = chartData && chartData.efficiency && chartData.efficiency[t];
+            const lab = EFF_METHOD[mk];
+            if (eff && eff[lab]) series.push(eff[lab]);
+        }));
+        if (!series.length) return;
+        const label = groupLabel(ms, gi);
+        const x = [], mean = [], std = [];
+        AGG_GRID.forEach(p => {
+            let sm = 0, ss = 0;
+            series.forEach(s => { const v = interpAtFrac(s, p / 100); sm += v.mean; ss += v.std; });
+            x.push(p); mean.push(+(sm / series.length).toFixed(4)); std.push(+(ss / series.length).toFixed(4));
+        });
+        ALGO_STYLES[label] = { line: groupColor(ms), fill: styleFor(EFF_METHOD[ms[0]]).fill, dash: [], width: 2.5 };
+        out[label] = { x, mean, std };
+    });
+    return out;
+}
+
+function renderCustomPlot() {
+    window.resultsCustomMode = true;
+    currentClaimKey = null; currentSelection = null;
+    clearClaimCharts();
+    const wrap = document.getElementById('results-plot');
+    const hint = document.getElementById('results-plot-hint');
+    const views = document.getElementById('results-plot-views');
+    if (!wrap) return;
+    if (document.body.classList.contains('results-undirected')) { wrap.style.display = 'none'; if (hint) hint.style.display = 'none'; if (views) views.style.display = 'none'; return; }
+    if (views) views.style.display = 'none';                      // Claim/Individual toggle doesn't apply here
+    wrap.innerHTML = '';
+    wrap.style.display = ''; if (hint) hint.style.display = 'none';
+    const agg = aggregateCustom();
+    if (!Object.keys(agg).length) {
+        wrap.insertAdjacentHTML('beforeend', '<p class="claim-plot-empty">Drag a method into a group to plot it.</p>');
+    } else {
+        wrap.insertAdjacentHTML('beforeend', '<div class="results-chart-container results-chart-container--claim"><canvas id="claim-chart"></canvas></div><div id="claim-chart-legend"></div>');
+        claimCharts.push(createResultChart('claim-chart', 'claim-chart-legend', 'Your grouping — sample efficiency', agg, true, 'Training Progress (%)', false));
+    }
+    wrap.insertAdjacentHTML('beforeend', cgbHTML());              // the group builder lives in the efficiency area
+    wireCustomBuilder();
+}
+window.renderCustomPlot = renderCustomPlot;
+window.enterCustomRQ = function () { renderCustomPlot(); };
+
+// methods not placed in any group — available to drag in, and excluded from the plot
+const customUngrouped = () => CUSTOM_METHODS.filter(m => !customGroups.some(g => g.includes(m)));
+
+// markup for the group builder: an "Available" pool + group bins (draggable method chips) + task toggles
+function cgbHTML() {
+    const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+    const chip = (m) => '<span class="cgb__chip" draggable="true" data-method="' + m + '" style="--cc:' + styleFor(EFF_METHOD[m]).line + '">' +
+        '<span class="cgb__dot"></span>' + esc(EFF_METHOD[m]) + '</span>';
+    const ung = customUngrouped();
+    const availBin = '<div class="cgb__avail"><span class="cgb__avail-label">Available <small>(not plotted)</small></span>' +
+        '<div class="cgb__bin cgb__bin--avail" data-gi="-1">' + (ung.length ? ung.map(chip).join('') : '<span class="cgb__empty">drag a method here to leave it out</span>') + '</div></div>';
+    const groupsHtml = customGroups.map((ms, gi) => {
+        const col = groupColor(ms);
+        const chips = ms.length ? ms.map(chip).join('') : '<span class="cgb__empty">drag methods here</span>';
+        return '<div class="cgb__group" style="--gc:' + col + '">' +
+            '<div class="cgb__group-head"><span class="cgb__group-title">' + esc(groupLabel(ms, gi)) + '</span>' +
+            (customGroups.length > 1 ? '<button type="button" class="cgb__del" data-gi="' + gi + '" title="Remove group (its methods become Available)">&times;</button>' : '') +
+            '</div><div class="cgb__bin" data-gi="' + gi + '">' + chips + '</div></div>';
+    }).join('');
+    const tasksHtml = CUSTOM_TASKS.map(([t, label]) =>
+        '<button type="button" class="cgb__task' + (customTaskSel.has(t) ? '' : ' is-off') + '" data-task="' + t + '">' + esc(label) + '</button>').join('');
+    return '<div class="cgb" id="cgb-root">' +
+        '<div class="cgb__head"><span class="cgb__title">Your groups</span><span class="cgb__hint">drag methods between groups &amp; the Available pool — each group is one averaged curve</span></div>' +
+        availBin +
+        '<div class="cgb__groups">' + groupsHtml + '<button type="button" class="cgb__add" title="Add an empty group">+ Add group</button></div>' +
+        '<div class="cgb__tasks"><span class="cgb__tasks-label">Tasks</span>' + tasksHtml + '</div></div>';
+}
+
+function customMoveMethod(method, gi) {
+    if (!CUSTOM_METHODS.includes(method)) return;
+    customGroups = customGroups.map(g => g.filter(m => m !== method));            // remove from any group
+    if (gi != null && gi >= 0 && customGroups[gi]) customGroups[gi].push(method); // gi < 0 → leave it Available (ungrouped)
+    renderCustomPlot();
+}
+// delegated builder interactions, attached once to the persistent #results-plot wrap (innerHTML re-renders in place)
+let cgbWired = false, cgbDragged = null;
+function wireCustomBuilder() {
+    const wrap = document.getElementById('results-plot');
+    if (!wrap || cgbWired) return;
+    cgbWired = true;
+    wrap.addEventListener('dragstart', e => { const c = e.target.closest('.cgb__chip'); if (c) { cgbDragged = c.dataset.method; if (e.dataTransfer) { e.dataTransfer.effectAllowed = 'move'; try { e.dataTransfer.setData('text/plain', cgbDragged); } catch (_) {} } c.classList.add('is-dragging'); } });
+    wrap.addEventListener('dragend', e => { const c = e.target.closest('.cgb__chip'); if (c) c.classList.remove('is-dragging'); });
+    wrap.addEventListener('dragover', e => { const b = e.target.closest('.cgb__bin'); if (b) { e.preventDefault(); b.classList.add('is-drop'); } });
+    wrap.addEventListener('dragleave', e => { const b = e.target.closest('.cgb__bin'); if (b) b.classList.remove('is-drop'); });
+    wrap.addEventListener('drop', e => { const b = e.target.closest('.cgb__bin'); if (b) { e.preventDefault(); b.classList.remove('is-drop'); customMoveMethod(cgbDragged, +b.dataset.gi); cgbDragged = null; } });
+    wrap.addEventListener('click', e => {
+        if (!window.resultsCustomMode) return;
+        const add = e.target.closest('.cgb__add');
+        if (add) { customGroups.push([]); renderCustomPlot(); return; }
+        const del = e.target.closest('.cgb__del');
+        if (del) { customGroups.splice(+del.dataset.gi, 1); if (!customGroups.length) customGroups.push([]); renderCustomPlot(); return; }   // its methods become Available
+        const task = e.target.closest('.cgb__task');
+        if (task) {
+            const t = task.dataset.task;
+            if (customTaskSel.has(t)) { if (customTaskSel.size > 1) customTaskSel.delete(t); }   // keep ≥1 task
+            else customTaskSel.add(t);
+            renderCustomPlot();
+        }
+    });
+}
+window.wireCustomBuilder = wireCustomBuilder;
 
 // plot view toggle (Claim / By task) — delegated since the buttons load with the section
 document.addEventListener('click', e => {

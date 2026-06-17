@@ -4262,3 +4262,44 @@ body.dark-mode .cpc-row__label { color: #7f8aa3; }
 body.dark-mode .cpc-chip { background: #131a2e; color: #cbd5e1; border-color: rgba(165, 180, 252, 0.2); }
 body.dark-mode .claim-plot-empty { color: #7f8aa3; }
 @media (max-width: 560px) { .cpc-row { flex-direction: column; gap: 4px; } .cpc-row__label { padding-top: 0; } }
+
+/* ── Q4 "Your Research Question": custom method-group builder (in the Efficiency panel) ─────── */
+.rq-claim--custom strong { color: #667eea; }
+.cgb { margin-top: 16px; padding-top: 14px; border-top: 1px dashed rgba(15,23,42,0.12); }
+body.dark-mode .cgb { border-top-color: rgba(165,180,252,0.18); }
+.cgb__head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; margin-bottom: 9px; }
+.cgb__title { font-size: 0.82rem; font-weight: 700; color: #374151; }
+.cgb__hint { font-size: 0.72rem; color: #9aa3b2; }
+body.dark-mode .cgb__title { color: #e2e8f0; }
+.cgb__avail { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid rgba(15,23,42,0.07); }
+.cgb__avail-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .03em; color: #9aa3b2; flex: 0 0 auto; }
+.cgb__avail-label small { font-weight: 600; text-transform: none; letter-spacing: 0; }
+.cgb__bin--avail { flex: 1 1 220px; }
+.cgb__groups { display: flex; flex-wrap: wrap; gap: 9px; align-items: flex-start; }
+.cgb__group { flex: 1 1 150px; max-width: 260px; }
+.cgb__group { border: 1px solid rgba(15,23,42,0.12); border-left: 3px solid var(--gc, #9aa3b2); border-radius: 9px; padding: 7px 9px; background: #fff; }
+body.dark-mode .cgb__group { background: #131a2e; border-color: rgba(165,180,252,0.18); }
+.cgb__group-head { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 5px; }
+.cgb__group-title { font-size: 0.74rem; font-weight: 700; color: var(--gc, #6b7280); }
+.cgb__del { border: none; background: none; color: #9aa3b2; font-size: 1.15rem; line-height: 1; cursor: pointer; padding: 0 3px; }
+.cgb__del:hover { color: #ef4444; }
+.cgb__bin { display: flex; flex-wrap: wrap; gap: 6px; min-height: 30px; padding: 5px; border: 1px dashed rgba(15,23,42,0.16); border-radius: 7px; align-content: flex-start; }
+.cgb__bin.is-drop { border-color: var(--gc, #667eea); background: rgba(102,126,234,0.08); }
+body.dark-mode .cgb__bin { border-color: rgba(165,180,252,0.22); }
+.cgb__chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 9px; cursor: grab; user-select: none;
+    font: 600 0.78rem 'Inter', system-ui, sans-serif; color: #374151; background: #f3f5fb; border: 1px solid rgba(15,23,42,0.12); border-radius: 7px; }
+.cgb__chip:active { cursor: grabbing; }
+.cgb__chip.is-dragging { opacity: 0.4; }
+.cgb__dot { width: 11px; height: 4px; border-radius: 2px; background: var(--cc, #8a93a8); flex: none; }
+body.dark-mode .cgb__chip { background: #1b2336; color: #cbd5e1; border-color: rgba(165,180,252,0.2); }
+.cgb__empty { font-size: 0.74rem; color: #9aa3b2; font-style: italic; align-self: center; padding: 2px 4px; }
+.cgb__add { align-self: flex-start; margin-top: 2px; padding: 6px 11px; font: 600 0.76rem 'Inter', system-ui, sans-serif;
+    color: #667eea; background: none; border: 1px dashed rgba(102,126,234,0.55); border-radius: 7px; cursor: pointer; }
+.cgb__add:hover { background: rgba(102,126,234,0.08); }
+.cgb__tasks { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 11px; padding-top: 10px; border-top: 1px solid rgba(15,23,42,0.08); }
+.cgb__tasks-label { font-size: 0.66rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: #9aa3b2; margin-right: 2px; }
+.cgb__task { padding: 4px 10px; font: 600 0.76rem 'Inter', system-ui, sans-serif; color: #374151; background: #fff; border: 1px solid rgba(15,23,42,0.16); border-radius: 7px; cursor: pointer; transition: opacity .15s ease, border-color .15s ease; }
+.cgb__task:hover { border-color: #667eea; }
+.cgb__task.is-off { opacity: .4; text-decoration: line-through; }
+body.dark-mode .cgb__task { background: #131a2e; color: #cbd5e1; border-color: rgba(165,180,252,0.2); }
+body.dark-mode .cgb__tasks-label { color: #7f8aa3; }

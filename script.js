@@ -653,6 +653,7 @@ function initResultsTunnel() {
         cells.forEach(c => c.classList.remove('tv-dim', 'tv-focus'));
         caption.classList.remove('is-on');
         claimBtns.forEach(b => b.classList.remove('is-on'));
+        const cb = document.querySelector('.rq-claim--custom'); if (cb) cb.classList.remove('is-on');
         active = null;
     }
 
@@ -699,6 +700,7 @@ function initResultsTunnel() {
         active = key;
         window.resultsActiveClaim = key;               // so selectTask can refresh the focus media
         claimBtns.forEach(b => b.classList.toggle('is-on', b.dataset.claim === key));
+        const cb = document.querySelector('.rq-claim--custom'); if (cb) cb.classList.remove('is-on');   // a preset claim deselects Q4
         const chip = claimBtns.filter(c => c.dataset.claim === key)[0];
         if (chip) showRQ(chip.dataset.rq);             // keep the compact bar's RQ + visible chips in sync
         focusTable(new Set(claim.rows), new Set(claim.cols));
@@ -712,7 +714,8 @@ function initResultsTunnel() {
     // (clicking either while in Undirected switches back to Focus so the focusing is visible)
     rqTabs.forEach(tab => tab.addEventListener('click', () => {
         if (document.body.classList.contains('results-undirected')) setResultsMode('focus');
-        applyRQ(tab.dataset.rq);
+        if (tab.dataset.rq === 'q4') enterCustomRQ();
+        else applyRQ(tab.dataset.rq);
     }));
     claimBtns.forEach(btn => btn.addEventListener('click', () => {
         if (document.body.classList.contains('results-undirected')) setResultsMode('focus');
@@ -725,6 +728,10 @@ function initResultsTunnel() {
         const group = q.closest('.rq-group');
         const open = group.classList.toggle('is-open');
         q.setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (group.dataset.rq === 'q4' && open) {
+            if (document.body.classList.contains('results-undirected')) setResultsMode('focus');
+            enterCustomRQ();
+        }
     }));
     // reset: clear claims, selections, and the stage back to a neutral state
     const resetBtn = document.getElementById('results-reset');
@@ -946,6 +953,9 @@ function initResultsTunnel() {
             cells.forEach(c => c.classList.remove('tv-dim', 'tv-focus'));
             caption.classList.remove('is-on');
             claimBtns.forEach(b => b.classList.remove('is-on'));
+            active = null; window.resultsActiveClaim = null;
+            showRQ('q4');                              // a user-selection is "Your Research Question"
+            if (customClaimBtn) customClaimBtn.classList.add('is-on');
             const list = COLS.filter(c => c !== 'method').reduce((acc, col) => {   // stable order: by column, then table row order
                 bodyRows.forEach(tr => { if (selected.has(tr.dataset.method + '|' + col)) acc.push([tr.dataset.method, col]); });
                 return acc;
@@ -997,6 +1007,7 @@ function initResultsTunnel() {
         if (!claims) return;
         selected.clear();
         active = null; window.resultsActiveClaim = null;
+        const cb = document.querySelector('.rq-claim--custom'); if (cb) cb.classList.remove('is-on');
         const seen = new Set(), unionCells = [], rowSet = new Set(), colSet = new Set();
         claims.forEach(k => {
             (CLAIM_CELLS[k] || []).forEach(c => { const id = c[0] + '|' + c[1]; if (!seen.has(id)) { seen.add(id); unionCells.push(c); } });
@@ -1012,6 +1023,26 @@ function initResultsTunnel() {
         if (typeof window.renderClaimPlot === 'function') window.renderClaimPlot('__none');
     }
     window.applyResultsRQ = applyRQ;
+
+    // Q4 "Your Research Question": render the user-built grouping plot + builder in the Efficiency area;
+    // the stage stays neutral until the user clicks table cells (which also lands in Q4).
+    const customClaimBtn = document.querySelector('.rq-claim--custom');
+    function enterCustomRQ() {
+        selected.clear();
+        bodyRows.forEach(tr => Array.prototype.forEach.call(tr.children, td => td.classList.remove('tv-selected')));
+        clear();                                       // drop any active claim, table focus, caption
+        window.resultsActiveClaim = null;              // so a refresh (e.g. Full-width) won't restore a stale claim
+        showRQ('q4');
+        if (customClaimBtn) customClaimBtn.classList.add('is-on');
+        const g = document.querySelector('.rq-group[data-rq="q4"]');
+        if (g) { g.classList.add('is-open'); const q = g.querySelector('.rq-group__q'); if (q) q.setAttribute('aria-expanded', 'true'); }
+        if (typeof window.renderCustomPlot === 'function') window.renderCustomPlot();
+        renderStage([], '');
+    }
+    if (customClaimBtn) customClaimBtn.addEventListener('click', () => {
+        if (document.body.classList.contains('results-undirected')) setResultsMode('focus');
+        enterCustomRQ();
+    });
 
     // ---- Focus / Undirected mode: Undirected reveals the full Training section as "all the evidence".
     //      There are two mode toggles (the selector + the training bar), so wire them by class. ----
