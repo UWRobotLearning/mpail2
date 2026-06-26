@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!-- gold "planner box" echoing the MPAIL2 branding enclosure, filling the icon -->
+  <rect x="1.5" y="1.5" width="29" height="29" rx="6" fill="none" stroke="#E0A53B" stroke-width="3"/>
+  <!-- the M, encoder-blue, matching the first letter of the wordmark -->
+  <text x="16" y="16" fill="#5BB1E8"
+        font-family="'Space Grotesk','Inter','Segoe UI',sans-serif"
+        font-size="22" font-weight="700"
+        text-anchor="middle" dominant-baseline="central">M</text>
+</svg>

@@ -4063,21 +4063,21 @@ body.story-pip-on .story__pip{display:block;}   /* the fly-in/out is FLIP-animat
     position:absolute; top:54px; left:50%; transform:translateX(-50%);
     display:flex; gap:7px; z-index:6; flex-wrap:wrap; justify-content:center; padding:5px 8px;
     background:rgba(14,17,23,0.55); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px);
-    border:1px solid rgba(255,255,255,0.07); border-radius:999px;
+    border:1px solid transparent; border-radius:999px;
 }
 .story__chip{
     font-family:'Space Grotesk','Inter',sans-serif; font-size:.74rem; font-weight:600; letter-spacing:.04em;
     color:#8a93a8; padding:5px 13px; border-radius:999px; line-height:1.2; cursor:pointer;
-    background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);
+    background:rgba(255,255,255,0.04); border:1px solid transparent;
     transition:color .3s, background .3s, border-color .3s, transform .15s ease;
 }
 .story__chip:hover{color:#fff; border-color:rgba(169,155,245,0.5);}
 .story__chip:active{transform:translateY(1px);}
 .story__chip.is-on{color:#fff; background:linear-gradient(135deg,#6E59C7,#9a8af0); border-color:transparent;}
 /* skip-to-end button, set off from the chapter chips */
-.story__skip{margin-left:6px; color:#c9c2ff; background:transparent; border-color:rgba(169,155,245,0.4);}
-.story__skip::before{content:""; position:absolute; margin-left:-12px; height:60%; top:20%; width:1px; background:rgba(255,255,255,0.12);}
-.story__skip{position:relative;}
+.story__skip{position:relative; margin-left:13px; color:#c9c2ff; background:transparent; border-color:rgba(169,155,245,0.4);}
+/* divider sits in the gap to the LEFT of the button, not through it */
+.story__skip::before{content:""; position:absolute; left:-7px; top:20%; height:60%; width:1px; background:rgba(255,255,255,0.12);}
 .story__skip:hover{background:rgba(169,155,245,0.14); border-color:rgba(169,155,245,0.7);}
 /* caption band: a zero-height anchor line a comfortable distance above the bottom; each caption is
    vertically CENTERED on this line, so 1- and 2-line captions stay put instead of growing down. */

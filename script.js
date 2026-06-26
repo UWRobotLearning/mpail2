@@ -2313,7 +2313,9 @@ function initStoryScrub() {
         const range = story.offsetHeight - window.innerHeight;
         window.scrollTo({ top: story.offsetTop + Math.min(1, (t + 0.4) / duration) * range, behavior: 'smooth' });
     };
-    chips.forEach(chip => chip.addEventListener('click', () => scrollToT(parseFloat(chip.dataset.t) || 0)));
+    // data-jump (when present) overrides data-t for the click target, so a chip can highlight on its
+    // own chapter but jump elsewhere — MPAIL2 jumps to the final, fully-assembled frame.
+    chips.forEach(chip => chip.addEventListener('click', () => scrollToT(parseFloat(chip.dataset.jump || chip.dataset.t) || 0)));
     const skip = document.getElementById('story-skip');
     if (skip) skip.addEventListener('click', () => {
         const range = story.offsetHeight - window.innerHeight;
@@ -2495,15 +2497,17 @@ function initializeInteractiveSections() {
         const isTeaser = display.classList.contains('teaser-video');
         const isMethodCard = display.closest('.method-mppi-video') || display.closest('.method-card-media') || display.closest('.method-video');
         if (isMethodCard) return;
-        if (!isDemo && !isTeaser && !display.querySelector('.video-speed-badge')) {
+        // rollout visualization clips (the MPPI planning viz) play at natural speed — no 3x
+        const isRolloutVis = !!display.querySelector('video source[src*="rollout_vis"], video[src*="rollout_vis"]');
+        if (!isDemo && !isTeaser && !isRolloutVis && !display.querySelector('.video-speed-badge')) {
             const badge = document.createElement('span');
             badge.className = 'video-speed-badge';
             badge.textContent = '3X';
             display.appendChild(badge);
         }
         display.querySelectorAll('video').forEach(v => {
-            // Leave the method MPAIL2 video and the summary teaser at normal speed
-            if (v.dataset.allowAudio !== undefined || isTeaser) {
+            // Leave the method MPAIL2 video, the summary teaser, and rollout-vis clips at normal speed
+            if (v.dataset.allowAudio !== undefined || isTeaser || isRolloutVis) {
                 v.playbackRate = 1;
                 return;
             }
