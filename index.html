@@ -27,35 +27,40 @@
     
     <section class="hero-section" id="hero">
         <div class="hero-inner">
-            <!-- <h1 class="hero-title">Online World Modeling<br>Enables<br>Real-World Inverse Reinforcement Learning from Observation</h1> -->
-            <!-- <h1 class="hero-title">Online World Modeling<br>enables<br><u>real-world</u> inverse reinforcement learning from observation.</h1> -->
-            <h1 class="hero-title">Online world modeling<br>enables <u>real-world</u><br> Inverse Reinforcement Learning from Observation</h1>
+            <h1 class="hero-title">Online world modeling enables <strong>real-world</strong> Inverse RL</h1>
             <div class="hero-showcase">
-                <div class="hero-claim">
-                    <span class="hero-claim__lead">meaning...</span>
-                    <span class="hero-claim__no" id="hero-no">NO</span>
-                    <div class="hero-list-mask">
-                    <ul class="hero-list" id="hero-rotator" aria-label="assumptions MPAIL2 does not rely on">
-                        <!-- add / reorder assumptions freely; the rotator picks them up automatically -->
-                        <li class="rotator__word is-active">rewards</li>
-                        <li class="rotator__word">action supervision</li>
-                        <li class="rotator__word">pre-training</li>
-                        <li class="rotator__word">play data</li>
-                        <li class="rotator__word">failure examples</li>
-                        <li class="rotator__word">prior models</li>
-                        <li class="rotator__word">interventions</li>
-                        <li class="rotator__word">simulation</li>
-                    </ul>
-                    </div>
-                </div>
                 <div class="hero-media">
                     <div class="hero-rollout">
-                        <video autoplay muted loop playsinline preload="metadata">
+                        <video class="hero-rollout__main" autoplay muted loop playsinline preload="metadata">
                             <source src="Media/Video/MoP/rollout_vis/mppi_iter_mug-on-plate_under_disturbance2.mp4" type="video/mp4">
                             Your browser does not support video playback.
                         </video>
+                        <!-- episode one of training ("from scratch"), crossfaded in on hovering "from scratch" -->
+                        <video class="hero-rollout__ep1" muted loop playsinline preload="auto" aria-hidden="true">
+                            <source src="Media/Video/MoP/iter_0.mp4" type="video/mp4">
+                        </video>
+                        <span class="hero-rollout__badge" aria-hidden="true">Episode 1 · from scratch</span>
                     </div>
-                    <p class="hero-tagline">Only <strong>15 observation-only demonstrations</strong> and <strong>&lt; 40 minutes</strong> of real-world training <strong>from scratch</strong></p>
+                    <p class="hero-tagline">Only <strong>15 observed demonstrations</strong> and <strong>40 minutes</strong> of training <strong class="hero-scratch" id="hero-scratch" tabindex="0" role="button" aria-label="Show episode one of mug-on-plate training from scratch">from scratch</strong></p>
+                </div>
+                <!-- caption above a horizontal ticker: "Scalable robot learning with:" then "NO <assumption> …" -->
+                <div class="hero-claim">
+                    <div class="hero-claim__row">
+                        <span class="hero-claim__no" id="hero-no">NO</span>
+                        <div class="hero-list-mask">
+                        <ul class="hero-list" id="hero-rotator" aria-label="assumptions MPAIL2 does not rely on">
+                            <!-- add / reorder assumptions freely; the rotator picks them up automatically -->
+                            <li class="rotator__word is-active">rewards</li>
+                            <li class="rotator__word">action supervision</li>
+                            <li class="rotator__word">pre-training</li>
+                            <li class="rotator__word">play data</li>
+                            <li class="rotator__word">failure examples</li>
+                            <li class="rotator__word">prior models</li>
+                            <li class="rotator__word">interventions</li>
+                            <li class="rotator__word">simulation</li>
+                        </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

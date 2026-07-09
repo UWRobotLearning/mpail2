@@ -172,79 +172,59 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Hero "NO <assumption>" list. The full list sits beside the video and scrolls
-// vertically (a seamless carousel) past a STATIC "NO"; whichever assumption is
-// beside NO is in focus. Words are read from the markup, so adding a
-// <li class="rotator__word"> in index.html is all that's needed.
+// Hero "NO <assumption>" ticker. The assumptions stream HORIZONTALLY past a STATIC "NO"
+// from right to left. Words are read from the markup, so adding a <li class="rotator__word">
+// is all that's needed. Drag to scrub; a flick throws it with momentum that eases back to speed.
 document.addEventListener('DOMContentLoaded', function() {
     var list = document.getElementById('hero-rotator');
     var no = document.getElementById('hero-no');
     if (!list || !no) return;
     var claim = list.closest('.hero-claim') || list.parentNode;
+    var viewport = list.parentNode;                    // .hero-list-mask — the scrolling window
     var orig = Array.prototype.slice.call(list.querySelectorAll('.rotator__word'));
     var N = orig.length;
     if (!N) return;
 
-    // Clone the words above and below (3 copies) so the strip always has content
-    // on both sides of NO and can wrap with no visible seam.
-    var clone = function(w) { var c = w.cloneNode(true); c.classList.remove('is-active'); return c; };
-    var firstChild = list.firstChild;
-    orig.forEach(function(w) { list.insertBefore(clone(w), firstChild); }); // copy above
-    orig.forEach(function(w) { list.appendChild(clone(w)); });              // copy below
-    var all = Array.prototype.slice.call(list.children);                    // 3N, middle copy is the original
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    var contC = 0;                                     // continuous offset of the strip, in word units
-    var focusY = function() { return no.offsetTop + no.offsetHeight / 2; };   // NO's center: the carousel's focal line
-    // set the words' heights + the strip position; the transform is driven by the continuous offset
-    function setStrip(animate) {
-        if (claim.clientHeight < 1) return;            // not laid out yet (e.g. video unsized) — wait for the observer
-        var h = claim.clientHeight / N;                // N words exactly fill the video height
-        all.forEach(function(el) { el.style.height = h + 'px'; });
-        list.style.transition = animate ? '' : 'none';
-        list.style.transform = 'translateY(' + (focusY() - ((N + contC) * h + h / 2)) + 'px)';
-        if (!animate) { void list.offsetHeight; list.style.transition = ''; }
+    // Clone the whole set repeatedly so the strip is always wider than the viewport and wraps seamlessly.
+    function addCopy() {
+        orig.forEach(function(w) { list.appendChild(w.cloneNode(true)); });
     }
-    // light up whichever word's center is within an epsilon of NO's center (used live while dragging)
-    function highlightAtCenter(ty) {
-        var h = claim.clientHeight / N, center = focusY(), eps = h * 0.42;
-        all.forEach(function(el, k) {
-            el.classList.toggle('is-active', Math.abs((ty + k * h + h / 2) - center) < eps);
-        });
+    var all = function() { return Array.prototype.slice.call(list.children); };
+    addCopy(); addCopy();                              // start with 3 sets; measure() tops up if needed
+
+    var setW = 0;                                      // px width of one full set of N words
+    var offset = 0;                                    // px scrolled to the left, kept within [0, setW)
+
+    function measure() {
+        var kids = all();
+        var oneSet = (kids.length > N) ? (kids[N].offsetLeft - kids[0].offsetLeft) : list.scrollWidth;
+        if (oneSet > 0) {                              // ensure strip covers viewport + a spare set for the wrap
+            var needed = viewport.clientWidth + oneSet * 2, guard = 0;
+            while (list.scrollWidth < needed && guard++ < 16) addCopy();
+        }
+        kids = all();
+        setW = (kids.length > N) ? (kids[N].offsetLeft - kids[0].offsetLeft) : list.scrollWidth;
     }
-    // same epsilon focus, but read from live layout so it works during the CSS-driven cycle slide
-    // (each word lights up as it passes NO, instead of defocusing then snapping on at the center).
-    var hlRAF = null;
-    function highlightLive() {
-        var cr = claim.getBoundingClientRect(), center = cr.top + focusY();
-        var eps = (claim.clientHeight / N) * 0.42;
-        all.forEach(function(el) {
-            var r = el.getBoundingClientRect();
-            el.classList.toggle('is-active', Math.abs((r.top + r.height / 2) - center) < eps);
-        });
-    }
-    setStrip(false); highlightLive();
-    if (document.fonts && document.fonts.ready) { document.fonts.ready.then(function() { setStrip(false); }); }
-    window.addEventListener('resize', function() { setStrip(false); });
-    setTimeout(function() { setStrip(false); }, 300);  // re-layout once the video sets the height
-    setTimeout(function() { setStrip(false); }, 1200);
-    // the claim's height is driven by the video (align-self: stretch); recompute the strip whenever it
-    // actually changes size so the words never stay compressed when the video sizes late (load race)
-    var resync = function() { setStrip(false); highlightLive(); };
-    if (window.ResizeObserver) { new ResizeObserver(resync).observe(claim); }
+    function apply() { list.style.transform = 'translateX(' + (-offset) + 'px)'; }
+    function wrap() { if (setW > 0) { while (offset >= setW) offset -= setW; while (offset < 0) offset += setW; } }
+
+    function resync() { measure(); wrap(); apply(); }
+    resync();
+    if (document.fonts && document.fonts.ready) { document.fonts.ready.then(resync); }
+    window.addEventListener('resize', resync);
+    if (window.ResizeObserver) { new ResizeObserver(function() { measure(); apply(); }).observe(claim); }
     var heroVid = document.querySelector('.hero-rollout video');
     if (heroVid) { heroVid.addEventListener('loadeddata', resync); heroVid.addEventListener('loadedmetadata', resync); }
 
-    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    // ----- continuous auto-cycle: the strip scrolls at a steady speed (no pausing), each word
-    //       lighting up as it passes NO; pausable while the user drags -----
+    // ----- continuous auto-cycle: the strip scrolls leftward; a flick sets the speed, which then
+    //       eases back to nominal. Paused while dragging. -----
     var cycleRAF = null, lastFrame = 0, dragging = false;
-    var SPEED = 1 / 1500;                              // nominal words per ms (~1.5s per word)
-    var MAX_SPEED = 1 / 60;                            // cap a flick at ~one word / 60ms
-    var RETURN_TAU = 650;                              // ms time-constant easing speed back to nominal
-    var curSpeed = SPEED;                              // live speed (signed); a flick sets it, then it decays
-    // keep contC within [-0.5, N-0.5) so the seam (copy-swap) always lands in the dim gap between words
-    function wrapC() { contC = ((contC + 0.5) % N + N) % N - 0.5; }
+    var PXSPEED = 0.05;                                // nominal px/ms (~50 px/s) leftward
+    var MAX_FLICK = 3.0;                               // px/ms cap on a flick's speed
+    var RETURN_TAU = 650;                              // ms time-constant easing the speed back to nominal
+    var curSpeed = PXSPEED;                            // live speed (signed); a flick sets it, then it decays
     function startCycle() {
         if (reduce || N < 2 || cycleRAF) return;
         lastFrame = 0;
@@ -252,14 +232,9 @@ document.addEventListener('DOMContentLoaded', function() {
             if (dragging) { cycleRAF = null; return; }
             if (lastFrame) {
                 var dt = now - lastFrame;
-                curSpeed = SPEED + (curSpeed - SPEED) * Math.exp(-dt / RETURN_TAU);  // ease back to nominal
-                contC += dt * curSpeed;
-                wrapC();
-                var h = claim.clientHeight / N;
-                var ty = focusY() - ((N + contC) * h + h / 2);
-                list.style.transition = 'none';
-                list.style.transform = 'translateY(' + ty + 'px)';
-                highlightAtCenter(ty);                 // analytic — avoids a per-frame layout read
+                curSpeed = PXSPEED + (curSpeed - PXSPEED) * Math.exp(-dt / RETURN_TAU);  // ease back to nominal
+                offset += dt * curSpeed;
+                wrap(); apply();
             }
             lastFrame = now;
             cycleRAF = requestAnimationFrame(tick);
@@ -268,46 +243,49 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     function stopCycle() { if (cycleRAF) cancelAnimationFrame(cycleRAF); cycleRAF = null; lastFrame = 0; }
 
-    // ----- drag to scrub through the assumptions; cycling resumes after release -----
+    // ----- intro: for a ticker the natural reveal is the streaming itself — the assumptions
+    //       flow in from the right. So we just fade the whole strip in and start scrolling. -----
+    function playIntro(done) {
+        if (reduce || N < 2) { done(); return; }
+        list.style.transition = 'none'; list.style.opacity = '0';
+        void list.offsetHeight;
+        list.style.transition = 'opacity .6s ease'; list.style.opacity = '1';
+        setTimeout(function() { list.style.transition = ''; }, 650);
+        done();                                        // begin scrolling immediately; words stream past NO
+    }
+
+    // ----- drag to scrub horizontally; a flick on release throws the ticker with momentum -----
     if (!reduce && N >= 2) {
-        var wordH = function() { return claim.clientHeight / N; };
-        var startY = 0, baseTy = 0;
-        var lastY = 0, lastT = 0, dragVel = 0;                // px & px/ms, for release momentum
-        var getY = function(e) {
-            if (e.touches && e.touches[0]) return e.touches[0].clientY;
-            if (e.changedTouches && e.changedTouches[0]) return e.changedTouches[0].clientY;
-            return e.clientY;
+        var startX = 0, baseOffset = 0, lastX = 0, lastT = 0, dragVel = 0;   // dragVel: smoothed pointer px/ms
+        var getX = function(e) {
+            if (e.touches && e.touches[0]) return e.touches[0].clientX;
+            if (e.changedTouches && e.changedTouches[0]) return e.changedTouches[0].clientX;
+            return e.clientX;
         };
         var onDown = function(e) {
             dragging = true; stopCycle();
-            startY = getY(e);
-            lastY = startY; lastT = performance.now(); dragVel = 0;
-            baseTy = focusY() - ((N + contC) * wordH() + wordH() / 2);
+            startX = getX(e); baseOffset = offset;
+            lastX = startX; lastT = performance.now(); dragVel = 0;
             list.style.transition = 'none';
             claim.classList.add('is-dragging');
             e.preventDefault();
         };
         var onMove = function(e) {
             if (!dragging) return;
-            var y = getY(e), t = performance.now(), dtm = t - lastT;
-            if (dtm > 0) { dragVel = dragVel * 0.6 + ((y - lastY) / dtm) * 0.4; lastY = y; lastT = t; }  // smoothed px/ms
-            var ty = baseTy + (y - startY);
-            list.style.transform = 'translateY(' + ty + 'px)';
-            highlightAtCenter(ty);             // words light up as they pass NO
+            var x = getX(e), t = performance.now(), dtm = t - lastT;
+            if (dtm > 0) { dragVel = dragVel * 0.6 + ((x - lastX) / dtm) * 0.4; lastX = x; lastT = t; }  // smoothed px/ms
+            offset = baseOffset - (x - startX);         // drag right -> content moves right
+            wrap(); apply();
             e.preventDefault();
         };
-        var onUp = function(e) {
+        var onUp = function() {
             if (!dragging) return;
             dragging = false; claim.classList.remove('is-dragging');
-            contC -= (getY(e) - startY) / wordH();            // drag down -> earlier words (continuous)
-            wrapC();                                          // normalize into [-0.5, N-0.5)
-            // hand off the release velocity as the cycle speed; it eases back to nominal in startCycle.
-            // contC moves opposite to drag-Y (see above), so negate; stale flick (paused before release) -> 0.
-            if (performance.now() - lastT > 120) dragVel = 0;
-            var v = -dragVel / wordH();                       // words/ms in contC space
-            curSpeed = Math.max(-MAX_SPEED, Math.min(MAX_SPEED, v));
-            highlightLive();
-            startCycle();                                     // resume the continuous scroll from here
+            list.style.transition = '';
+            if (performance.now() - lastT > 120) dragVel = 0;   // held still before release -> no flick
+            // offset moves opposite to the pointer, so the throw speed is the negated pointer velocity
+            curSpeed = Math.max(-MAX_FLICK, Math.min(MAX_FLICK, -dragVel));
+            startCycle();                                       // resume the scroll, decaying from the flick speed
         };
         claim.addEventListener('mousedown', onDown);
         window.addEventListener('mousemove', onMove);
@@ -316,7 +294,32 @@ document.addEventListener('DOMContentLoaded', function() {
         window.addEventListener('touchmove', onMove, { passive: false });
         window.addEventListener('touchend', onUp);
     }
-    startCycle();
+    playIntro(startCycle);
+});
+
+// Hero: hovering / focusing "from scratch" crossfades in episode one of mug-on-plate
+// training (the untrained, from-scratch policy) stacked over the rollout, and fades it out
+// on leave. Both clips keep playing underneath, so there's no reload / black flash.
+document.addEventListener('DOMContentLoaded', function() {
+    var scratch = document.getElementById('hero-scratch');
+    var rollout = document.querySelector('.hero-rollout');
+    var ep1 = rollout && rollout.querySelector('.hero-rollout__ep1');
+    if (!scratch || !rollout || !ep1) return;
+
+    var enter = function() {
+        rollout.classList.add('is-scratch');
+        try { ep1.currentTime = 0; } catch (e) {}   // replay episode one from the start each time
+        ep1.play().catch(function() {});
+    };
+    var leave = function() {
+        rollout.classList.remove('is-scratch');
+        setTimeout(function() { if (!rollout.classList.contains('is-scratch')) ep1.pause(); }, 470);
+    };
+
+    scratch.addEventListener('pointerenter', enter);
+    scratch.addEventListener('pointerleave', leave);
+    scratch.addEventListener('focus', enter);
+    scratch.addEventListener('blur', leave);
 });
 
 // Main functionality
