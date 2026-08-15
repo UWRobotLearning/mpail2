@@ -34,6 +34,11 @@ class FixedObsNormalizer(nn.Module):
         # Compute and register statistics from demonstrations
         self._compute_statistics(demonstrations)
 
+    @staticmethod
+    def _buf_name(key: str) -> str:
+        """Sanitize observation key to a valid buffer name (no dots allowed)."""
+        return key.replace(".", "_")
+
     def _compute_statistics(self, demonstrations: Dict[str, torch.Tensor]):
         """Compute mean and std from expert demonstrations."""
         self._obs_keys = list(demonstrations.keys())
@@ -52,9 +57,10 @@ class FixedObsNormalizer(nn.Module):
             mean = flat_data.mean(dim=0)
             std = flat_data.std(dim=0)
 
+            buf = self._buf_name(key)
             # Register as buffers so they're saved/loaded with model and moved with .to()
-            self.register_buffer(f"{key}_mean", mean.to(self.device))
-            self.register_buffer(f"{key}_std", std.to(self.device))
+            self.register_buffer(f"{buf}_mean", mean.to(self.device))
+            self.register_buffer(f"{buf}_std", std.to(self.device))
 
             print(f"[FixedObsNormalizer] {key}: mean range [{mean.min():.3f}, {mean.max():.3f}], "
                   f"std range [{std.min():.3f}, {std.max():.3f}]")
@@ -63,9 +69,10 @@ class FixedObsNormalizer(nn.Module):
         if isinstance(obs, dict):
             normalized_obs = {}
             for key, value in obs.items():
-                if hasattr(self, f"{key}_mean"):
-                    mean = getattr(self, f"{key}_mean")
-                    std = getattr(self, f"{key}_std")
+                buf = self._buf_name(key)
+                if hasattr(self, f"{buf}_mean"):
+                    mean = getattr(self, f"{buf}_mean")
+                    std = getattr(self, f"{buf}_std")
                     normalized_obs[key] = (value - mean) / (std + self.eps)
                     if self.clip_obs is not None:
                         normalized_obs[key] = torch.clamp(normalized_obs[key], min=-self.clip_obs, max=self.clip_obs)
@@ -76,9 +83,9 @@ class FixedObsNormalizer(nn.Module):
         else:
             # For single tensor, use first key's statistics (assumes single obs type)
             if len(self._obs_keys) > 0:
-                key = self._obs_keys[0]
-                mean = getattr(self, f"{key}_mean")
-                std = getattr(self, f"{key}_std")
+                buf = self._buf_name(self._obs_keys[0])
+                mean = getattr(self, f"{buf}_mean")
+                std = getattr(self, f"{buf}_std")
                 return (obs - mean) / (std + self.eps)
             return obs
 
@@ -86,18 +93,19 @@ class FixedObsNormalizer(nn.Module):
         if isinstance(normalized_obs, dict):
             denormalized_obs = {}
             for key, value in normalized_obs.items():
-                if hasattr(self, f"{key}_mean"):
-                    mean = getattr(self, f"{key}_mean")
-                    std = getattr(self, f"{key}_std")
+                buf = self._buf_name(key)
+                if hasattr(self, f"{buf}_mean"):
+                    mean = getattr(self, f"{buf}_mean")
+                    std = getattr(self, f"{buf}_std")
                     denormalized_obs[key] = value * (std + self.eps) + mean
                 else:
                     denormalized_obs[key] = value
             return denormalized_obs
         else:
             if len(self._obs_keys) > 0:
-                key = self._obs_keys[0]
-                mean = getattr(self, f"{key}_mean")
-                std = getattr(self, f"{key}_std")
+                buf = self._buf_name(self._obs_keys[0])
+                mean = getattr(self, f"{buf}_mean")
+                std = getattr(self, f"{buf}_std")
                 return normalized_obs * (std + self.eps) + mean
             return normalized_obs
 
@@ -115,8 +123,14 @@ class CamOnlyObsNormalizer(nn.Module):
             normalized_obs = {}
             for key, value in obs.items():
                 if isinstance(value, torch.Tensor) and "cam" in key.lower():
-                    # Camera observations: normalize to [-0.5, 0.5]
-                    normalized_obs[key] = value / 255.0 - 0.5
+                    # Camera observations: normalize to [-0.5, 0.5]. Some callers (e.g.
+                    # so101_env.py, convert.py) already divide by 255 before this point,
+                    # so dividing unconditionally here would silently double-divide and
+                    # crush the whole batch into a ~[0, 1/255] sliver near -0.5 (near-zero
+                    # variance regardless of image content). Only divide if still raw uint8
+                    # scale, mirroring the same max()>1.0 check convert.py already uses.
+                    scaled = value / 255.0 if value.max() > 1.0 else value
+                    normalized_obs[key] = scaled - 0.5
                 else:
                     # Pass through all other observations unchanged
                     normalized_obs[key] = value
@@ -131,8 +145,11 @@ class CamOnlyObsNormalizer(nn.Module):
             denormalized_obs = {}
             for key, value in normalized_obs.items():
                 if isinstance(value, torch.Tensor) and "cam" in key.lower():
-                    # Camera observations: denormalize from [-0.5, 0.5]
-                    denormalized_obs[key] = (value + 0.5) * 255.0
+                    # Undo forward()'s "- 0.5" back to [0, 1] — matches this codebase's
+                    # actual convention (so101_env.py/convert.py always hand forward()
+                    # already-[0,1] images, so forward() never multiplies by 255 in
+                    # practice; scaling back up to [0,255] here would be the wrong inverse).
+                    denormalized_obs[key] = value + 0.5
                 else:
                     # Pass through all other observations unchanged
                     denormalized_obs[key] = value

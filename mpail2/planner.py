@@ -205,6 +205,27 @@ class Planner(torch.nn.Module):
 
         return actions
 
+    def act_policy_only(self, observations: Dict[str, torch.Tensor]) -> torch.Tensor:
+        '''Return the policy network's own deterministic (tanh-squashed mean) action,
+        bypassing CEM/MPPI entirely — no noise rollouts, no elite re-weighting, no
+        blending with the exploration distribution. For evaluating what the learned
+        policy net alone has learned, independent of the planner's search process.
+        '''
+        if self._obs_normalizer is not None:
+            observations = self._obs_normalizer(observations)
+
+        with torch.no_grad():
+            z0 = self.encoder(observations)
+            self.sampling.policy.plan(z0)
+            actions = self.sampling.policy.action_mean
+
+        self._last_actions = actions
+        self._current_obs = observations
+        with torch.no_grad():
+            self._prev_z = z0
+
+        return actions
+
     def update(self, obs: torch.Tensor, map: torch.Tensor=None):
         '''
         Update the internal belief state of the agent.
@@ -241,7 +262,15 @@ class Planner(torch.nn.Module):
         else:
             self._opt_controls[:] = 0.
 
-        self.sampling.reset_iter_state()
+        # Bug fix: this used to call reset_iter_state() with no arguments, which resets
+        # _iter_mean to zero every single real-world step — discarding the warm-start
+        # above and making ~95% of each decision's candidates (the noise-sampled ones,
+        # not the small policy_proportion fraction) a fresh zero-mean/max-std blind
+        # search with no memory of the previous decision's converged plan. Passing
+        # _opt_controls through means the noise samples are actually centered on the
+        # carried-forward plan, as intended (matches this method's own docstring: "resets
+        # _iter_std to max_std and _iter_mean to prev_controls").
+        self.sampling.reset_iter_state(prev_controls=self._opt_controls)
 
         for i in range(self.cfg.opt_iters - 1):
             # Subsequent optimization uses previous optimal controls

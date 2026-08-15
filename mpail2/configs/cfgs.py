@@ -189,6 +189,13 @@ class RewardCfg:
 
     model_factory: Callable[[Any], torch.nn.Sequential] = mlp_factory
 
+    reward_clip: float = None
+    '''Clamp raw reward output to [-reward_clip, reward_clip]. None disables clamping.
+    The WGAN-style critic has no inherent output bound, and without one its scale can
+    drift arbitrarily over training (observed: mean_demo_reward climbing from ~6 to ~16
+    across iterations, Value/mean_q_value swinging from -187 to +164) — this bounds how
+    far that drift can propagate into the TD target / value loss.'''
+
 
 @dataclass(kw_only=True)
 class EnsembleValueCfg:
@@ -265,6 +272,15 @@ class DynamicsLearnerCfg:
 
     enc_lr_scale: float = None
     '''Scaling factor for the encoder learning rate relative to the dynamics model learning rate.'''
+
+    sigreg_coeff: float = None
+    '''Coefficient for SIGReg auxiliary regularization loss (see mpail2.dynamics.SIGReg). Disabled when None or <= 0.'''
+
+    sigreg_knots: int = None
+    '''Number of integration knots used by SIGReg.'''
+
+    sigreg_num_proj: int = None
+    '''Number of random projection vectors used by SIGReg.'''
 
 
 @dataclass(kw_only=True)
