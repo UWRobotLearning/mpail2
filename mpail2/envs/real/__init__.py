@@ -64,3 +64,38 @@ try:
     )
 except ImportError:
     pass
+
+try:
+    from .so101 import (
+        ACTION_DIM as SO101_ACTION_DIM,
+        SO101RealWrapper,
+        SO101RealEnvArgs,
+        STATE_DIM as SO101_STATE_DIM,
+        EE_PROPRIO_DIM as SO101_EE_PROPRIO_DIM,
+        HOME_POSITION_DEG as SO101_HOME_POSITION_DEG,
+        EE_LOWER_M as SO101_EE_LOWER_M,
+        EE_UPPER_M as SO101_EE_UPPER_M,
+        JOINT_LOWER_DEG as SO101_JOINT_LOWER_DEG,
+        JOINT_UPPER_DEG as SO101_JOINT_UPPER_DEG,
+        MAX_EPISODE_STEPS as SO101_MAX_EPISODE_STEPS,
+        make_so101_env,
+    )
+
+    __all__.extend(
+        [
+            "SO101RealWrapper",
+            "SO101RealEnvArgs",
+            "SO101_STATE_DIM",
+            "SO101_ACTION_DIM",
+            "SO101_EE_PROPRIO_DIM",
+            "SO101_HOME_POSITION_DEG",
+            "SO101_EE_LOWER_M",
+            "SO101_EE_UPPER_M",
+            "SO101_JOINT_LOWER_DEG",
+            "SO101_JOINT_UPPER_DEG",
+            "SO101_MAX_EPISODE_STEPS",
+            "make_so101_env",
+        ]
+    )
+except ImportError:
+    pass

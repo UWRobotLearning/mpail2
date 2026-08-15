@@ -11,6 +11,7 @@
 | 🧪 IsaacLab / Isaac Sim | [Install Isaac Sim / IsaacLab](#isaaclab--isaac-sim) |
 | 🦾 Franka real | Set up the [realtime kernel](https://frankarobotics.github.io/docs/libfranka/docs/real_time_kernel.html), then install `mpail2` with `".[franka]"` |
 | 🤖 Kinova real | Install [ROS 2](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debs.html) and [`ros2_kortex`](https://github.com/Kinovarobotics/ros2_kortex) |
+| 🦿 SO-101 real | Install `mpail2` with `".[so101]"`, plus a separate [`lerobot`](https://github.com/huggingface/lerobot) clone — see [`mpail2/envs/real/so101/README.md`](../mpail2/envs/real/so101/README.md) |
 
 ## Default Install
 
@@ -31,6 +32,7 @@ IsaacLab and the real-robot environments require extra setup:
 - IsaacLab / Isaac Sim: install Isaac Sim / IsaacLab first, then install `mpail2`
 - Franka real robot: install `mpail2` with `".[franka]"`
 - Kinova real robot: install ROS 2 / `ros2_kortex`
+- SO-101 real robot: install `mpail2` with `".[so101]"` — see [`mpail2/envs/real/so101/README.md`](../mpail2/envs/real/so101/README.md) for the full setup (needs a separate `lerobot` clone + conda env)
 
 ## Gym / MuJoCo
 
