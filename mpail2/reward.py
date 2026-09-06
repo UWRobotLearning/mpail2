@@ -37,4 +37,7 @@ class Reward(torch.nn.Module):
     def forward(self, state, next_state, action=None):
         '''state shape: (num_envs, state_dim)'''
         _input = torch.cat([state, next_state], dim=-1)
-        return self.model(_input).squeeze(-1)
+        out = self.model(_input).squeeze(-1)
+        if self.cfg.reward_clip is not None:
+            out = out.clamp(-self.cfg.reward_clip, self.cfg.reward_clip)
+        return out

@@ -7,7 +7,7 @@ import torch.nn.functional as F
 from typing import TYPE_CHECKING, Dict, Optional
 
 from mpail2.encoder import Coder
-from mpail2.dynamics import Dynamics
+from mpail2.dynamics import Dynamics, SIGReg
 from mpail2.reward import Reward
 from mpail2.value import EnsembleValue
 from mpail2.sampling import PolicyNetwork
@@ -110,6 +110,14 @@ class MPAIL2Learner:
             dyn_params,
             **self.dynamics_learner_cfg.opt_params
         )
+
+        self._sigreg = None
+        if getattr(self.dynamics_learner_cfg, 'sigreg_coeff', None) is not None \
+                and self.dynamics_learner_cfg.sigreg_coeff > 0.0:
+            self._sigreg = SIGReg(
+                knots=self.dynamics_learner_cfg.sigreg_knots,
+                num_proj=self.dynamics_learner_cfg.sigreg_num_proj,
+            ).to(device=self.device, dtype=self.dtype)
 
         #
         # POLICY SAMPLING SETUP
@@ -400,6 +408,16 @@ class MPAIL2Learner:
         _jep_se = (pred_latents[:, 1:, :] - next_latent_batch_traj.detach()).pow(2)
         loss = (_rhos[..., None] * _jep_se).mean()
 
+        sigreg_loss = torch.tensor(0.0, device=self.device, dtype=self.dtype)
+        if self._sigreg is not None:
+            # SIGReg expects (T, B, D); latent_batch_traj (the gradient-carrying encode
+            # of the full obs_batch_traj horizon, not just z0) already has this shape
+            # once transposed.
+            sigreg_proj = latent_batch_traj.transpose(0, 1)
+            sigreg_loss = self._sigreg(sigreg_proj)
+            loss = loss + self.dynamics_learner_cfg.sigreg_coeff * sigreg_loss
+        self._mean_stats['Dyn/sigreg_loss'] += sigreg_loss.item()
+
         # Decoder for visualization if specified
         if self._decoder:
             _recon_loss = torch.tensor(0.0, device=self.device, dtype=self.dtype)
@@ -552,7 +570,8 @@ class MPAIL2Learner:
         """
 
         with torch.no_grad():
-            rewards_batch = self._reward(latent_batch, next_latent_batch, action=action_batch)
+            _rscale = getattr(self, '_reward_scale', 1.0)
+            rewards_batch = self._reward(latent_batch, next_latent_batch, action=action_batch) * _rscale
             _next_plans = self._policy.plan(next_latent_batch) # [batch_size, H, action_dim]
             pred_next_latent_batch_traj = self._dynamics(
                 z0=next_latent_batch, controls=_next_plans,
@@ -665,9 +684,10 @@ class MPAIL2Learner:
         '''
 
         _gam, _H = self.value_learner_cfg.gamma, self.cfg.loss_horizon
+        _rscale = getattr(self, '_reward_scale', 1.0)
         _all_rewards = reward_fn( # [batch, H]
             z_traj, next_z_traj, action=actions_traj
-        )
+        ) * _rscale
         _all_vals = value(z_traj, actions_traj, return_type=value_return_type)  # [batch, H] or [num_q, batch, H]
         if log_probs is not None:
             # Entropy regularization adjustment

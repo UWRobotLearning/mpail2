@@ -205,6 +205,27 @@ class Planner(torch.nn.Module):
 
         return actions
 
+    def act_policy_only(self, observations: Dict[str, torch.Tensor]) -> torch.Tensor:
+        '''Return the policy network's own deterministic (tanh-squashed mean) action,
+        bypassing CEM/MPPI entirely — no noise rollouts, no elite re-weighting, no
+        blending with the exploration distribution. For evaluating what the learned
+        policy net alone has learned, independent of the planner's search process.
+        '''
+        if self._obs_normalizer is not None:
+            observations = self._obs_normalizer(observations)
+
+        with torch.no_grad():
+            z0 = self.encoder(observations)
+            self.sampling.policy.plan(z0)
+            actions = self.sampling.policy.action_mean
+
+        self._last_actions = actions
+        self._current_obs = observations
+        with torch.no_grad():
+            self._prev_z = z0
+
+        return actions
+
     def update(self, obs: torch.Tensor, map: torch.Tensor=None):
         '''
         Update the internal belief state of the agent.
@@ -241,7 +262,15 @@ class Planner(torch.nn.Module):
         else:
             self._opt_controls[:] = 0.
 
-        self.sampling.reset_iter_state()
+        # Bug fix: this used to call reset_iter_state() with no arguments, which resets
+        # _iter_mean to zero every single real-world step — discarding the warm-start
+        # above and making ~95% of each decision's candidates (the noise-sampled ones,
+        # not the small policy_proportion fraction) a fresh zero-mean/max-std blind
+        # search with no memory of the previous decision's converged plan. Passing
+        # _opt_controls through means the noise samples are actually centered on the
+        # carried-forward plan, as intended (matches this method's own docstring: "resets
+        # _iter_std to max_std and _iter_mean to prev_controls").
+        self.sampling.reset_iter_state(prev_controls=self._opt_controls)
 
         for i in range(self.cfg.opt_iters - 1):
             # Subsequent optimization uses previous optimal controls
@@ -274,13 +303,12 @@ class Planner(torch.nn.Module):
             self._returns[:] = self.td_return(rollouts=self._z_rollouts, actions=self._prior_controls)  # [num_envs, K, T]
 
         # Update weights and optimal controls via CEM-MPPI
-        _elite_idxs = torch.topk(self._returns.sum(dim=-1), k=self.cfg.num_elites).indices
-        _elite_values = self._returns.gather(
-            dim=-2,
-            index=_elite_idxs.unsqueeze(-1)
-        ) # [num_envs, num_elites, T]
-
-        elite_rewards = _elite_values.sum(dim=-1)  # [num_envs, num_elites]
+        trajectory_returns = self._returns.sum(dim=-1)  # [num_envs, K]
+        _elite_idxs = torch.topk(trajectory_returns, k=self.cfg.num_elites).indices
+        elite_rewards = trajectory_returns.gather(
+            dim=-1,
+            index=_elite_idxs,
+        )  # [num_envs, num_elites]
         max_value = elite_rewards.max(dim=-1, keepdim=True).values  # [num_envs, 1]
         score = torch.exp((1. / self.temperature) * (elite_rewards - max_value))  # [num_envs, num_elites]
         score = score / (score.sum(dim=-1, keepdim=True) + 1e-9)  # normalize

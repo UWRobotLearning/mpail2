@@ -14,7 +14,7 @@ The following settings MUST be set for each task:
 
 #### SHARED CONSTANTS ####
 OPT = "adam"
-LR = 3e-4
+LR = 2e-4
 HORIZON = 7
 OPT_ITERS = 5
 GAMMA = 0.99
@@ -54,6 +54,7 @@ class RewardConfig(cfgs.RewardCfg):
         "use_layer_norm": False,
         "disable_output_bias": True,
     })
+    reward_clip: float = None
 
 @dataclass(kw_only=True)
 class EnsembleValueConfig(cfgs.EnsembleValueCfg):
@@ -83,7 +84,10 @@ class CNNCoderConfig(cfgs.CNNCoderCfg):
     model_kwargs: dict = field(default_factory=lambda: {
         **CNN_MODEL_KWARGS,
         ## OVERRIDES ##
-        "override_last_layer_activation": True,
+        # Camera embedding ends in LayerNorm (normalized, zero-centered), not a
+        # trailing one-sided SiLU which distorts the geometry LayerNorm just
+        # established (ported from mpail-research fix-main #18).
+        "override_last_layer_norm": True,
     })
 
 @dataclass(kw_only=True)
@@ -95,9 +99,9 @@ class MultiCoderConfig(cfgs.MultiCoderCfg):
             **MODEL_KWARGS,
             ## OVERRIDES ##
             "hidden_dims": [256],
-            "use_layer_norm": False,
+            # Hidden LN on (inherited from MODEL_KWARGS), no trailing SiLU on the
+            # latent slice — same rationale as CNNCoderConfig above.
             "override_last_layer_norm": True,
-            "override_last_layer_activation": True,
         })
 
     model_kwargs:dict = field(default_factory=lambda: {
@@ -175,10 +179,10 @@ class PlannerConfig(cfgs.PlannerCfg):
     temperature: float = 2.0
     opt_iters: int = OPT_ITERS
 
-    reward_cfg: RewardConfig = RewardConfig()
-    value_cfg: EnsembleValueConfig = EnsembleValueConfig()
-    sampling_cfg: PolicySamplingConfig = PolicySamplingConfig()
-    dynamics_cfg: DynamicsConfig = DynamicsConfig()
+    reward_cfg: RewardConfig = field(default_factory=RewardConfig)
+    value_cfg: EnsembleValueConfig = field(default_factory=EnsembleValueConfig)
+    sampling_cfg: PolicySamplingConfig = field(default_factory=PolicySamplingConfig)
+    dynamics_cfg: DynamicsConfig = field(default_factory=DynamicsConfig)
 
     seed: int = 42
     u_per_command: int = 1
@@ -210,7 +214,7 @@ class RewardLearnerConfig(cfgs.RewardLearnerCfg):
 
     opt_params: dict = field(default_factory=lambda: OPT_PARAMS)
 
-    gp_coeff: float = 0.1
+    gp_coeff: float = 5.0
 
     gp_target_gradient: float = 1.0
 
@@ -223,7 +227,7 @@ class PolicyLearnerConfig(cfgs.PolicyLearnerCfg):
 
     max_grad_norm: float = 1.0
 
-    target_entropy: float = -3.0  # -ACTION_DIM
+    target_entropy: float = -2.0  # encourage exploration; -ACTION_DIM=-5 is too conservative
 
     alpha_lr: float = LR
 
@@ -236,11 +240,18 @@ class DynamicsLearnerConfig(cfgs.DynamicsLearnerCfg):
 
     opt_params: dict = field(default_factory=lambda: OPT_PARAMS)
 
-    enc_lr_scale: float = 0.1
+    enc_lr_scale: float = 0.08
 
     rho: float = 0.95
 
     recon_coeff: float = 1.0 # Exact coefficient doesn't matter if not using recon loss
+
+    # Conservative starting point (ported from mpail-research fix-main #18, which used
+    # 0.1 on a sim pick-place task) — start smaller so it doesn't swamp the JEP loss
+    # before it's been tuned here.
+    sigreg_coeff: float = 0.02
+    sigreg_knots: int = 17
+    sigreg_num_proj: int = 1024
 
 @dataclass(kw_only=True)
 class LearnerConfig(cfgs.MPAIL2LearnerCfg):
@@ -259,13 +270,13 @@ class LearnerConfig(cfgs.MPAIL2LearnerCfg):
     loss_horizon: int = HORIZON  # Match num_timesteps in sampling_cfg
 
     # Dynamics - ENABLED for training
-    dynamics_learner_cfg: cfgs.DynamicsLearnerCfg = DynamicsLearnerConfig()
+    dynamics_learner_cfg: cfgs.DynamicsLearnerCfg = field(default_factory=DynamicsLearnerConfig)
 
     # Reward (adversarial training)
-    reward_learner_cfg: cfgs.RewardLearnerCfg = RewardLearnerConfig()
+    reward_learner_cfg: cfgs.RewardLearnerCfg = field(default_factory=RewardLearnerConfig)
 
     # Value
-    value_learner_cfg: cfgs.ValueLearnerCfg = ValueLearnerConfig()
+    value_learner_cfg: cfgs.ValueLearnerCfg = field(default_factory=ValueLearnerConfig)
 
     # Policy Learner
-    policy_learner_cfg: cfgs.PolicyLearnerCfg = PolicyLearnerConfig()
+    policy_learner_cfg: cfgs.PolicyLearnerCfg = field(default_factory=PolicyLearnerConfig)

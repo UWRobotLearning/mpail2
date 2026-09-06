@@ -1,0 +1,31 @@
+// gRPC service for the SO-101 real-robot control server (mpail2/envs/real/so101).
+//
+// Replaces the HTTP (/state, /step, /camera, /camera2, /reset) design described in
+// so101_env.py's original docstring. One RPC per env.step()/env.reset() call instead
+// of four separate HTTP round-trips (state + step + camera + camera2), and camera
+// frames are sent as raw uint8 bytes instead of JSON-nested float lists.
+//
+// Regenerate after editing:
+//   python -m grpc_tools.protoc -I transport --python_out=transport --grpc_python_out=transport transport/so101_robot.proto
+
+syntax = "proto3";
+package so101robot;
+
+service SO101Robot {
+  // Move the arm to HOME_POSITION_DEG and open the gripper; returns the resulting state.
+  rpc Reset (ResetRequest) returns (RobotState);
+  // Command a joint-position target; returns the state resulting from that action.
+  rpc Step (StepRequest) returns (RobotState);
+}
+
+message ResetRequest {}
+
+message StepRequest {
+  repeated float joints_deg = 1;  // 6 target joint degrees, JOINT_NAMES order
+}
+
+message RobotState {
+  repeated float joints_deg = 1;  // 6 current joint degrees, JOINT_NAMES order
+  bytes cam = 2;                  // wrist cam, raw uint8, row-major (CAM_H, CAM_W, CAM_C)
+  bytes cam2 = 3;                 // RealSense cam, raw uint8, row-major (CAM2_H, CAM2_W, CAM2_C)
+}
