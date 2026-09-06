@@ -303,13 +303,12 @@ class Planner(torch.nn.Module):
             self._returns[:] = self.td_return(rollouts=self._z_rollouts, actions=self._prior_controls)  # [num_envs, K, T]
 
         # Update weights and optimal controls via CEM-MPPI
-        _elite_idxs = torch.topk(self._returns.sum(dim=-1), k=self.cfg.num_elites).indices
-        _elite_values = self._returns.gather(
-            dim=-2,
-            index=_elite_idxs.unsqueeze(-1)
-        ) # [num_envs, num_elites, T]
-
-        elite_rewards = _elite_values.sum(dim=-1)  # [num_envs, num_elites]
+        trajectory_returns = self._returns.sum(dim=-1)  # [num_envs, K]
+        _elite_idxs = torch.topk(trajectory_returns, k=self.cfg.num_elites).indices
+        elite_rewards = trajectory_returns.gather(
+            dim=-1,
+            index=_elite_idxs,
+        )  # [num_envs, num_elites]
         max_value = elite_rewards.max(dim=-1, keepdim=True).values  # [num_envs, 1]
         score = torch.exp((1. / self.temperature) * (elite_rewards - max_value))  # [num_envs, num_elites]
         score = score / (score.sum(dim=-1, keepdim=True) + 1e-9)  # normalize
