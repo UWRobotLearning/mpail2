@@ -277,7 +277,7 @@ class Planner(torch.nn.Module):
         _elite_idxs = torch.topk(self._returns.sum(dim=-1), k=self.cfg.num_elites).indices
         _elite_values = self._returns.gather(
             dim=-2,
-            index=_elite_idxs.unsqueeze(-1)
+            index=_elite_idxs.unsqueeze(-1).expand(-1, -1, self._returns.shape[-1])
         ) # [num_envs, num_elites, T]
 
         elite_rewards = _elite_values.sum(dim=-1)  # [num_envs, num_elites]
